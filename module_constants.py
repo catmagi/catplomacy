@@ -220,6 +220,12 @@ slot_faction_war_damage_inflicted_on_factions_end 	= slot_faction_sum_advice_abo
 slot_faction_sum_advice_about_factions_end			= 160
 ##diplomacy end+
 
+#-## TBS - Beer drinking
+# These are troop slots, so check for conflicting numbers in your mod.
+slot_beers_for_the_day = 420
+slot_last_beers_time   = 421
+#-## TBS - Beer drinking end
+
 #revolts -- notes for self
 #type 1 -- minor revolt, aimed at negotiating change without changing the ruler
 #type 2 -- alternate ruler revolt (ie, pretender, chinese dynastic revolt -- keep the same polity but switch the ruler)
