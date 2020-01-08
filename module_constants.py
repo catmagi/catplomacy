@@ -2495,3 +2495,4 @@ DPLMC_NUM_PREFERENCE_OPTIONS = 12 #for prsnt_adv_diplomacy_preferences
 camels_begin = "itm_pack_camel"
 camels_end = "itm_arrows"
 #camel fear end
+
