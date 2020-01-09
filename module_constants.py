@@ -2499,13 +2499,13 @@ camels_end = "itm_arrows"
 #AI variables
 AI_long_range	= 13000	#do not put over 130m if you want archers to always fire
 AI_firing_distance	= AI_long_range / 2
-AI_for_kingdoms_only	= 0
+AI_for_kingdoms_only	= 1
 Percentage_Cav_For_New_Dest	= 40
 Hold_Point	= 100	#archer hold if outnumbered
 Advance_More_Point	= 100 - Hold_Point * 100 / (Hold_Point + 100)	#advance 'cause expect other side is holding
 AI_Max_Reinforcements	= 2	#maximum number of reinforcement stages in a battle
 AI_Replace_Dead_Player	= 1
-AI_Poor_Troop_Level	= 12	#average level of troops under which a division may lose discipline
+AI_Poor_Troop_Level	= 5	#average level of troops under which a division may lose discipline
 
 #positions used in a script, named for convenience
 Nearest_Enemy_Troop_Pos	= 48	#pos48	used only by infantry AI
