@@ -2692,6 +2692,22 @@ mission_templates = [
          (play_sound, "snd_town_ambiance", sf_looping),
        (try_end),
      ]),
+     
+     (0, 0, ti_once, [],### replace static horse
+      [(neg|is_edit_mode_enabled),
+	    (try_for_range, ":horse", all_items_begin, all_items_end),#itp_type_horse
+			(item_get_type, ":type", ":horse"),
+			(eq, ":type", itp_type_horse),
+			(scene_item_get_num_instances, ":num_instances", ":horse"),
+			(try_for_range, ":number", 0, ":num_instances"),
+				(scene_item_get_instance, ":scene_item", ":horse", ":number"),
+				(prop_instance_get_position, pos53, ":scene_item"),
+				(prop_instance_set_scale, ":scene_item", 0, 0, 0),
+				(set_spawn_position, pos53),
+				(spawn_horse, ":horse", 0),
+			(try_end),
+		(try_end),
+     ]),
 
 	(3, 0, 0,
 	[
