@@ -99,7 +99,7 @@ def wp_melee(x):
   return n
 
 #Skills
-knows_common = knows_riding_1|knows_trade_2|knows_inventory_management_2|knows_prisoner_management_1|knows_leadership_1
+knows_common = knows_riding_1|knows_trade_2|knows_inventory_management_3|knows_prisoner_management_1|knows_leadership_1
 knows_common_multiplayer = knows_trade_10|knows_inventory_management_10|knows_prisoner_management_10|knows_leadership_10|knows_spotting_10|knows_pathfinding_10|knows_tracking_10|knows_engineer_10|knows_first_aid_10|knows_surgery_10|knows_wound_treatment_10|knows_tactics_10|knows_trainer_10|knows_looting_10
 def_attrib = str_7 | agi_5 | int_4 | cha_4
 def_attrib_multiplayer = int_30 | cha_30
@@ -316,6 +316,7 @@ troops = [
    str_12|agi_12|level(23),wp(150),knows_common,mercenary_face_1, mercenary_face_2],
 
   ["cattle","Cattle","Cattle",0,no_scene,reserved,fac_neutral, [], def_attrib|level(1),wp(60),0,mercenary_face_1, mercenary_face_2],
+  inject('arena_specator_watch1'),
 
 
 #soldiers:
@@ -2652,6 +2653,7 @@ troops = [
    def_attrib|agi_21|int_30|cha_21|level(25),wp(130),knows_common|knows_riding_7|knows_horse_archery_5|knows_leadership_7,swadian_face_young_1, swadian_face_old_2],
 # recruiter kit end
   ##diplomacy end
+
 ]
 
 

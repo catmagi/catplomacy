@@ -1,4 +1,4 @@
-reserved_01
+arena_entry
 reserved_02
 reserved_03
 reserved_04
