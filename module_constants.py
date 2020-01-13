@@ -2496,29 +2496,3 @@ camels_begin = "itm_pack_camel"
 camels_end = "itm_arrows"
 #camel fear end
 
-#AI variables
-AI_long_range	= 13000	#do not put over 130m if you want archers to always fire
-AI_firing_distance	= AI_long_range / 2
-AI_for_kingdoms_only	= 1
-Percentage_Cav_For_New_Dest	= 40
-Hold_Point	= 100	#archer hold if outnumbered
-Advance_More_Point	= 100 - Hold_Point * 100 / (Hold_Point + 100)	#advance 'cause expect other side is holding
-AI_Max_Reinforcements	= 2	#maximum number of reinforcement stages in a battle
-AI_Replace_Dead_Player	= 1
-AI_Poor_Troop_Level	= 5	#average level of troops under which a division may lose discipline
-
-#positions used in a script, named for convenience
-Nearest_Enemy_Troop_Pos	= 48	#pos48	used only by infantry AI
-Nearest_Enemy_Battlegroup_Pos	= 50	#pos50	used only by ranged AI
-Nearest_Threat_Pos	= Nearest_Enemy_Troop_Pos	#used only by cavalry AI
-Nearest_Target_Pos	= Nearest_Enemy_Battlegroup_Pos	#used only by cavalry AI
-Infantry_Pos	= 51	#pos51
-Archers_Pos	= 53	#pos53
-Cavalry_Pos	= 54	#pos54
-Team_Starting_Point	= 55	#pos55
-
-#positions used through battle
-Team0_Cavalry_Destination	= 56	#pos56
-Team1_Cavalry_Destination	= 57	#pos57
-Team2_Cavalry_Destination	= 58	#pos58
-Team3_Cavalry_Destination	= 59	#pos59
