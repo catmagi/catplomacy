@@ -316,7 +316,7 @@ troops = [
    str_12|agi_12|level(23),wp(150),knows_common,mercenary_face_1, mercenary_face_2],
 
   ["cattle","Cattle","Cattle",0,no_scene,reserved,fac_neutral, [], def_attrib|level(1),wp(60),0,mercenary_face_1, mercenary_face_2],
-  inject('arena_specator_watch1'),
+  
 
 
 #soldiers:

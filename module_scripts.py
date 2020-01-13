@@ -15238,7 +15238,7 @@ scripts = [
             (assign, ":continue", 0),
           (try_end),
           (eq, ":continue", 1),
-<<<<<<< HEAD
+
           (item_get_slot, ":food_bonus", ":item_no", slot_item_food_bonus),         
            ########################################################################################################################
 # LAV MODIFICATIONS START (TRADE GOODS MOD)
@@ -15263,39 +15263,7 @@ scripts = [
             (val_add, ":food_bonus", 6),
           (try_end),
 ########################################################################################################################
-# LAV MODIFICATIONS END (TRADE GOODS MOD)
-########################################################################################################################
-=======
-          (item_get_slot, ":food_bonus", ":item_no", slot_item_food_bonus),
-<<<<<<< HEAD
->>>>>>> parent of 765b342... partially added speclife support(unfinished) for arena mode, also made some other minor tweak
-=======
-          ########################################################################################################################
-# LAV MODIFICATIONS START (TRADE GOODS MOD)
-########################################################################################################################
-          (try_begin),
-            (eq, ":item_modifier", imod_cheap),
-            (val_sub, ":food_bonus", 2),
-          (else_try),
-            (eq, ":item_modifier", imod_fine),
-            (val_add, ":food_bonus", 1),
-          (else_try),
-            (eq, ":item_modifier", imod_well_made),
-            (val_add, ":food_bonus", 2),
-          (else_try),
-            (eq, ":item_modifier", imod_strong),
-            (val_add, ":food_bonus", 3),
-          (else_try),
-            (eq, ":item_modifier", imod_lordly),
-            (val_add, ":food_bonus", 5),
-          (else_try),
-            (eq, ":item_modifier", imod_exquisite),
-            (val_add, ":food_bonus", 6),
-          (try_end),
-########################################################################################################################
-# LAV MODIFICATIONS END (TRADE GOODS MOD)
-########################################################################################################################
->>>>>>> master
+
           (assign, reg1, ":food_bonus"),
           (set_result_string, "@+{reg1} to party morale"),
           (set_trigger_result, 0x4444FF),
@@ -29343,25 +29311,16 @@ scripts = [
         (troop_get_inventory_slot_modifier, ":cur_modifier", "trp_player", ":i_slot"),
         (neq, ":cur_modifier", ":modifier"),
         (assign, ":has_without_modifier", 1),
-<<<<<<< HEAD
-<<<<<<< HEAD
+
+
         
-         ########################################################################################################################
-=======
-        
-        ########################################################################################################################
->>>>>>> master
+
 # LAV MODIFICATIONS START (TRADE GOODS MOD)
 ########################################################################################################################
         (assign, reg0, ":cur_modifier"),
 ########################################################################################################################
 # LAV MODIFICATIONS END (TRADE GOODS MOD)
 ########################################################################################################################
-<<<<<<< HEAD
-=======
->>>>>>> parent of 765b342... partially added speclife support(unfinished) for arena mode, also made some other minor tweak
-=======
->>>>>>> master
         (assign, ":inv_size", 0), #break
       (try_end),
       (eq, ":has_without_modifier", 1),
@@ -29431,35 +29390,6 @@ scripts = [
 ########################################################################################################################
 # LAV MODIFICATIONS END (TRADE GOODS MOD)
 ########################################################################################################################
-
-<<<<<<< HEAD
-#######################################################################################################################
-# LAV MODIFICATIONS START (TRADE GOODS MOD)
-########################################################################################################################
-        (try_begin),
-          (eq, reg0, imod_cheap),
-          (val_sub, ":food_bonus", 2),
-        (else_try),
-          (eq, reg0, imod_fine),
-          (val_add, ":food_bonus", 1),
-        (else_try),
-          (eq, reg0, imod_well_made),
-          (val_add, ":food_bonus", 2),
-        (else_try),
-          (eq, reg0, imod_strong),
-          (val_add, ":food_bonus", 3),
-        (else_try),
-          (eq, reg0, imod_lordly),
-          (val_add, ":food_bonus", 5),
-        (else_try),
-          (eq, reg0, imod_exquisite),
-          (val_add, ":food_bonus", 6),
-        (try_end),
-########################################################################################################################
-# LAV MODIFICATIONS END (TRADE GOODS MOD)
-########################################################################################################################
-=======
->>>>>>> parent of 765b342... partially added speclife support(unfinished) for arena mode, also made some other minor tweak
         (val_mul, ":food_bonus", 3),
         (val_div, ":food_bonus", 2),
 

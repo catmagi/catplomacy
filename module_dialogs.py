@@ -50,22 +50,6 @@ from compiler import *
 
 dialogs = [
 
-# Mark7 arena dialogs
-##Arena commoner's sit
-  [anyone|plyr,"start",[(store_conversation_troop,reg(1)),(is_between,reg(1),"trp_arena_sit_man_1","trp_arena_sit_end")],
-   "This person is too passionate, I will not distract him ...","close_window",[]],
-##Arena commoner's stand
-  [anyone|plyr,"start",[(store_conversation_troop,reg(1)),(is_between,reg(1),"trp_arena_stand_man_1","trp_town_arena_stand_end")],
-   "This person is too passionate, I will not distract him ...","close_window",[]],
-   ##Arena Noble's sit
-  [anyone|plyr,"start",[(store_conversation_troop,reg(1)),(is_between,reg(1),"trp_arena_1_noble","trp_arena_12_noble")],
-   "This person is too passionate, I will not distract him ...","close_window",[]],
-##Arena Noble's stand
-  [anyone|plyr,"start",[(store_conversation_troop,reg(1)),(is_between,reg(1),"trp_arena_stand_1_noble","trp_arena_stand_12_noble")],
-   "This person is too passionate, I will not distract him ...","close_window",[]],
-   
- # Mark7 arena dialogs END
-
 [anyone ,"start", [(store_conversation_troop, "$g_talk_troop"),
                (store_conversation_agent, "$g_talk_agent"),
                (store_troop_faction, "$g_talk_troop_faction", "$g_talk_troop"),
