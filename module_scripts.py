@@ -25,6 +25,7 @@ from header_presentations import tf_left_align
 from module_items import *
 
 ## deprecated due to 1.165 operations
+from compiler import *
 # ibf_item_type_mask = 0x000000ff
 
 # def set_item_difficulty():
@@ -1017,6 +1018,11 @@ scripts = [
       (call_script, "script_update_tavern_minstrels"),
       (call_script, "script_update_booksellers"),
 
+# Merc Camp Begin 
+      (try_for_range, ":camp_no", mercenary_camp_begin, mercenary_camp_end),
+			(call_script, "script_refresh_mercenary_camp_troops",":camp_no"),
+      (try_end),  
+# Merc Camp End
       (try_for_range, ":village_no", villages_begin, villages_end),
         (call_script, "script_update_volunteer_troops_in_village", ":village_no"),
       (try_end),
@@ -3357,6 +3363,11 @@ scripts = [
          (else_try),
            (eq, "$g_encountered_party", "p_camp_bandits"),
            (jump_to_menu, "mnu_camp"),
+# Merc Camp Begin        
+         (else_try),
+           (is_between, "$g_encountered_party", mercenary_camp_begin, mercenary_camp_end),       
+           (jump_to_menu, "mnu_mercenary_camp"),    
+# Merc Camp End
          (else_try),
            (jump_to_menu, "mnu_simple_encounter"),
          (try_end),
@@ -3682,6 +3693,7 @@ scripts = [
               #SB : colorize
               (faction_get_color, ":color", ":defeated_troop_faction"),
               (try_begin),
+                (ge, ":rand", hero_escape_after_defeat_chance),
                 (party_stack_get_troop_id, ":leader_troop_id", ":nonempty_winner_party", 0),
                 ##diplomacy start+ kingdom ladies might lead kingdom parties
                 (this_or_next|is_between,":leader_troop_id", kingdom_ladies_begin, kingdom_ladies_end),
@@ -3690,10 +3702,6 @@ scripts = [
                 (this_or_next|troop_slot_eq, ":leader_troop_id", slot_troop_occupation, slto_kingdom_hero),
                 ##diplomacy end+
                 (is_between, ":leader_troop_id", active_npcs_begin, active_npcs_end), #disable non-kingdom parties capturing enemy lords
-                (store_skill_level, ":lvl", ":leader_troop_id"),
-                (val_sub, ":rand", ":lvl"), #SB : small bonus chance for capture
-                (ge, ":rand", hero_escape_after_defeat_chance),
-                
                 (party_add_prisoners, ":nonempty_winner_party", ":cur_troop_id", 1),
                 (gt, reg0, 0),
                 #(troop_set_slot, ":cur_troop_id", slot_troop_is_prisoner, 1),
@@ -3702,7 +3710,7 @@ scripts = [
                 (display_log_message, "str_hero_taken_prisoner", ":color"),
 
                 (try_begin),
-                  (call_script, "script_cf_prisoner_offered_parole", ":cur_troop_id", ":leader_troop_id"),
+                  (call_script, "script_cf_prisoner_offered_parole", ":cur_troop_id"),
 
                   (try_begin),
                     (eq, "$cheat_mode", 1),
@@ -3710,18 +3718,18 @@ scripts = [
                   (try_end),
 
                   (call_script, "script_troop_change_relation_with_troop", ":leader_troop_id", ":cur_troop_id", 3),
-                  (val_add, "$total_battle_enemy_changes", 3),
+				  (val_add, "$total_battle_enemy_changes", 3),
                 (else_try),
                   (try_begin),
                     (eq, "$cheat_mode", 1),
                     (display_message, "@{!}DEBUG : Prisoner not offered parole"),
-                  (try_end),
-                  (call_script, "script_troop_change_relation_with_troop", ":leader_troop_id", ":cur_troop_id", -5),
-                  (val_add, "$total_battle_enemy_changes", -5),
-                  (call_script, "script_change_troop_renown", ":cur_troop_id", dplmc_taken_prisoner_renown),
-                (try_end),
+		          (try_end),
 
-                (store_faction_of_party, ":capturer_faction", ":nonempty_winner_party"),
+		          (call_script, "script_troop_change_relation_with_troop", ":leader_troop_id", ":cur_troop_id", -5),
+				  (val_add, "$total_battle_enemy_changes", -5),
+		        (try_end),
+
+				(store_faction_of_party, ":capturer_faction", ":nonempty_winner_party"),
                 (call_script, "script_update_troop_location_notes_prisoned", ":cur_troop_id", ":capturer_faction"),
               (else_try),
                 (display_message,"@{s1} of {s3} was defeated in battle but managed to escape.", ":color"),
@@ -3742,7 +3750,7 @@ scripts = [
                 (call_script, "script_dplmc_is_affiliated_family_member", ":cur_troop_id"),
                 (eq, reg0, 1),
                 ##diplomacy start+ skip relationship decay for defeat when the player himself is imprisoned or wounded
-                (eq, "$g_player_is_captive", 0),
+					 (eq, "$g_player_is_captive", 0),
                 (neg|troop_slot_ge, "trp_player", slot_troop_prisoner_of_party, 1),
                 (neg|troop_is_wounded, "trp_player"),
                 ##diplomacy end+
@@ -5236,7 +5244,7 @@ scripts = [
 			(is_between,"$g_player_culture", npc_kingdoms_begin, npc_kingdoms_end),
 			(eq, "$g_player_culture", ":faction_no"),
 			#SB TODO: pick a number less arbitrarily
-			(store_add, reg0, 100, "$player_right_to_rule"),
+			(store_add, reg0, 100, "$right_to_rule"),
 		(try_end),
       ##diplomacy end+
       (val_div, reg0, 100),
@@ -15238,9 +15246,9 @@ scripts = [
             (assign, ":continue", 0),
           (try_end),
           (eq, ":continue", 1),
-
-          (item_get_slot, ":food_bonus", ":item_no", slot_item_food_bonus),         
-           ########################################################################################################################
+          (item_get_slot, ":food_bonus", ":item_no", slot_item_food_bonus),
+          
+          ########################################################################################################################
 # LAV MODIFICATIONS START (TRADE GOODS MOD)
 ########################################################################################################################
           (try_begin),
@@ -15263,10 +15271,19 @@ scripts = [
             (val_add, ":food_bonus", 6),
           (try_end),
 ########################################################################################################################
+# LAV MODIFICATIONS END (TRADE GOODS MOD)
+########################################################################################################################
 
           (assign, reg1, ":food_bonus"),
           (set_result_string, "@+{reg1} to party morale"),
           (set_trigger_result, 0x4444FF),
+      (else_try),
+        (is_between, ":item_no", "itm_flag_pole_1", "itm_flag_pole_3"),
+        (try_begin),
+          (eq, ":extra_text_id", 0),
+          (set_result_string, "@Increases morale during battle"),
+          (set_trigger_result, 0x4444FF),
+        (try_end),
         (else_try),
           (eq, ":extra_text_id", 1),
           (assign, ":quest_no", -1), #no quest selected
@@ -16458,25 +16475,16 @@ scripts = [
 			(val_div, ":modified_production", 125),
 		(try_end),
 
-		(try_begin), #SB : TODO scale down instead of set to 0
-			# (store_script_param, ":ignore_state", 3),
-			(party_get_slot, ":svs", ":center_no", slot_village_state),
-			(try_begin), #SB : fix butter bug
-				(eq, ":center_no", "$g_player_raiding_village"),
-				(eq, "$g_player_raid_complete", 1),
-				(assign, ":svs", -1),
-			(try_end),
-			(this_or_next|eq, ":svs", svs_being_raided),
-			(this_or_next|eq, ":svs", svs_deserted),
-			(eq, ":svs", svs_looted),
-		    # (this_or_next|party_slot_ge, ":center_no", slot_center_has_bandits, 0),
-		    # (this_or_next|party_slot_ge, ":center_no", slot_center_is_besieged_by, 0),
-			# (assign, ":modified_production", 0),
+		(try_begin),
+		    (this_or_next|party_slot_eq, ":center_no", slot_village_state, svs_being_raided),
+		    (this_or_next|party_slot_eq, ":center_no", slot_village_state, svs_deserted), #SB : deserted village
+		        (party_slot_eq, ":center_no", slot_village_state, svs_looted),
+		    (assign, ":modified_production", 0),
 		(try_end),
 
-		(assign, reg0, ":modified_production"), #modded by prosperity
-		(assign, reg1, ":base_production_modded_by_raw_materials"),
-		(assign, reg2, ":base_production"),
+	    (assign, reg0, ":modified_production"), #modded by prosperity
+	    (assign, reg1, ":base_production_modded_by_raw_materials"),
+	    (assign, reg2, ":base_production"),
 
 	]),
 
@@ -16501,8 +16509,8 @@ scripts = [
 			(lt, "$g_dplmc_gold_changes", DPLMC_GOLD_CHANGES_LOW),
 #If economic changes are disabled, use the Native desert-check logic.
 ##diplomacy end+
-			(this_or_next|is_between, ":center_no", "p_town_19", towns_end),
-				(is_between, ":center_no", "p_village_91", villages_end), #SB : limit range
+			(this_or_next|is_between, ":center_no", "p_town_19", "p_castle_1"),
+				(ge, ":center_no", "p_village_91"),
 			(item_slot_ge, ":cur_good", slot_item_desert_demand, 0), #Otherwise use rural or urban
 			(item_get_slot, ":consumer_consumption", ":cur_good", slot_item_desert_demand),
 		(else_try),
@@ -17191,6 +17199,27 @@ scripts = [
       (val_div, ":loot_probability", ":num_player_party_shares"),
 
       (party_get_num_companion_stacks, ":num_stacks",":enemy_party"),
+      (assign, ":last_stack", ":num_stacks"),
+      (try_for_range, ":unused", 0, ":num_stacks"),
+        (assign, ":best_stack", -1),
+        (assign, ":best_level", -1),
+        (try_for_range, ":cur_stack", 0, ":last_stack"),
+          (party_stack_get_troop_id, ":cur_troop", ":enemy_party", ":cur_stack"),
+      (neg|troop_is_hero, ":cur_troop"),
+          (store_character_level, ":troop_level", ":cur_troop"),
+          (gt, ":troop_level", ":best_level"),
+          (assign, ":best_level", ":troop_level"),
+          (assign, ":best_stack", ":cur_stack"),
+        (try_end),
+        (try_begin),
+          (gt, ":best_stack", -1),
+          (party_stack_get_troop_id, ":stack_troop", ":enemy_party", ":best_stack"),
+          (party_stack_get_size, ":stack_size", ":enemy_party", ":best_stack"),
+          (party_remove_members, ":enemy_party", ":stack_troop", ":stack_size"),
+          (party_add_members, ":enemy_party", ":stack_troop", ":stack_size"),
+          (val_sub, ":last_stack", 1),
+        (try_end),
+      (try_end),
       (try_for_range, ":i_stack", 0, ":num_stacks"),
         (party_stack_get_troop_id, ":stack_troop",":enemy_party",":i_stack"),
         (neg|troop_is_hero, ":stack_troop"),
@@ -17391,7 +17420,6 @@ scripts = [
     [
       (store_script_param_1, ":party"), #Source Party_id
       (party_get_num_companion_stacks, ":num_companion_stacks",":party"),
-      (options_get_campaign_ai, ":difficulty"), #SB : store difficulty for escape bonus
       (try_for_range_backwards, ":stack_no", 0, ":num_companion_stacks"),
         (party_stack_get_troop_id, ":stack_troop",":party",":stack_no"),
 
@@ -17427,16 +17455,8 @@ scripts = [
           (neq, ":stack_troop", "trp_player"),
           (eq, "$g_prison_heroes", 1),
           (eq, ":party", "p_main_party"),
-          (store_random_in_range, ":succeed_escaping", 0, 100),
-          (try_begin), #SB : add small chance based on level
-            (store_troop_health, ":bonus", ":stack_troop"), #usually 15/100
-            (store_character_level, ":lvl", ":stack_troop"), #1 to 30
-            (val_mul, ":bonus", ":difficulty"), #0 to 2
-            (val_mul, ":bonus", ":lvl"),
-            (val_div, ":bonus", 100),
-            (val_sub, ":succeed_escaping", ":bonus"),
-          (try_end),
-          (gt, ":succeed_escaping", companion_escape_after_defeat_chance), #50% chance companion stays with us.
+          (store_random_in_range, ":succeed_escaping", 0, 2),
+          (neq, ":succeed_escaping", 0), #50% chance companion stays with us.
           (troop_set_health, ":stack_troop", 100), #heal before leaving
           (store_faction_of_party, ":enemy_faction", "$g_enemy_party"),
           (assign, ":minimum_distance", 99999),
@@ -17453,10 +17473,8 @@ scripts = [
           #(display_message, "@{!}DEBUG : prison center is {reg1}"),
           (try_begin),
             (ge, ":prison_center", 0),
-            (store_random_in_range, ":succeed_escaping", 0, 100),
-            (val_sub, ":succeed_escaping", ":bonus"),
-            (gt, ":succeed_escaping", companion_escape_after_defeat_chance / 2), #25% chance companion escapes to a tavern.
-            (call_script, "script_change_troop_renown", ":stack_troop", dplmc_taken_prisoner_renown), #SB : lose some renown
+            (store_random_in_range, ":succeed_escaping", 0, 4),
+            (neq, ":succeed_escaping", 0), #25% chance companion escapes to a tavern.
             (party_add_prisoners, ":prison_center", ":stack_troop", ":stack_size"),
             (troop_set_slot, ":stack_troop", slot_troop_prisoner_of_party, ":prison_center"),
             (troop_set_slot, ":stack_troop", slot_troop_playerparty_history, pp_history_scattered),
@@ -17495,7 +17513,6 @@ scripts = [
             (troop_set_slot, ":stack_troop", slot_troop_turned_down_twice, 0),
             (troop_set_slot, ":stack_troop", slot_troop_occupation, 0),
             (party_remove_members, ":party", ":stack_troop", ":stack_size"),
-            (call_script, "script_change_troop_renown", ":stack_troop", dplmc_taken_prisoner_renown + dplmc_escape_prisoner_renown), #SB : lose renown
             (try_begin),
               (eq, "$cheat_mode", 1),
               (str_store_troop_name, 4, ":stack_troop"),
@@ -18068,7 +18085,6 @@ scripts = [
     (try_begin), #here we give positive morale to our troops of owner of rescued village's faction after saving village from bandits by x3 bonus.
       (neg|party_is_active, "$g_enemy_party"),
       (ge, "$current_town", 0),
-      (neq, "$g_village_raid_evil", 1), #SB : not raiding
 
       (store_mul, ":ally_faction_morale_change", ":faction_morale_change", 2), #2x bonus (more than normal)
       (store_faction_of_party, ":ally_faction", "$current_town"),
@@ -25153,7 +25169,25 @@ scripts = [
       #  (val_add, ":flag_icon", custom_banner_map_icons_begin),
       #  (party_set_banner_icon, "$pout_party", ":flag_icon"),
       (try_end),
-
+       (try_begin),
+      (eq, ":troop_faction_no", "fac_kingdom_1"),
+      (party_set_icon, "$pout_party", "icon_dedal_map_swadia_lord_a"),
+   (else_try),
+      (eq, ":troop_faction_no", "fac_kingdom_2"),
+      (party_set_icon, "$pout_party", "icon_dedal_map_vaegir_lord_a"),
+   (else_try),
+      (eq, ":troop_faction_no", "fac_kingdom_3"),
+      (party_set_icon, "$pout_party", "icon_dedal_map_khergit_lord_a"),
+   (else_try),
+      (eq, ":troop_faction_no", "fac_kingdom_4"),
+      (party_set_icon, "$pout_party", "icon_dedal_map_nordic_lord_a"),
+   (else_try),
+      (eq, ":troop_faction_no", "fac_kingdom_5"),
+      (party_set_icon, "$pout_party", "icon_dedal_map_rhodok_king_a"),
+   (else_try),
+      (eq, ":troop_faction_no", "fac_kingdom_6"),
+      (party_set_icon, "$pout_party", "icon_dedal_map_sarranid_lord_a"),
+   (try_end),
       (try_begin),
         #because of below two lines, lords can only hire more than one party_template(stack) at game start once a time during all game.
         (troop_slot_eq, ":troop_no", slot_troop_spawned_before, 0),
@@ -25531,6 +25565,25 @@ scripts = [
       #SB : probably do something like trash item at base values
       (troop_clear_inventory, ":merchant_troop"),
       (troop_add_merchandise, ":merchant_troop", itp_type_goods, ":number_of_items_in_village"),
+      ### cultural restriction ###
+        (try_begin),
+            (party_get_slot, ":culture", ":village_no", slot_center_culture),
+            (store_add, ":number_of_eqslot", ":number_of_items_in_village", 10),
+                (try_for_range, ":inv", 9, ":number_of_eqslot"),
+                    (try_begin),
+	          (eq,":culture",fac_culture_6),#sarranids
+                        (troop_get_inventory_slot, ":haram", ":merchant_troop", ":inv"),
+	         #(this_or_next|eq,":haram",itm_boar_meat),
+	         #(this_or_next|eq,":haram",itm_deer_meat),
+	          #(this_or_next|eq,":haram",itm_deer_meat),
+	          (eq,":haram",itm.pork),
+	          (troop_remove_item, ":merchant_troop", ":haram"),
+	          (store_random_in_range, ":halyal", itm_cheese,itm_chicken),
+	          (troop_add_item,":merchant_troop",":halyal",0),
+	     (try_end),
+	(try_end),
+        (try_end),
+### cultural restriction end ###
       (troop_ensure_inventory_space, ":merchant_troop", 80),
 
       #Adding 1 prosperity to the village while reducing each 3000 gold from the elder
@@ -25649,14 +25702,14 @@ scripts = [
 
         (party_set_slot, ":village_no", slot_village_raided_by, -1),
         (call_script, "script_change_center_prosperity", ":village_no", -20),
-        (val_add, "$newglob_total_prosperity_from_villageloot", -20),
+		(val_add, "$newglob_total_prosperity_from_villageloot", -20),
       (else_try),
         (eq, ":new_state", svs_looted),
         (party_set_extra_text, ":village_no", "@(Looted)"),
 
         (party_set_slot, ":village_no", slot_village_raided_by, -1),
         (call_script, "script_change_center_prosperity", ":village_no", -60),
-        (val_add, "$newglob_total_prosperity_from_villageloot", -60),
+		(val_add, "$newglob_total_prosperity_from_villageloot", -60),
 
 		# (try_begin), #optional - lowers the relationship between a lord and his liege if his fief is looted
 			# (eq, 5, 0),
@@ -25670,27 +25723,28 @@ scripts = [
       (else_try),
         (eq, ":new_state", svs_under_siege),
         (party_set_extra_text, ":village_no", "@(Under Siege)"),
+
 		#Divert all caravans heading to the center
 		#Note that occasionally, no alternative center will be found. In that case, the caravan will try to run the blockade
-        (try_for_parties, ":party_no"),
-          (gt, ":party_no", "p_spawn_points_end"),
-          (party_slot_eq, ":party_no", slot_party_type, spt_kingdom_caravan),
-          (party_slot_eq, ":party_no", slot_party_ai_object, ":village_no"),
+		(try_for_parties, ":party_no"),
+			(gt, ":party_no", "p_spawn_points_end"),
+			(party_slot_eq, ":party_no", slot_party_type, spt_kingdom_caravan),
+            (party_slot_eq, ":party_no", slot_party_ai_object, ":village_no"),
 
-          (party_get_slot, ":origin", ":party_no", slot_party_last_traded_center),
-          (store_faction_of_party, ":merchant_faction", ":party_no"),
-          ##diplomacy start+ added new third parameter, the caravan party itself
-          (call_script, "script_cf_select_most_profitable_town_at_peace_with_faction_in_trade_route", ":origin", ":merchant_faction",":party_no"),
-          ##diplomacy end+
-          (assign, ":target_center", reg0),
-          (is_between, ":target_center", centers_begin, centers_end),
+			(party_get_slot, ":origin", ":party_no", slot_party_last_traded_center),
+			(store_faction_of_party, ":merchant_faction", ":party_no"),
+            ##diplomacy start+ added new third parameter, the caravan party itself
+            (call_script, "script_cf_select_most_profitable_town_at_peace_with_faction_in_trade_route", ":origin", ":merchant_faction",":party_no"),
+			##diplomacy end+
+            (assign, ":target_center", reg0),
+			(is_between, ":target_center", centers_begin, centers_end),
 
-          (party_set_ai_behavior, ":party_no", ai_bhvr_travel_to_party),
-          (party_set_ai_object, ":party_no", ":target_center"),
-          (party_set_flags, ":party_no", pf_default_behavior, 0),
-          (party_set_slot, ":party_no", slot_party_ai_state, spai_trading_with_town),
-          (party_set_slot, ":party_no", slot_party_ai_object, ":target_center"),
-        (try_end),
+            (party_set_ai_behavior, ":party_no", ai_bhvr_travel_to_party),
+            (party_set_ai_object, ":party_no", ":target_center"),
+            (party_set_flags, ":party_no", pf_default_behavior, 0),
+            (party_set_slot, ":party_no", slot_party_ai_state, spai_trading_with_town),
+            (party_set_slot, ":party_no", slot_party_ai_object, ":target_center"),
+		(try_end),
       (try_end),
       (party_set_slot, ":village_no", slot_village_state, ":new_state"),
   ]),
@@ -29311,16 +29365,15 @@ scripts = [
         (troop_get_inventory_slot_modifier, ":cur_modifier", "trp_player", ":i_slot"),
         (neq, ":cur_modifier", ":modifier"),
         (assign, ":has_without_modifier", 1),
-
-
         
-
+        ########################################################################################################################
 # LAV MODIFICATIONS START (TRADE GOODS MOD)
 ########################################################################################################################
         (assign, reg0, ":cur_modifier"),
 ########################################################################################################################
 # LAV MODIFICATIONS END (TRADE GOODS MOD)
 ########################################################################################################################
+
         (assign, ":inv_size", 0), #break
       (try_end),
       (eq, ":has_without_modifier", 1),
@@ -29390,6 +29443,7 @@ scripts = [
 ########################################################################################################################
 # LAV MODIFICATIONS END (TRADE GOODS MOD)
 ########################################################################################################################
+
         (val_mul, ":food_bonus", 3),
         (val_div, ":food_bonus", 2),
 
@@ -30960,8 +31014,7 @@ scripts = [
       (party_get_current_terrain, ":terrain_type", "p_main_party"),
       (assign, ":scene_to_use", "scn_random_scene"),
       (try_begin),
-      #start of custom battle scenes
-        (eq, ":terrain_type", rt_steppe),
+      (eq, ":terrain_type", rt_steppe),
             (store_random_in_range,":battle_scene",1,100),
             (try_begin),
             (is_between,":battle_scene",1,10),
@@ -31268,7 +31321,6 @@ scripts = [
 			   (is_between,":battle_scene",80,100),
                (assign, ":scene_to_use", "scn_random_scene_desert_forest_custom_5"),
 			(try_end),
-			#end of custom battle scenes
         (eq, ":terrain_type", rt_steppe),
         (assign, ":scene_to_use", "scn_random_scene_steppe"),
       (else_try),
@@ -31875,7 +31927,7 @@ scripts = [
   # script_battle_tactic_init_aux
   # Input: team_no, battle_tactic
   # Output: none
-  ("battle_tactic_init_aux",
+  ("orig_battle_tactic_init_aux",
     [
       (store_script_param, ":team_no", 1),
       (store_script_param, ":battle_tactic", 2),
@@ -32398,7 +32450,7 @@ scripts = [
   # script_battle_tactic_apply_aux
   # Input: team_no, battle_tactic
   # Output: battle_tactic
-  ("battle_tactic_apply_aux",
+  ("orig_battle_tactic_apply_aux",
     [
       (store_script_param, ":team_no", 1),
       (store_script_param, ":battle_tactic", 2),
@@ -34908,7 +34960,7 @@ scripts = [
         (party_get_slot, ":walker_troop_id", "$current_town", ":troop_slot"),
         (gt, ":walker_troop_id", 0),
         (store_add, ":entry_no", town_walker_entries_start, ":walker_no"),
-        (set_visitor, ":entry_no", ":walker_troop_id"),
+        (set_visitor, ":entry_no", ":walker_troop_id",7),
       (try_end),
     (try_end),
   ]),
@@ -35370,82 +35422,61 @@ scripts = [
 
 
   # script_set_town_walker_destination
-  # Input: arg1 = agent_no
-  # Output: none
-  ("set_town_walker_destination",
-    [(store_script_param_1, ":agent_no"),
-     (assign, reg0, 9),
-     (assign, reg1, 10),
-     (assign, reg2, 12),
-     (assign, reg3, 32),
-     (assign, reg4, 33),
-     (assign, reg5, 34),
-     (assign, reg6, 35),
-     (assign, reg7, 36),
-     (assign, reg8, 37),
-     (assign, reg9, 38),
-     (assign, reg10, 39),
-     (try_for_agents, ":cur_agent"),
-       (agent_get_troop_id, ":cur_troop", ":cur_agent"),
-       (is_between, ":cur_troop", walkers_begin, walkers_end),
-       (agent_get_slot, ":target_entry_point", ":cur_agent", 0),
-       (try_begin),
-         (eq, ":target_entry_point", 9),
-         (assign, reg0, 0),
-       (else_try),
-         (eq, ":target_entry_point", 10),
-         (assign, reg1, 0),
-       (else_try),
-         (eq, ":target_entry_point", 12),
-         (assign, reg2, 0),
-       (else_try),
-         (eq, ":target_entry_point", 32),
-         (assign, reg3, 0),
-       (else_try),
-         (eq, ":target_entry_point", 33),
-         (assign, reg4, 0),
-       (else_try),
-         (eq, ":target_entry_point", 34),
-         (assign, reg5, 0),
-       (else_try),
-         (eq, ":target_entry_point", 35),
-         (assign, reg6, 0),
-       (else_try),
-         (eq, ":target_entry_point", 36),
-         (assign, reg7, 0),
-       (else_try),
-         (eq, ":target_entry_point", 37),
-         (assign, reg8, 0),
-       (else_try),
-         (eq, ":target_entry_point", 38),
-         (assign, reg9, 0),
-       (else_try),
-         (eq, ":target_entry_point", 39),
-         (assign, reg10, 0),
-       (try_end),
-     (try_end),
-     (assign, ":try_limit", 100),
-     (assign, ":target_entry_point", 0),
-     (try_for_range, ":unused", 0, ":try_limit"),
-       (shuffle_range, 0, 11),
-       (gt, reg0, 0),
-       (assign, ":target_entry_point", reg0),
-       (assign, ":try_limit", 0),
-     (try_end),
-     (try_begin),
-       (gt, ":target_entry_point", 0),
-       (agent_set_slot, ":agent_no", 0, ":target_entry_point"),
-       (entry_point_get_position, pos1, ":target_entry_point"),
-       (try_begin),
-         (lt, ":target_entry_point", 32),
-         (init_position, pos2),
-         (position_set_y, pos2, 250),
-         (position_transform_position_to_parent, pos1, pos1, pos2),
-       (try_end),
-       (agent_set_scripted_destination, ":agent_no", pos1, 0),
-       (agent_set_speed_limit, ":agent_no", 5),
-     (try_end),
-  ]),
+          # Input: arg1 = agent_no
+          # Output: none
+          ("set_town_walker_destination",
+            [(store_script_param_1, ":agent_no"),	 
+			(store_random_in_range, ":rand_dest", 1 ,12),
+			
+            (try_begin),
+				(eq, ":rand_dest", 1),
+				(assign, ":target_entry_point", 9),
+			(else_try),	
+				(eq, ":rand_dest", 2),
+				(assign, ":target_entry_point", 10),
+			(else_try),	
+				(eq, ":rand_dest", 3),
+				(assign, ":target_entry_point", 12),	
+			(else_try),	
+				(eq, ":rand_dest", 4),
+				(assign, ":target_entry_point", 32),	
+			(else_try),	
+				(eq, ":rand_dest", 2),
+				(assign, ":target_entry_point", 33),	
+			(else_try),	
+				(eq, ":rand_dest", 5),
+				(assign, ":target_entry_point", 34),	
+			(else_try),	
+				(eq, ":rand_dest", 6),
+				(assign, ":target_entry_point", 35),	
+			(else_try),	
+				(eq, ":rand_dest", 7),
+				(assign, ":target_entry_point", 36),	
+			(else_try),	
+				(eq, ":rand_dest", 8),
+				(assign, ":target_entry_point", 37),	
+			(else_try),	
+				(eq, ":rand_dest", 9),
+				(assign, ":target_entry_point", 38),	
+			(else_try),	
+				(eq, ":rand_dest", 10),
+				(assign, ":target_entry_point", 39),	
+			(else_try),	
+				(assign, ":target_entry_point", 10),					
+			(try_end),
+			 
+              (try_begin),
+                (agent_set_slot, ":agent_no", 0, ":target_entry_point"),
+                (entry_point_get_position, pos1, ":target_entry_point"),
+                (try_begin),
+                  (init_position, pos2),
+                  (position_set_y, pos2, 250),
+                  (position_transform_position_to_parent, pos1, pos1, pos2),
+                (try_end),
+                (agent_set_scripted_destination, ":agent_no", pos1, 0),
+                (agent_set_speed_limit, ":agent_no", 5),
+              (try_end),
+          ]),
 
   # script_town_init_doors
   # Input: door_state (-1 = closed, 1 = open, 0 = use $town_nighttime)
@@ -35767,7 +35798,7 @@ scripts = [
           (agent_get_class, ":agent_class", ":cur_agent"),
           (this_or_next|eq, ":agent_class", grc_infantry),
           (eq, ":agent_class", grc_cavalry),
-          (agent_get_slot, ":x_pos", ":cur_agent", slot_agent_target_x_pos),
+          (agent_get_slot, ":x_pos", ":cur_agent", 1),
           (eq, ":x_pos", 0),
           (assign, ":y_pos", 0),
           (try_begin),
@@ -35802,8 +35833,8 @@ scripts = [
             (val_add, ":slot_6_positioned", 1),
           (try_end),
           (val_add, "$belfry_num_slots_positioned", 1),
-          (agent_set_slot, ":cur_agent", slot_agent_target_x_pos, ":x_pos"),
-          (agent_set_slot, ":cur_agent", slot_agent_target_y_pos, ":y_pos"),
+          (agent_set_slot, ":cur_agent", 1, ":x_pos"),
+          (agent_set_slot, ":cur_agent", 2, ":y_pos"),
         (try_end),
       (try_end),
       (try_begin),
@@ -35816,7 +35847,7 @@ scripts = [
           (this_or_next|eq, "$attacker_team", ":cur_agent_team"),
           (             eq, "$attacker_team_2", ":cur_agent_team"),
           (neq, ":player_agent", ":cur_agent"),
-          (agent_get_slot, ":x_pos", ":cur_agent", slot_agent_target_x_pos),
+          (agent_get_slot, ":x_pos", ":cur_agent", 1),
           (eq, ":x_pos", 0),
           (assign, ":y_pos", 0),
           (try_begin),
@@ -35851,8 +35882,8 @@ scripts = [
             (val_add, ":slot_6_positioned", 1),
           (try_end),
           (val_add, "$belfry_num_slots_positioned", 1),
-          (agent_set_slot, ":cur_agent", slot_agent_target_x_pos, ":x_pos"),
-          (agent_set_slot, ":cur_agent", slot_agent_target_y_pos, ":y_pos"),
+          (agent_set_slot, ":cur_agent", 1, ":x_pos"),
+          (agent_set_slot, ":cur_agent", 2, ":y_pos"),
         (try_end),
       (try_end),
     (else_try),
@@ -38349,13 +38380,11 @@ scripts = [
           (party_get_num_prisoners, ":prisoner_count", ":town_no"),
           (gt, ":prisoner_count", 0),
           (party_set_slot, ":town_no", slot_center_ransom_broker, ":troop_no"),
-          (troop_set_slot, ":troop_no", slot_troop_cur_center, ":town_no"), #DA 3.10.2019: necessary for travellers to know about him
           (assign, ":limit", 0), #loop breaker
        (try_end),
        (eq, ":limit", 20), #none found
        (store_random_in_range, ":town_no", towns_begin, towns_end),
        (party_set_slot, ":town_no", slot_center_ransom_broker, ":troop_no"),
-       (troop_set_slot, ":troop_no", slot_troop_cur_center, ":town_no"), #DA: necessary for travellers to know about it
      (try_end),
 
      (party_set_slot,"p_town_2",slot_center_ransom_broker,"trp_ramun_the_slave_trader"),
@@ -40057,6 +40086,20 @@ scripts = [
        (spawn_around_party,":spawn_point","pt_taiga_bandits"),
      (try_end),
      (try_begin),
+       (store_num_parties_of_template, ":num_parties", "pt_robber_knights"),
+       (lt,":num_parties",15),
+       (store_random,":spawn_point",num_robber_knights_spawn_points),
+       (val_add,":spawn_point","p_robber_knight_spawn_point"),
+       (spawn_around_party,":spawn_point","pt_robber_knights"),
+     (try_end),
+     (try_begin),
+       (store_num_parties_of_template, ":num_parties", "pt_roving_knights"),
+       (lt,":num_parties",10),
+       (store_random,":spawn_point",num_roving_knights_spawn_points),
+       (val_add,":spawn_point","p_roving_knight_spawn_point"),
+       (spawn_around_party,":spawn_point","pt_roving_knights"),
+     (try_end),     
+     (try_begin),
        (store_num_parties_of_template, ":num_parties", "pt_desert_bandits"),
        (lt,":num_parties",16), #was 14 at mount&blade, 18 in warband, 16 last decision
        (store_random,":spawn_point",num_desert_bandit_spawn_points),
@@ -41550,7 +41593,8 @@ scripts = [
         (quest_slot_eq, "qst_persuade_lords_to_make_peace", slot_quest_object_troop, ":troop_no"),
         (assign, ":quest_target", 1),
       (else_try),
-        (is_between, ":troop_no", "trp_sea_raider_leader", "trp_bandit_leaders_end"),
+        (ge, ":troop_no", "trp_sea_raider_leader"),
+        (lt, ":troop_no", "trp_bandit_leaders_end"),
         (try_begin),
           (check_quest_active, "qst_learn_where_merchant_brother_is"),
           (assign, ":quest_target", 1), #always catched
@@ -41743,7 +41787,6 @@ scripts = [
        (faction_get_color, ":color", ":troop_faction"),
        #SB : factionalize color, set to log
        (display_log_message, "@{reg0?One of your prisoners, :}{s1} of {s3} has escaped from captivity!", ":color"),
-       (call_script, "script_change_troop_renown", ":stack_troop", dplmc_escape_prisoner_renown),
      (try_end),
      ]),
 
@@ -54537,13 +54580,13 @@ scripts = [
 	   (assign, ":terrain_type", rt_desert),
 	(try_end),
 	(try_begin),
-     (lt, "$g_dplmc_gold_changes", DPLMC_GOLD_CHANGES_LOW),
-     #To be consistent with script_center_get_consumption and script_initialize_economic_information
-     #use the Native desert-determination scheme when economic changes are disabled.
-    (assign, ":terrain_type", rt_plain), #SB : use
-    (this_or_next|is_between, ":center_no", "p_town_19", towns_end),
-    (is_between, ":center_no", "p_village_91", villages_end),
-    (assign, ":terrain_type", rt_desert),
+	   (lt, "$g_dplmc_gold_changes", DPLMC_GOLD_CHANGES_LOW),
+	   #To be consistent with script_center_get_consumption and script_initialize_economic_information
+	   #use the Native desert-determination scheme when economic changes are disabled.
+	   (assign, ":terrain_type", rt_plain),
+  	   (this_or_next|is_between, ":center_no", "p_town_19", "p_castle_1"),
+	   (ge, ":center_no", "p_village_91"),
+	   (assign, ":terrain_type", rt_desert),
 	(try_end),
 	##diplomacy end+
 
@@ -57781,8 +57824,9 @@ scripts = [
 		(lt, "$g_dplmc_gold_changes", DPLMC_GOLD_CHANGES_LOW),
 	    #fall through to default behavior
 	    ##diplomacy end+
+	    #modified base gold+variant of new gold
     (lt,":cur_gold",4200),
-    (store_random_in_range,":new_gold",1000,5000),
+    (store_random_in_range,":new_gold",1500,3000),
     (call_script, "script_troop_add_gold", ":cur_merchant", ":new_gold"),
     ##diplomacy start+
     (try_end),
@@ -58252,7 +58296,6 @@ scripts = [
         # (item_get_slot, ":shield_armor", ":item", dplmc_slot_item_shield_armor),
 
         ## SB : factor in speed and height
-        (set_fixed_point_multiplier, 100), #item_get_shield_height needs this
         (item_get_shield_height, ":shield_height", ":item"),
         (item_get_weapon_length, ":shield_width", ":item"),
         (item_get_body_armor, ":shield_armor", ":item"),
@@ -58262,6 +58305,7 @@ scripts = [
         (try_begin),
           (gt, ":shield_height", 0),
           (val_mul, ":shield_width",  ":shield_height"),
+          (set_fixed_point_multiplier, 100),
           (store_mul, ":i_score", ":shield_width", 100),
           (store_sqrt, ":i_score", ":i_score"),
           (val_div, ":i_score", 100),
@@ -61807,7 +61851,7 @@ scripts = [
 			(try_begin), #new-begin
 				(neq, ":faction_no", "fac_player_supporters_faction"),
 				(this_or_next|troop_slot_eq, ":troop_no", slot_troop_occupation, slto_inactive),
-					(this_or_next|troop_slot_eq, ":troop_no", slot_troop_occupation, slto_retirement),
+					(troop_slot_eq, ":troop_no", slot_troop_occupation, slto_retirement),
 					(troop_slot_eq, ":troop_no", slot_troop_occupation, dplmc_slto_exile), #SB : revoke exile
 				(troop_set_slot, ":troop_no", slot_troop_occupation, slto_kingdom_hero),
 		    (try_end), #new-end
@@ -61819,8 +61863,8 @@ scripts = [
 			(faction_get_color, ":color", ":faction_no"), #SB : store colour for logs
 			(display_log_message, "@{s4} has been granted a pardon by {s6} of {s5} and has returned from exile.", ":color"),
 
-			#SB : spawn full army
-			(troop_set_slot, ":troop_no", slot_troop_spawned_before, 0),
+            #SB : spawn full army
+            (troop_set_slot, ":troop_no", slot_troop_spawned_before, 0),
 			(troop_get_slot, ":led_party", ":troop_no", slot_troop_leaded_party),
 			(try_begin),
 				(party_is_active, ":led_party"),
@@ -72181,17 +72225,47 @@ Born at {s43}^Contact in {s44} of the {s45}.^\
       (ge, ":cur_item", 0),
       (cur_tableau_add_override_item, ":cur_item"),
     (try_end),
+
+
+
+
+
+
+
+
+
     (try_begin),
       (player_get_gender , ":is_female", ":my_player_no"),
       (eq, ":is_female", 1),
       (val_add, ":canvas_no", 1),
     (try_end),
+
     #(assign, reg0, ":canvas_no"),
     #(display_message, "@canvas no: {reg0}"),
+
     (str_store_player_face_keys, s0, ":my_player_no"),
     (troop_set_face_keys, ":canvas_no", s0),
+
     (store_mod, ":animation", ":my_agent_no", 4),
+
     (val_add, ":animation", "anim_pose_1"),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     (set_fixed_point_multiplier, 100),
     (cur_tableau_set_camera_parameters, 1, 6, 6, 10, 10000),
     (assign, ":cam_height", 145),
@@ -72210,6 +72284,15 @@ Born at {s43}^Contact in {s44} of the {s45}.^\
     (position_rotate_x, pos5, ":camera_pitch"),
     (position_move_z, pos5, ":camera_distance", 0),
     (position_move_y, pos5, 60, 0),
+
+
+
+
+
+
+
+
+
     (init_position, pos2),
     (cur_tableau_add_troop, ":canvas_no", pos2, ":animation", 0),
     (cur_tableau_set_camera_position, pos5),
@@ -73946,5 +74029,3874 @@ Born at {s43}^Contact in {s44} of the {s45}.^\
       # (try_end),
     # ),
     # ]),
+# Merc Camp Begin 	
+  # script_refresh_mercenary_camp_troops
+  # Input: arg1 = camp_no
+  # Output: none
+  ("refresh_mercenary_camp_troops",
+    [
+      (store_script_param_1, ":camp_no"),
+      (assign, ":ideal_size", 50), # Past this value the troop pool of the camp will be reset
+
+      (try_begin),
+        (eq, ":camp_no", "p_merc_camp_geroia"),	
+        (assign, ":party_template", "pt_merc_camp_geroia_troops"), 	
+      (else_try),
+        (eq, ":camp_no", "p_merc_camp_balion"),	
+        (assign, ":party_template", "pt_merc_camp_balion_troops"), 	
+      (else_try),
+        (eq, ":camp_no", "p_merc_camp_jumne"),	
+        (assign, ":party_template", "pt_merc_camp_jumne_troops"), 	     
+      (else_try),
+        (eq, ":camp_no", "p_merc_camp_zendar"),	
+        (assign, ":party_template", "pt_merc_camp_zendar_troops"), 			 
+      (try_end),
+		
+        (party_get_num_companions, ":party_size", ":camp_no"),	
+      (try_begin),
+        (gt, ":party_size", ":ideal_size"), # We're past the ideal number of troops in the camp
+        (party_clear,":camp_no"), # Reset the troop pool
+        (party_add_template, ":camp_no", ":party_template"),	 
+      (else_try),
+        (party_add_template, ":camp_no", ":party_template"),		 
+      (try_end),
+  ]),
+ # Merc Camp End
+    #tom-script
+    #input: team, group, formation_type
+    #output: none
+    #first formation member sounds the horn. Used mainly for player armies(ai use them diffrently)
+    #script_first_formation_member_sound_horn
+    ("first_formation_member_sound_horn",
+    [
+      #(store_script_param, ":team", 1),
+      #(store_script_param, ":group", 2),
+      #(store_script_param, ":formation_type", 3),
+      (get_player_agent_no,":player_agent"),
+      (agent_get_team, ":team", ":player_agent"),
+      (try_for_range, ":cur_group", 0, 9),
+      #(try_begin),
+      (class_is_listening_order, ":team", ":cur_group"),
+      (assign, ":agent_to_play_sound", -1),
+      (try_for_agents, ":agent"),
+        (neq, ":agent", ":player_agent"),
+        (agent_is_alive, ":agent"), 
+        (agent_is_human, ":agent"),
+        (agent_get_division, ":division", ":agent"),
+        (eq, ":division", ":cur_group"),
+        (agent_get_team, ":p_team", ":agent"),
+        (eq, ":p_team", ":team"),
+        (assign, ":agent_to_play_sound" ,":agent"),
+      (try_end),
+      
+      #(call_script, "script_get_first_formation_member", ":team", ":cur_group", 0),
+      (try_begin),
+        (gt, ":agent_to_play_sound", -1),
+        (agent_play_sound, ":agent_to_play_sound", "snd_horn"),
+      (try_end),
+      (try_end),
+    ]
+    ),
+    
+    #tom-script
+    #input: nothing
+    #output: nothing
+    #script_set_flag_carriers
+    ("set_flag_carriers",
+    [
+      (try_for_range, ":team", 0, 4),
+        (team_get_slot, ":team_size", ":team", slot_team_size),
+      #(try_begin),
+      (gt, ":team_size", 0),
+      (neq, "$fplayer_team_no", 0),
+      (store_div, ":flags", ":team_size", 35),
+      (gt, ":flags", 0),
+      (assign, ":flags", 1),
+      (try_for_agents, ":cur_agent"),
+        (agent_is_human, ":cur_agent"),
+        (agent_is_non_player, ":cur_agent"),
+        (agent_get_troop_id, ":cur_troop", ":cur_agent"),
+        (neg|troop_is_guarantee_ranged, ":cur_troop"),
+        (neg|troop_is_guarantee_horse, ":cur_troop"),
+        (neg|troop_is_hero,":cur_troop"),
+        (agent_get_team, ":cur_team", ":cur_agent"),
+        (eq, ":cur_team", 0),
+        (gt, ":flags", 0),
+        (try_begin),
+          (agent_get_party_id, ":party", ":cur_agent"),
+        (gt, ":party", 0),
+        (store_faction_of_party, ":faction", ":party"),
+        (eq, ":faction", "fac_kingdom_1"),
+        (party_stack_get_troop_id, ":party_leader", ":party", 0),
+        (eq, ":party_leader", "trp_kingdom_1_lord"),
+        (assign, ":item", "itm_flag_pole_3"),
+        (else_try),
+          (store_random_in_range, ":item", "itm_flag_pole_1", "itm_flag_pole_3"),
+        (try_end),  
+        (agent_equip_item, ":cur_agent", ":item"),
+        (agent_set_wielded_item, ":cur_agent", ":item"),
+        (agent_set_slot, ":cur_agent",slot_agent_banner, 1),
+        (val_sub, ":flags", 1),
+      (try_end),
+      (try_end),
+      
+      #player team - flag carriers
+      (assign, ":group0", 0),
+      (assign, ":group1", 0),
+      (assign, ":group2", 0),
+      (assign, ":group3", 0),
+      (assign, ":group4", 0),
+      (assign, ":group5", 0),
+      (assign, ":group6", 0),
+      (assign, ":group7", 0),
+      (assign, ":group8", 0),
+      #count the amount of agents
+      (try_for_agents, ":cur_agent"),
+      (agent_is_human, ":cur_agent"),
+      (agent_is_non_player, ":cur_agent"),
+      (agent_get_team, ":cur_team", ":cur_agent"),
+      (eq, ":cur_team", "$fplayer_team_no"),
+      (agent_get_division, ":cur_group", ":cur_agent"),
+      (try_begin),
+        (eq, ":cur_group", 0),
+        (val_add, ":group0", 1),
+      (else_try),
+        (eq, ":cur_group", 1),
+        (val_add, ":group1", 1),
+      (else_try),
+        (eq, ":cur_group", 2),
+        (val_add, ":group2", 1),
+      (else_try),
+        (eq, ":cur_group", 3),
+        (val_add, ":group3", 1),
+      (else_try),
+        (eq, ":cur_group", 4),
+        (val_add, ":group4", 1),
+      (else_try),
+        (eq, ":cur_group", 5),
+        (val_add, ":group5", 1),
+      (else_try),
+        (eq, ":cur_group", 6),
+        (val_add, ":group6", 1),
+      (else_try),
+        (eq, ":cur_group", 7),
+        (val_add, ":group7", 1),
+      (else_try),
+        (eq, ":cur_group", 8),
+        (val_add, ":group8", 1),
+      (try_end),
+      (try_end),
+      
+      (try_for_range, reg1, 0, 9),
+      (assign, ":head_count", 0),
+      (assign, ":group", reg1),
+      (try_begin),
+        (eq, reg1, 0),
+        (val_add, ":head_count", ":group0"),
+      (else_try),
+        (eq, reg1, 1),
+        (val_add, ":head_count", ":group1"),
+      (else_try),
+        (eq, reg1, 2),
+        (val_add, ":head_count", ":group2"),
+      (else_try),
+        (eq, reg1, 3),
+        (val_add, ":head_count", ":group3"),
+      (else_try),
+        (eq, reg1, 4),
+        (val_add, ":head_count", ":group4"),
+      (else_try),
+        (eq, reg1, 5),
+        (val_add, ":head_count", ":group5"),
+      (else_try),
+        (eq, reg1, 6),
+        (val_add, ":head_count", ":group6"),
+      (else_try),
+        (eq, reg1, 7),
+        (val_add, ":head_count", ":group7"),
+      (else_try),
+        (eq, reg1, 8),
+        (val_add, ":head_count", ":group8"),
+      (try_end),
+      (store_div, ":flags", ":head_count", 20),
+      (gt, ":flags", 0),
+      (assign, ":flags", 1),
+      (try_for_agents, ":cur_agent"),
+        (agent_is_human, ":cur_agent"),
+        (agent_is_non_player, ":cur_agent"),
+        (agent_get_troop_id, ":cur_troop", ":cur_agent"),
+        (neg|is_between, ":cur_troop", active_npcs_begin, active_npcs_end), #not a lord or a companion
+        (neg|troop_is_guarantee_ranged, ":cur_troop"),
+        (neg|troop_is_guarantee_horse, ":cur_troop"),
+        (neg|troop_is_hero,":cur_troop"),
+        (agent_get_team, ":cur_team", ":cur_agent"),
+        (eq, ":cur_team", "$fplayer_team_no"),
+        (agent_get_division, ":cur_group", ":cur_agent"),
+        (eq, ":cur_group", ":group"),
+        (gt, ":flags", 0),
+        # (init_position, pos8),
+        (agent_get_position, pos8, ":cur_agent"),
+        (set_spawn_position, pos8),
+        #(spawn_agent, ":cur_troop"),
+        #(display_message, "@spawning"),
+        #(assign, ":agent", reg0),
+        (assign, ":agent", ":cur_agent"),
+        (agent_set_team, ":agent", ":cur_team"),
+        #(agent_set_division, ":agent", ":cur_group"),
+        (store_random_in_range, ":item", "itm_flag_pole_1", "itm_flag_pole_3"),
+        (agent_equip_item, ":agent", ":item"),
+        (agent_equip_item, ":agent", ":item"),
+        (agent_equip_item, ":agent", ":item"),
+        (agent_set_wielded_item, ":agent", ":item"),
+        (agent_set_slot, ":agent",slot_agent_banner, 1),
+        (val_sub, ":flags", 1),
+      (try_end),
+      (try_end),
+    ]),
+
+#Volley
+  # script_cf_order_volley_check
+  # Input: Nothing
+  # Output: Nothing   
+  # Check for an active Volley Fire order
+ ("cf_order_volley_check", [
+    (assign, ":active", 0),
+    (assign, ":end", 4),
+    (assign, ":end2", slot_team_d0_order_volley + 9),
+    (try_for_range, ":team", 0, ":end"),
+        (try_for_range, ":i", slot_team_d0_order_volley, ":end2"),
+            (team_slot_ge, ":team", ":i", 1),
+            (assign, ":active", 1),
+            (assign, ":end", 0),
+            (assign, ":end2", slot_team_d0_order_volley),
+        (try_end),
+    (try_end),
+    (eq, ":active", 1),
+    ]),  
+  # script_order_volley_begin_end
+  # Input: Nothing
+  # Output: Nothing
+  # On key depression, determine if beginning or ending volley fire
+  # Display appropriate order text on screen.
+ ("order_volley_begin_end", [
+     (get_player_agent_no, ":player"),
+     (agent_get_team, ":playerteam", ":player"),
+     
+     (assign, ":volley", 0),
+     
+     (try_for_range, ":class", 0, 8),
+         (class_is_listening_order, ":playerteam", ":class"), #Listening to Order
+         (store_add, ":class_ordered", slot_team_d0_order_volley, ":class"),
+         (team_slot_eq, ":playerteam", ":class_ordered", 0),
+         (team_set_slot, ":playerteam", ":class_ordered", 1),
+         (assign, ":volley", 1),
+         (str_store_string, s1, "@prepare to volley"),
+         (try_begin), #Mark class as selected--used for display text
+             (eq, ":class", 0),
+             (assign, ":group0_is_selected", 1),
+         (else_try),
+             (eq, ":class", 1),
+             (assign, ":group1_is_selected", 1),   
+         (else_try),
+             (eq, ":class", 2),
+             (assign, ":group2_is_selected", 1),         
+         (else_try),
+             (eq, ":class", 3),
+             (assign, ":group3_is_selected", 1),         
+         (else_try),
+             (eq, ":class", 4),
+             (assign, ":group4_is_selected", 1),         
+         (else_try),
+             (eq, ":class", 5),
+             (assign, ":group5_is_selected", 1),   
+         (else_try),
+             (eq, ":class", 6),
+             (assign, ":group6_is_selected", 1),         
+         (else_try),
+             (eq, ":class", 7),
+             (assign, ":group7_is_selected", 1),         
+         (else_try),
+             (eq, ":class", 8),
+             (assign, ":group8_is_selected", 1),                       
+         (try_end),
+     (try_end), #Class Loop
+       
+     (try_for_agents, ":agent"),
+         (agent_is_alive, ":agent"),
+         (agent_is_human, ":agent"),
+         (agent_is_non_player, ":agent"),
+         (agent_get_team, ":team", ":agent"),
+         (eq, ":team", ":playerteam"), #On Player's side?
+         (agent_get_division, ":class", ":agent"),
+         (try_begin), #Mark class as in battle--used for display text
+             (eq, ":class", 0),
+             (assign, ":group0_in_battle", 1),
+         (else_try),
+             (eq, ":class", 1),
+             (assign, ":group1_in_battle", 1),   
+         (else_try),
+             (eq, ":class", 2),
+             (assign, ":group2_in_battle", 1),         
+         (else_try),
+             (eq, ":class", 3),
+             (assign, ":group3_in_battle", 1),         
+         (else_try),
+             (eq, ":class", 4),
+             (assign, ":group4_in_battle", 1),         
+         (else_try),
+             (eq, ":class", 5),
+             (assign, ":group5_in_battle", 1),   
+         (else_try),
+             (eq, ":class", 6),
+             (assign, ":group6_in_battle", 1),         
+         (else_try),
+             (eq, ":class", 7),
+             (assign, ":group7_in_battle", 1),         
+         (else_try),
+             (eq, ":class", 8),
+             (assign, ":group8_in_battle", 1),                       
+         (try_end),
+         (class_is_listening_order, ":team", ":class"), #Is the agent's division selected?
+         (try_begin),
+             (eq, ":volley", 0),
+             (store_add, ":class_ordered", slot_team_d0_order_volley, ":class"),
+             (team_set_slot, ":team", ":class_ordered", 0),
+             (try_begin),
+                (agent_slot_ge, ":agent", slot_agent_volley_fire, 1),
+                (agent_set_slot, ":agent", slot_agent_volley_fire, 0),
+                (agent_set_attack_action, ":agent", 0, 0), #Release (if holding)
+             (try_end),
+             (str_store_string, s1, "@end volley"),
+             (try_begin), #Mark class as selected--used for display text
+                 (eq, ":class", 0),
+                 (assign, ":group0_is_selected", 1),
+             (else_try),
+                 (eq, ":class", 1),
+                 (assign, ":group1_is_selected", 1),   
+             (else_try),
+                 (eq, ":class", 2),
+                 (assign, ":group2_is_selected", 1),         
+             (else_try),
+                 (eq, ":class", 3),
+                 (assign, ":group3_is_selected", 1),         
+             (else_try),
+                 (eq, ":class", 4),
+                 (assign, ":group4_is_selected", 1),         
+             (else_try),
+                 (eq, ":class", 5),
+                 (assign, ":group5_is_selected", 1),   
+             (else_try),
+                 (eq, ":class", 6),
+                 (assign, ":group6_is_selected", 1),         
+             (else_try),
+                 (eq, ":class", 7),
+                 (assign, ":group7_is_selected", 1),         
+             (else_try),
+                 (eq, ":class", 8),
+                 (assign, ":group8_is_selected", 1),                       
+             (try_end),
+         (else_try),
+            (eq, ":volley", 1),
+            (agent_get_horse, ":horse", ":agent"),
+            (le, ":horse", 0), #Not Mounted
+           
+            (assign, ":volley_wpn_type", -1),
+            (try_begin),
+                (team_get_movement_order, ":mordr", ":team", ":class"),
+                (this_or_next|eq, ":mordr", mordr_hold),
+                (eq, ":mordr", mordr_stand_ground),
+               
+                (agent_get_wielded_item, ":wielded", ":agent", 0),
+                (ge, ":wielded", 0),
+                (item_get_type, ":type", ":wielded"),
+                (try_begin),
+                    (this_or_next|eq, ":type", itp_type_bow),
+                    (eq, ":type", itp_type_crossbow),
+                    (assign, ":volley_wpn_type", ":type"),
+                (else_try),
+                    (assign, ":end", ek_head),
+                    (try_for_range, ":i_slot", ek_item_0, ":end"),
+                        (agent_get_item_slot, ":item", ":agent", ":i_slot"),
+                        (ge, ":item", 0),
+                        (item_get_type, ":type", ":item"),
+                        (this_or_next|eq, ":type", itp_type_bow),
+                        (eq, ":type", itp_type_crossbow),
+                        (agent_set_wielded_item, ":agent", ":item"),
+                        (assign, ":volley_wpn_type", ":type"),
+                        (assign, ":end", ek_item_0),
+                    (try_end),
+                (try_end),
+            (try_end),
+            (agent_set_slot, ":agent", slot_agent_volley_fire, ":volley_wpn_type"),         
+         (try_end), #Volley End or Begin
+     (try_end), #Agent loop
+         
+     (str_clear, s2),
+     (str_clear, s3),
+     (assign, ":count_possible", 0),
+     (assign, ":count_selected", 0),
+     (try_begin),
+         (eq, ":group0_in_battle", 1),
+         (val_add, ":count_possible", 1),
+         (eq, ":group0_is_selected", 1),
+         (val_add, ":count_selected", 1),
+         (str_store_class_name, s2, 0),
+     (try_end),
+     (try_begin),
+         (eq, ":group1_in_battle", 1),
+         (val_add, ":count_possible", 1),
+         (eq, ":group1_is_selected", 1),
+         (val_add, ":count_selected", 1),
+         (try_begin),
+             (neg|str_is_empty, s2),
+             (str_store_class_name, s3, 1),
+             (str_store_string, s2, "@{!}{s2}, {s3}"),
+         (else_try),
+             (str_store_class_name, s2, 1),
+         (try_end),
+     (try_end),
+     (try_begin),
+         (eq, ":group2_in_battle", 1),
+         (val_add, ":count_possible", 1),
+         (eq, ":group2_is_selected", 1),
+         (val_add, ":count_selected", 1),
+         (try_begin),
+             (neg|str_is_empty, s2),
+             (str_store_class_name, s3, 2),
+             (str_store_string, s2, "@{!}{s2}, {s3}"),
+         (else_try),
+             (str_store_class_name, s2, 2),
+         (try_end),
+     (try_end),
+     (try_begin),
+         (eq, ":group3_in_battle", 1),
+         (val_add, ":count_possible", 1),
+         (eq, ":group3_is_selected", 1),
+         (val_add, ":count_selected", 1),
+         (try_begin),
+             (neg|str_is_empty, s2),
+             (str_store_class_name, s3, 3),
+             (str_store_string, s2, "@{!}{s2}, {s3}"),
+         (else_try),
+             (str_store_class_name, s2, 3),
+         (try_end),
+     (try_end),
+     (try_begin),
+         (eq, ":group4_in_battle", 1),
+         (val_add, ":count_possible", 1),
+         (eq, ":group4_is_selected", 1),
+         (val_add, ":count_selected", 1),
+         (try_begin),
+             (neg|str_is_empty, s2),
+             (str_store_class_name, s3, 4),
+             (str_store_string, s2, "@{!}{s2}, {s3}"),
+         (else_try),
+             (str_store_class_name, s2, 4),
+         (try_end),
+     (try_end),
+     (try_begin),
+         (eq, ":group5_in_battle", 1),
+         (val_add, ":count_possible", 1),
+         (eq, ":group5_is_selected", 1),
+         (val_add, ":count_selected", 1),
+         (try_begin),
+             (neg|str_is_empty, s2),
+             (str_store_class_name, s3, 5),
+             (str_store_string, s2, "@{!}{s2}, {s3}"),
+         (else_try),
+             (str_store_class_name, s2, 5),
+         (try_end),
+     (try_end),
+     (try_begin),
+         (eq, ":group6_in_battle", 1),
+         (val_add, ":count_possible", 1),
+         (eq, ":group6_is_selected", 1),
+         (val_add, ":count_selected", 1),
+         (try_begin),
+             (neg|str_is_empty, s2),
+             (str_store_class_name, s3, 6),
+             (str_store_string, s2, "@{!}{s2}, {s3}"),
+         (else_try),
+             (str_store_class_name, s2, 6),
+         (try_end),
+     (try_end),
+     (try_begin),
+         (eq, ":group7_in_battle", 1),
+         (val_add, ":count_possible", 1),
+         (eq, ":group7_is_selected", 1),
+         (val_add, ":count_selected", 1),
+         (try_begin),   
+             (neg|str_is_empty, s2),
+             (str_store_class_name, s3, 7),
+             (str_store_string, s2, "@{!}{s2}, {s3}"),
+         (else_try),
+             (str_store_class_name, s2, 7),
+         (try_end),
+     (try_end),
+     (try_begin),
+         (eq, ":group8_in_battle", 1),
+         (val_add, ":count_possible", 1),
+         (eq, ":group8_is_selected", 1),
+         (val_add, ":count_selected", 1),
+         (try_begin),
+             (neg|str_is_empty, s2),
+             (str_store_class_name, s3, 8),
+             (str_store_string, s2, "@{!}{s2}, {s3}"),
+         (else_try),
+             (str_store_class_name, s2, 8),
+         (try_end),
+     (try_end),   
+     (try_begin),
+         (eq, ":count_selected", ":count_possible"),
+         (str_store_string, s2, "@Everyone"),
+     (try_end),
+     (try_begin),
+         (gt, ":count_selected", 0),
+         (display_message, "@{!}{s2}, {s1}!", 0xFFDDDD66),
+     (try_end),
+     (str_clear, s2),
+     (str_clear, s3),
+    ]),
+#Volley End
+# #Formations Scripts   
+  # script_division_reset_places by motomataru
+  # Input: none
+  # Output: none
+  # Resets globals for placing divisions around player for script_battlegroup_place_around_leader
+  ("division_reset_places", [
+  (assign, "$next_cavalry_place", formation_minimum_spacing_horse_width), #first spot RIGHT of the player
+  (assign, "$next_archer_place", 1000), #first spot 10m FRONT of the player
+  (assign, "$next_infantry_place", -1 * formation_minimum_spacing_horse_width), #first spot LEFT of the player
+  ]),
+   
+  # script_battlegroup_place_around_leader by motomataru
+  # Input: team, division
+  # Output: pos61 division position
+  ("battlegroup_place_around_leader", [
+  (store_script_param, ":fteam", 1),
+  (store_script_param, ":fdivision", 2),
+  (team_get_leader, ":fleader", ":fteam"),
+  (try_begin),
+    (gt, ":fleader", -1), #any team members left?
+    
+    (agent_get_position, pos1, ":fleader"),
+    (try_begin),
+      (eq, "$autorotate_at_player", 1),
+      (call_script, "script_team_get_position_of_enemies", pos60, ":fteam", grc_everyone),
+      (neq, reg0, 0), #more than 0 enemies still alive?
+      (call_script, "script_point_y_toward_position", pos1, pos60),
+    (try_end),
+
+    (store_add, ":slot", slot_team_d0_type, ":fdivision"),
+    (team_get_slot, ":sd_type", ":fteam", ":slot"),
+    (store_add, ":slot", slot_team_d0_size, ":fdivision"),
+    (team_get_slot, ":num_troops", ":fteam", ":slot"),
+    (store_add, ":slot", slot_team_d0_formation, ":fdivision"),
+    (team_get_slot, ":fformation", ":fteam", ":slot"),
+    (store_add, ":slot", slot_team_d0_formation_space, ":fdivision"),
+    (team_get_slot, ":formation_extra_spacing", ":fteam", ":slot"),
+# (assign, reg1, ":sd_type"),
+# (assign, reg0, ":num_troops"),
+# (assign, reg2, ":fteam"),
+# (assign, reg3, ":fdivision"),
+# (position_get_x, reg4, pos1),
+# (position_get_y, reg5, pos1),
+# (assign, reg6, ":fformation"),
+# (display_message, "@Team {reg2} Division {reg3} type {reg1} numbers {reg0} leader at {reg4},{reg5} formation {reg6}"),
+    (try_begin),
+      (this_or_next|eq, ":sd_type", sdt_cavalry),
+      (eq, ":sd_type", sdt_harcher),
+      (position_move_x, pos1, "$next_cavalry_place", 0),
+      (try_begin),  #handle Native's way of doing things
+        (eq, ":fformation", formation_none),
+        (try_begin),
+          (ge, ":formation_extra_spacing", 0),
+          (store_mul, ":troop_space", ":formation_extra_spacing", 133),
+          (val_add, ":troop_space", 150),
+        (else_try), #handle Native multi-ranks
+          (assign, ":troop_space", 200),
+          (val_mul, ":formation_extra_spacing", -1),
+          (val_add, ":formation_extra_spacing", 1),
+          (val_div, ":num_troops", ":formation_extra_spacing"),
+        (try_end),
+        (store_mul, ":formation_width", ":num_troops", ":troop_space"),
+        (store_div, reg0, ":formation_width", 2),
+        (position_move_x, pos1, reg0, 0), #cavalry set up RIGHT of leader
+# (display_message, "@Cavalry move {reg0}"),
+        (copy_position, pos61, pos1),
+      (else_try),
+        (store_mul, ":troop_space", ":formation_extra_spacing", 50),
+        (val_add, ":troop_space", formation_minimum_spacing_horse_width),
+        (convert_to_fixed_point, ":num_troops"),
+        (store_sqrt, ":formation_width", ":num_troops"),
+        (val_mul, ":formation_width", ":troop_space"),
+        (convert_from_fixed_point, ":formation_width"),
+        (val_sub, ":formation_width", ":troop_space"),
+        (store_div, reg0, ":formation_width", 2),
+        (position_move_x, pos1, reg0, 0), #cavalry set up RIGHT of leader
+# (display_message, "@Cavalry move {reg0}"),
+        (copy_position, pos61, pos1),
+        (call_script, "script_form_cavalry", ":fteam", ":fdivision", ":fleader", ":formation_extra_spacing"),
+      (try_end),
+      (val_add, "$next_cavalry_place", ":formation_width"),
+      (val_add, "$next_cavalry_place", formation_minimum_spacing_horse_width),
+
+    (else_try),
+      (eq, ":sd_type", sdt_archer),
+      (position_move_y, pos1, "$next_archer_place"),  #archers set up FRONT of leader
+      (copy_position, pos61, pos1),
+      (try_begin),
+        (neq, ":fformation", formation_none),
+        (call_script, "script_get_centering_amount", formation_default, ":num_troops", ":formation_extra_spacing"),
+        (val_mul, reg0, -1),
+        (position_move_x, pos1, reg0, 0),
+        (call_script, "script_form_archers", ":fteam", ":fdivision", ":fleader", ":formation_extra_spacing", ":fformation"),
+      (try_end),
+      (val_add, "$next_archer_place", 500), #next archers 5m FRONT of these
+      
+    (else_try),
+      (eq, ":sd_type", sdt_skirmisher),
+      (position_move_y, pos1, "$next_archer_place"),  #skirmishers set up FRONT of leader
+      (copy_position, pos61, pos1),
+      (try_begin),
+        (neq, ":fformation", formation_none),
+        (call_script, "script_get_centering_amount", ":fformation", ":num_troops", ":formation_extra_spacing"),
+        (position_move_x, pos1, reg0, 0),
+        (call_script, "script_form_infantry", ":fteam", ":fdivision", ":fleader", ":formation_extra_spacing", ":fformation"),
+      (try_end),
+      (val_add, "$next_archer_place", 500), #next archers 5m FRONT of these
+      
+    (else_try),
+      (position_move_x, pos1, "$next_infantry_place", 0),
+      (copy_position, pos61, pos1),
+      (try_begin),  #handle Native's way of doing things
+        (eq, ":fformation", formation_none),
+        (try_begin),
+          (ge, ":formation_extra_spacing", 0),
+          (store_mul, ":troop_space", ":formation_extra_spacing", 75),  #Native minimum spacing not consistent but less than this
+          (val_add, ":troop_space", 100),
+        (else_try), #handle Native multi-ranks
+          (assign, ":troop_space", 150),
+          (val_mul, ":formation_extra_spacing", -1),
+          (val_add, ":formation_extra_spacing", 1),
+          (val_div, ":num_troops", ":formation_extra_spacing"),
+        (try_end),
+        (store_mul, ":formation_width", ":num_troops", ":troop_space"),
+        (store_div, reg0, ":formation_width", 2),
+        (val_mul, reg0, -1),  #infantry set up LEFT of leader
+# (display_message, "@Infantry unformed move {reg0}"),
+        (position_move_x, pos61, reg0, 0),
+      (else_try),
+        (call_script, "script_form_infantry", ":fteam", ":fdivision", ":fleader", ":formation_extra_spacing", ":fformation"),
+        (call_script, "script_get_centering_amount", ":fformation", ":num_troops", ":formation_extra_spacing"),
+        (store_mul, ":formation_width", 2, reg0),
+        (store_mul, ":troop_space", ":formation_extra_spacing", 50),
+        (val_add, ":troop_space", formation_minimum_spacing),
+        (val_add, ":formation_width", ":troop_space"),
+        (val_mul, reg0, -1),  #infantry set up LEFT of leader
+# (display_message, "@Infantry formation move {reg0}"),
+        (position_move_x, pos61, reg0, 0),
+      (try_end),
+      (val_sub, "$next_infantry_place", ":formation_width"),  #next infantry 1m LEFT of these
+      (val_sub, "$next_infantry_place", 100),
+# (assign, reg0, "$next_infantry_place"),
+# (display_message, "@Next infantry {reg0}"),
+    (try_end),
+    
+    (store_add, ":slot", slot_team_d0_move_order, ":fdivision"),
+    (team_set_slot, ":fteam", ":slot", mordr_hold),
+    (set_show_messages, 0),
+    (team_get_movement_order, reg0, ":fteam", ":fdivision"),
+    (try_begin),
+      (neq, reg0, mordr_hold),
+      (team_give_order, ":fteam", ":fdivision", mordr_hold),
+    (try_end),
+    # (team_set_order_position, ":fteam", ":fdivision", pos61),
+    (call_script, "script_set_formation_position", ":fteam", ":fdivision", pos61),
+    (set_show_messages, 1),
+  (try_end),
+  ]),
+  
+  # script_form_cavalry by motomataru
+  # Input: (pos1), team, division, agent number of team leader, spacing
+  # Output: none
+  # Form in wedge, (now not) excluding horse archers
+  # Creates formation starting at pos1
+  ("form_cavalry", [
+  (store_script_param, ":fteam", 1),
+  (store_script_param, ":fdivision", 2),
+  (store_script_param, ":fleader", 3),
+  (store_script_param, ":formation_extra_spacing", 4),
+  (store_mul, ":extra_space", ":formation_extra_spacing", 50),
+  (store_add, ":x_distance", formation_minimum_spacing_horse_width, ":extra_space"),
+  (store_add, ":y_distance", formation_minimum_spacing_horse_length, ":extra_space"),
+  (assign, ":max_level", 0),
+  (try_for_agents, ":agent"),
+    (call_script, "script_cf_valid_formation_member", ":fteam", ":fdivision", ":fleader", ":agent"),
+    (agent_get_troop_id, ":troop_id", ":agent"),
+    (store_character_level, ":troop_level", ":troop_id"),
+    (gt, ":troop_level", ":max_level"),
+    (assign, ":max_level", ":troop_level"),
+  (end_try),
+  (assign, ":column", 1),
+  (assign, ":rank_dimension", 1),
+  (store_mul, ":neg_y_distance", ":y_distance", -1),
+  (store_mul, ":neg_x_distance", ":x_distance", -1),
+  (store_div, ":wedge_adj", ":x_distance", 2),
+  (store_div, ":neg_wedge_adj", ":neg_x_distance", 2),
+  (val_add, ":max_level", 1),
+  (assign, ":form_left", 1),
+  (try_for_range_backwards, ":rank_level", 0, ":max_level"),  #put troops with highest exp in front
+    (try_for_agents, ":agent"),
+      (agent_get_troop_id, ":troop_id", ":agent"),
+      (store_character_level, ":troop_level", ":troop_id"),
+      (eq, ":troop_level", ":rank_level"),        
+      (call_script, "script_cf_valid_formation_member", ":fteam", ":fdivision", ":fleader", ":agent"),
+      (agent_set_scripted_destination, ":agent", pos1, 1),
+      (try_begin),
+        (eq, ":form_left", 1),
+        (position_move_x, pos1, ":neg_x_distance", 0),
+      (else_try),
+        (position_move_x, pos1, ":x_distance", 0),
+      (try_end),
+      (val_add, ":column", 1),
+      (gt, ":column", ":rank_dimension"),
+      (position_move_y, pos1, ":neg_y_distance", 0),
+      (try_begin),
+        (neq, ":form_left", 1),
+        (assign, ":form_left", 1),
+        (position_move_x, pos1, ":neg_wedge_adj", 0),
+      (else_try),
+        (assign, ":form_left", 0),
+        (position_move_x, pos1, ":wedge_adj", 0),
+      (try_end),      
+      (assign, ":column", 1),
+      (val_add, ":rank_dimension", 1),
+    (end_try),
+  (end_try),
+  ]),
+     
+  # script_form_archers by motomataru
+  # Input: (pos1), team, division, agent number of team leader, spacing, formation
+  # Output: none
+  # Form in line, staggered if formation = formation_ranks
+  # Creates formation starting at pos1
+  ("form_archers", [
+  (store_script_param, ":fteam", 1),
+  (store_script_param, ":fdivision", 2),
+  (store_script_param, ":fleader", 3),
+  (store_script_param, ":formation_extra_spacing", 4),
+  (store_script_param, ":archers_formation", 5),
+  (store_mul, ":extra_space", ":formation_extra_spacing", 50),
+  (store_add, ":distance", formation_minimum_spacing, ":extra_space"),    #minimum distance between troops
+  (assign, ":total_move_y", 0), #staggering variable  
+  (try_for_agents, ":agent"),
+    (call_script, "script_cf_valid_formation_member", ":fteam", ":fdivision", ":fleader", ":agent"),
+    (agent_set_scripted_destination, ":agent", pos1, 1),
+    (position_move_x, pos1, ":distance", 0),
+    (try_begin),
+      (eq, ":archers_formation", formation_ranks),
+      (val_add, ":total_move_y", 75),
+      (try_begin),
+        (le, ":total_move_y", 150),
+        (position_move_y, pos1, 75, 0),
+      (else_try),
+        (position_move_y, pos1, -150, 0),
+        (assign, ":total_move_y", 0),
+      (try_end),
+    (try_end),
+  (try_end),
+  ]),
+  ("get_default_formation", [
+  (store_script_param, ":fteam", 1),
+  (team_get_slot, ":ffaction", ":fteam", slot_team_faction),
+  (try_begin),
+      (this_or_next|eq, ":ffaction", fac_player_supporters_faction),
+    (eq, ":ffaction", fac_player_faction),
+    (is_between, "$players_kingdom", kingdoms_begin, kingdoms_end),
+    (neq, "$players_kingdom", fac_player_supporters_faction),
+    (assign, ":ffaction", "$players_kingdom"),
+  (try_end),
+  (faction_get_slot, ":culture", ":ffaction", slot_faction_culture),
+  (try_begin), #wall
+    (this_or_next|eq, ":culture", "fac_culture_1"),
+    (this_or_next|eq, ":culture", "fac_culture_2"),
+    (this_or_next|eq, ":culture", "fac_culture_3"),
+    (this_or_next|eq, ":culture", "fac_culture_4"),
+    (this_or_next|eq, ":culture", "fac_culture_5"),
+    (this_or_next|eq, ":culture", "fac_culture_6"),
+    (assign, reg0, formation_shield),
+  (else_try),
+    (this_or_next|eq, ":ffaction", "fac_player_supporters_faction"),
+    (this_or_next|is_between, ":ffaction", kingdoms_begin, kingdoms_end),
+    (is_between, ":culture", fac_culture_1, fac_culture_5 +1),
+    (assign, reg0, formation_ranks),
+  (try_end),
+  ]),     
+  # script_form_infantry by motomataru
+  # Input: (pos1), team, division, agent number of team leader, spacing, formation
+  # Output: none
+  # If input "formation" is formation_default, will select a formation based on faction
+  # Creates formation starting at pos1
+  ("form_infantry", [
+  (store_script_param, ":fteam", 1),
+  (store_script_param, ":fdivision", 2),
+  (store_script_param, ":fleader", 3),
+  (store_script_param, ":formation_extra_spacing", 4),
+  (store_script_param, ":infantry_formation", 5),
+  (store_mul, ":extra_space", ":formation_extra_spacing", 50),
+  (store_add, ":distance", formation_minimum_spacing, ":extra_space"),    #minimum distance between troops  
+  (store_mul, ":neg_distance", ":distance", -1),
+  (store_add, ":slot", slot_team_d0_size, ":fdivision"),
+  (team_get_slot, ":num_troops", ":fteam", ":slot"),
+  (try_begin),
+    (eq, ":infantry_formation", formation_default),
+    (call_script, "script_get_default_formation", ":fteam"),
+    (assign, ":infantry_formation", reg0),
+  (try_end),
+  (team_get_weapon_usage_order, ":weapon_order", ":fteam", grc_infantry),
+  (assign, ":form_left", 1),
+  (assign, ":column", 1),
+  (assign, ":rank", 1),
+
+  (try_begin),
+    (eq, ":infantry_formation", formation_square),
+    (convert_to_fixed_point, ":num_troops"),
+    (store_sqrt, ":square_dimension", ":num_troops"),
+    (convert_from_fixed_point, ":square_dimension"),
+    (val_add, ":square_dimension", 1),
+
+    (try_for_agents, ":agent"),
+      (call_script, "script_cf_valid_formation_member", ":fteam", ":fdivision", ":fleader", ":agent"),
+      (agent_set_scripted_destination, ":agent", pos1, 1),
+      (try_begin),
+        (eq, formation_reequip, 1),
+        (eq, ":weapon_order", wordr_use_any_weapon),
+        (try_begin),
+          (this_or_next|eq, ":rank", 1),
+          (this_or_next|ge, ":rank", ":square_dimension"),
+          (this_or_next|eq, ":column", 1),
+          (ge, ":column", ":square_dimension"),
+          (call_script, "script_equip_best_melee_weapon", ":agent", 0, 0),
+        (else_try),
+          (call_script, "script_equip_best_melee_weapon", ":agent", 0, 1),
+        (try_end),
+      (try_end),
+      (try_begin),
+        (eq, ":form_left", 1),
+        (position_move_x, pos1, ":neg_distance", 0),
+      (else_try),
+        (position_move_x, pos1, ":distance", 0),
+      (try_end),
+      (val_add, ":column", 1),
+      (gt, ":column", ":square_dimension"),
+      (position_move_y, pos1, ":neg_distance", 0),
+      (try_begin),
+        (neq, ":form_left", 1),
+        (assign, ":form_left", 1),
+        (position_move_x, pos1, ":neg_distance", 0),
+      (else_try),
+        (assign, ":form_left", 0),
+        (position_move_x, pos1, ":distance", 0),
+      (try_end),      
+      (assign, ":column", 1),   
+      (val_add, ":rank", 1),
+    (end_try),
+    
+  (else_try),
+    (eq, ":infantry_formation", formation_wedge),
+    (assign, ":max_level", 0),
+    (try_for_agents, ":agent"),
+      (call_script, "script_cf_valid_formation_member", ":fteam", ":fdivision", ":fleader", ":agent"),
+      (agent_get_troop_id, ":troop_id", ":agent"),
+      (store_character_level, ":troop_level", ":troop_id"),
+      (gt, ":troop_level", ":max_level"),
+      (assign, ":max_level", ":troop_level"),
+    (end_try),
+
+    (assign, ":rank_dimension", 1),
+    (store_div, ":wedge_adj", ":distance", 2),
+    (store_div, ":neg_wedge_adj", ":neg_distance", 2),
+    (val_add, ":max_level", 1),
+    (try_for_range_backwards, ":rank_level", 0, ":max_level"),  #put troops with highest exp in front
+      (try_for_agents, ":agent"),
+        (agent_get_troop_id, ":troop_id", ":agent"),
+        (store_character_level, ":troop_level", ":troop_id"),
+        (eq, ":troop_level", ":rank_level"),        
+        (call_script, "script_cf_valid_formation_member", ":fteam", ":fdivision", ":fleader", ":agent"),
+        (agent_set_scripted_destination, ":agent", pos1, 1),
+        (try_begin),
+          (eq, formation_reequip, 1),
+          (eq, ":weapon_order", wordr_use_any_weapon),
+          (try_begin),
+            (this_or_next|eq, ":column", 1),
+            (ge, ":column", ":rank_dimension"),
+            (call_script, "script_equip_best_melee_weapon", ":agent", 0, 0),
+          (else_try),
+            (call_script, "script_equip_best_melee_weapon", ":agent", 0, 1),
+          (try_end),
+        (try_end),
+        (try_begin),
+          (eq, ":form_left", 1),
+          (position_move_x, pos1, ":neg_distance", 0),
+        (else_try),
+          (position_move_x, pos1, ":distance", 0),
+        (try_end),
+        (val_add, ":column", 1),
+        (gt, ":column", ":rank_dimension"),
+        (position_move_y, pos1, ":neg_distance", 0),
+        (try_begin),
+          (neq, ":form_left", 1),
+          (assign, ":form_left", 1),
+          (position_move_x, pos1, ":neg_wedge_adj", 0),
+        (else_try),
+          (assign, ":form_left", 0),
+          (position_move_x, pos1, ":wedge_adj", 0),
+        (try_end),      
+        (assign, ":column", 1),
+        (val_add, ":rank_dimension", 1),
+      (end_try),
+    (end_try),
+    
+  (else_try),
+    (eq, ":infantry_formation", formation_ranks),
+    (store_div, ":rank_dimension", ":num_troops", 3),   #basic three ranks
+    (val_add, ":rank_dimension", 1),    
+    (assign, ":max_level", 0),
+    (try_for_agents, ":agent"),
+      (call_script, "script_cf_valid_formation_member", ":fteam", ":fdivision", ":fleader", ":agent"),
+      (agent_get_troop_id, ":troop_id", ":agent"),
+      (store_character_level, ":troop_level", ":troop_id"),
+      (gt, ":troop_level", ":max_level"),
+      (assign, ":max_level", ":troop_level"),
+    (end_try),
+
+
+    (val_add, ":max_level", 1),
+    (try_for_range_backwards, ":rank_level", 0, ":max_level"),  #put troops with highest exp in front
+      (try_for_agents, ":agent"),
+        (agent_get_troop_id, ":troop_id", ":agent"),
+        (store_character_level, ":troop_level", ":troop_id"),
+        (eq, ":troop_level", ":rank_level"),        
+        (call_script, "script_cf_valid_formation_member", ":fteam", ":fdivision", ":fleader", ":agent"),
+        (agent_set_scripted_destination, ":agent", pos1, 1),
+        (try_begin),
+          (eq, formation_reequip, 1),
+          (eq, ":weapon_order", wordr_use_any_weapon),
+          (try_begin),
+            (eq, ":rank", 1),
+            (call_script, "script_equip_best_melee_weapon", ":agent", 0, 0),
+          (else_try),
+            (call_script, "script_equip_best_melee_weapon", ":agent", 0, 1),
+          (try_end),
+        (try_end),
+        (try_begin),
+          (eq, ":form_left", 1),
+          (position_move_x, pos1, ":neg_distance", 0),
+        (else_try),
+          (position_move_x, pos1, ":distance", 0),
+        (try_end),
+        (val_add, ":column", 1),
+
+        (gt, ":column", ":rank_dimension"), #next rank?
+        (position_move_y, pos1, ":neg_distance", 0),
+        (try_begin),
+          (neq, ":form_left", 1),
+          (assign, ":form_left", 1),
+          (position_move_x, pos1, ":neg_distance", 0),
+        (else_try),
+          (assign, ":form_left", 0),
+          (position_move_x, pos1, ":distance", 0),
+        (try_end),      
+        (assign, ":column", 1),
+        (val_add, ":rank", 1),
+      (end_try),
+    (end_try),
+    
+  (else_try),
+    (eq, ":infantry_formation", formation_shield),
+    (store_div, ":rank_dimension", ":num_troops", 3),   #basic three ranks
+    (val_add, ":rank_dimension", 1),
+    (assign, ":first_second_rank_agent", -1),
+    (assign, ":min_len_non_shielded", -1),
+    (try_for_range, ":weap_group", 0, 3),
+      (store_mul, ":min_len", ":weap_group", Third_Max_Weapon_Length),
+      (store_add, ":max_len", ":min_len", Third_Max_Weapon_Length),
+      (try_begin),
+        (gt, ":min_len_non_shielded", -1),  #looped through agents at least once since rank 2
+        (assign, ":min_len_non_shielded", ":min_len"),
+      (try_end),
+      (try_for_agents, ":agent"),
+        (call_script, "script_cf_valid_formation_member", ":fteam", ":fdivision", ":fleader", ":agent"),
+        (agent_get_wielded_item, ":agent_weapon", ":agent", 0),
+        (try_begin),
+          (gt, ":agent_weapon", itm_no_item),
+          (item_get_slot, ":weapon_length", ":agent_weapon", slot_item_length),
+        (else_try),
+          (assign, ":weapon_length", 0),
+        (try_end),
+        (try_begin),
+          (gt, ":rank", 1),
+          (try_begin),
+            (eq, ":first_second_rank_agent", ":agent"), #looped through agents at least once since rank 2
+            (assign, ":min_len_non_shielded", ":min_len"),
+          (else_try),
+            (eq, ":first_second_rank_agent", -1),
+            (assign, ":first_second_rank_agent", ":agent"),
+          (try_end),
+          (eq, formation_reequip, 1),
+          (eq, ":weapon_order", wordr_use_any_weapon),
+          (ge, ":weapon_length", ":min_len"), #avoid reequipping agents that are already in formation
+          (eq, ":min_len_non_shielded", -1),  #haven't looped through agents at least once since rank 2
+          (call_script, "script_equip_best_melee_weapon", ":agent", 0, 1),  #longest weapon, including two-handed
+          (agent_get_wielded_item, ":agent_weapon", ":agent", 0),
+          (try_begin),
+            (gt, ":agent_weapon", itm_no_item),
+            (item_get_slot, ":weapon_length", ":agent_weapon", slot_item_length),
+          (else_try),
+            (assign, ":weapon_length", 0),
+          (try_end),
+        (try_end),
+        
+        (assign, ":form_up", 0),
+        (agent_get_wielded_item, ":agent_shield", ":agent", 1),
+        (try_begin),
+          (gt, ":agent_shield", itm_no_item),
+          (item_get_type, reg0, ":agent_shield"),
+          (eq, reg0, itp_type_shield),
+          (try_begin),
+            (is_between, ":weapon_length", ":min_len", ":max_len"),
+            (assign, ":form_up", 1),
+          (try_end),
+        (else_try),
+          (gt, ":rank", 1),
+          (is_between, ":weapon_length", ":min_len_non_shielded", ":max_len"),
+          (assign, ":form_up", 1),
+        (try_end),
+
+        (eq, ":form_up", 1),
+        (agent_set_scripted_destination, ":agent", pos1, 1),
+        (try_begin),
+          (eq, formation_reequip, 1),
+          (eq, ":weapon_order", wordr_use_any_weapon),
+          (eq, ":rank", 1),
+          (call_script, "script_equip_best_melee_weapon", ":agent", 1, 0),  #best weapon, force shield
+        (try_end),
+        (try_begin),
+          (eq, ":form_left", 1),
+          (position_move_x, pos1, ":neg_distance", 0),
+        (else_try),
+          (position_move_x, pos1, ":distance", 0),
+        (try_end),
+        (val_add, ":column", 1),
+        
+        (gt, ":column", ":rank_dimension"), #next rank?
+        (position_move_y, pos1, ":neg_distance", 0),
+        (try_begin),
+          (neq, ":form_left", 1),
+          (assign, ":form_left", 1),
+          (position_move_x, pos1, ":neg_distance", 0),
+        (else_try),
+          (assign, ":form_left", 0),
+          (position_move_x, pos1, ":distance", 0),
+        (try_end),      
+        (assign, ":column", 1),
+        (val_add, ":rank", 1),
+      (try_end),
+    (try_end),
+  (try_end),
+  ]),
+     
+
+  # script_equip_best_melee_weapon by motomataru
+  # Input: agent id, flag to force shield, flag to force for length ALONE
+  # Output: none
+  ("equip_best_melee_weapon", [
+  (store_script_param, ":agent", 1),
+  (store_script_param, ":force_shield", 2),
+  (store_script_param, ":force_length", 3),
+
+  #priority items
+  (assign, ":shield", itm_no_item),
+  (assign, ":weapon", itm_no_item),
+  (try_for_range, ":item_slot", ek_item_0, ek_head),
+    (agent_get_item_slot, ":item", ":agent", ":item_slot"),
+    (gt, ":item", itm_no_item),
+    (item_get_type, ":weapon_type", ":item"),
+    (try_begin),
+      (eq, ":weapon_type", itp_type_shield),
+      (assign, ":shield", ":item"),
+    (else_try),
+      (eq, ":weapon_type", itp_type_thrown),
+      # (agent_get_ammo, ":ammo", ":agent", 0), #assume infantry would have no other kind of ranged weapon
+      # (gt, ":ammo", 0),
+      (assign, ":weapon", ":item"), #use thrown weapons first
+    (try_end),
+  (try_end),
+
+  #select weapon
+  (try_begin),
+    (eq, ":weapon", itm_no_item),
+    (assign, ":cur_score", 0),
+    (try_for_range, ":item_slot", ek_item_0, ek_head),
+      (agent_get_item_slot, ":item", ":agent", ":item_slot"),
+      (gt, ":item", itm_no_item),
+      (item_get_type, ":weapon_type", ":item"),
+      (neq, ":weapon_type", itp_type_shield),
+
+      (item_get_slot, reg0, ":item", slot_item_needs_two_hands),
+      (this_or_next|eq, reg0, 0),
+      (this_or_next|eq, ":force_shield", 0),
+      (eq, ":shield", itm_no_item),
+      
+      (try_begin),
+        (neq, ":force_length", 0),
+        (item_get_slot, ":item_length", ":item", slot_item_length),
+        (try_begin),
+          (lt, ":cur_score", ":item_length"),
+          (assign, ":cur_score", ":item_length"),
+          (assign, ":weapon", ":item"),
+        (try_end),
+      (else_try),
+        (assign, ":imod", imodbit_plain),
+        (agent_get_troop_id, ":troop_id", ":agent"),
+        (try_begin),    #only heroes have item modifications
+          (troop_is_hero, ":troop_id"),
+          (try_for_range, ":troop_item_slot",  ek_item_0, ek_head),    # heroes have only 4 possible weapons (equipped)
+            (troop_get_inventory_slot, reg0, ":troop_id", ":troop_item_slot"),  #Find Item Slot with same item ID as Equipped Weapon
+            (eq, reg0, ":item"),
+            (troop_get_inventory_slot_modifier, ":imod", ":troop_id", ":troop_item_slot"),
+          (try_end),
+        (try_end), 
+
+        (call_script, "script_dplmc_get_item_score_with_imod", ":item", ":imod"),
+        (lt, ":cur_score", reg0),
+        (assign, ":cur_score", reg0),
+        (assign, ":weapon", ":item"),
+      (try_end),
+    (try_end),
+  (try_end),
+
+  #equip selected items if needed
+  (agent_get_wielded_item, reg0, ":agent", 0),
+  (try_begin),
+    (neq, reg0, ":weapon"),
+    (try_begin),
+      (gt, ":shield", itm_no_item),
+      (agent_get_wielded_item, reg0, ":agent", 1),
+      (neq, reg0, ":shield"), #reequipping secondary will UNequip (from experience)
+      (agent_set_wielded_item, ":agent", ":shield"),
+    (try_end),
+    (gt, ":weapon", itm_no_item),
+    (agent_set_wielded_item, ":agent", ":weapon"),
+  (try_end),
+  ]),
+
+  # script_formation_current_position by motomataru
+  # Input: destination position (not pos0), team, division
+  # Output: in destination position
+  ("formation_current_position", [
+  (store_script_param, ":fposition", 1),
+  (store_script_param, ":fteam", 2),
+  (store_script_param, ":fdivision", 3),
+  (store_add, ":slot", slot_team_d0_first_member, ":fdivision"),
+  (team_get_slot, ":first_agent_in_formation", ":fteam", ":slot"),
+  (call_script, "script_get_formation_position", pos0, ":fteam", ":fdivision"),
+  (try_begin),
+    (eq, ":first_agent_in_formation", -1),
+    (copy_position, ":fposition", pos0),
+  (else_try),
+    (agent_get_position, ":fposition", ":first_agent_in_formation"),
+    (position_copy_rotation, ":fposition", pos0),
+    (store_add, ":slot", slot_team_d0_size, ":fdivision"),
+    (team_get_slot, ":num_troops", ":fteam", ":slot"),
+    (store_add, ":slot", slot_team_d0_formation_space, ":fdivision"),
+    (team_get_slot, ":formation_extra_spacing", ":fteam", ":slot"),
+    (try_begin),
+      (store_add, ":slot", slot_team_d0_type, ":fdivision"),
+      (team_slot_eq, ":fteam", ":slot", sdt_archer),
+      (call_script, "script_get_centering_amount", formation_default, ":num_troops", ":formation_extra_spacing"),
+    (else_try),
+      (store_add, ":slot", slot_team_d0_formation, ":fdivision"),
+      (team_get_slot, ":fformation", ":fteam", ":slot"),
+      (call_script, "script_get_centering_amount", ":fformation", ":num_troops", ":formation_extra_spacing"),
+      (val_mul, reg0, -1),
+    (try_end),
+    (position_move_x, ":fposition", reg0, 0),
+  (try_end),
+  ]),
+
+  # script_get_centering_amount by motomataru
+  # Input: formation type, number of troops, extra spacing
+  #        Use formation type formation_default to use script for archer line
+  # Output: reg0 number of centimeters to adjust x-position to center formation
+  ("get_centering_amount", [
+  (store_script_param, ":troop_formation", 1),
+  (store_script_param, ":num_troops", 2),
+  (store_script_param, ":extra_spacing", 3),
+  (store_mul, ":troop_space", ":extra_spacing", 50),
+  (val_add, ":troop_space", formation_minimum_spacing),
+  (assign, reg0, 0),
+  (try_begin),
+    (eq, ":troop_formation", formation_square),
+    (convert_to_fixed_point, ":num_troops"),
+    (store_sqrt, reg0, ":num_troops"),
+    (val_mul, reg0, ":troop_space"),
+    (convert_from_fixed_point, reg0),
+    (val_sub, reg0, ":troop_space"),
+  (else_try),
+    (this_or_next|eq, ":troop_formation", formation_ranks),
+    (eq, ":troop_formation", formation_shield),
+    (store_div, reg0, ":num_troops", 3),
+    (try_begin),
+      (store_mod, reg1, ":num_troops", 3),
+      (eq, reg1, 0),
+      (val_sub, reg0, 1),
+    (try_end),
+    (val_mul, reg0, ":troop_space"),
+  (else_try),
+    (eq, ":troop_formation", formation_default),  #assume these are archers in a line
+    (store_mul, reg0, ":num_troops", ":troop_space"),
+  (try_end),
+  (val_div, reg0, 2),
+  ]),
+
+  # script_formation_end
+  # Input: team, division
+  # Output: none
+  ("formation_end", [
+  (store_script_param, ":fteam", 1),
+  (store_script_param, ":fdivision", 2),
+  (try_begin),
+    (store_add, ":slot", slot_team_d0_formation, ":fdivision"),
+    (neg|team_slot_eq, ":fteam", ":slot", formation_none),
+    (team_set_slot, ":fteam", ":slot", formation_none),
+    (team_get_leader, ":leader", ":fteam"),
+    
+    (try_for_agents, ":agent"),
+      (agent_is_alive, ":agent"),
+      (agent_is_human, ":agent"),
+      (agent_get_team, ":team", ":agent"),
+      (eq, ":team", ":fteam"),
+      (neq, ":leader", ":agent"),
+      (agent_get_division, ":bgroup", ":agent"),
+      (eq, ":bgroup", ":fdivision"),
+      (agent_clear_scripted_mode, ":agent"),
+    (try_end),
+    
+    (try_begin),
+      (eq, ":fteam", "$fplayer_team_no"),
+      (store_add, ":slot", slot_team_d0_formation_space, ":fdivision"),
+      (team_get_slot, ":div_spacing", "$fplayer_team_no", ":slot"),
+      
+      #adjust for differences between the two systems of spreading out
+      (set_show_messages, 0),
+      (try_begin),
+        (gt, ":div_spacing", 3),
+        (assign, ":div_spacing", 2),  #Native maximum spread out
+      (else_try),
+        (gt, ":div_spacing", 0),
+        (team_give_order, "$fplayer_team_no", ":fdivision", mordr_stand_closer),
+        (try_begin),
+          (gt, ":div_spacing", 1),
+          (assign, ":div_spacing", 1),
+        (else_try),
+          (assign, ":div_spacing", 0),
+        (try_end),
+      (try_end),
+      (set_show_messages, 1),
+      (team_set_slot, "$fplayer_team_no", ":slot", ":div_spacing"),
+    (try_end),
+  (try_end),
+  ]),
+
+  # script_formation_move_position by motomataru
+  # Input: team, division, formation current position, (1 to advance or -1 to withdraw or 0 to redirect)
+  # Output: pos1 (offset for centering)
+  ("formation_move_position", [
+  (store_script_param, ":fteam", 1),
+  (store_script_param, ":fdivision", 2),
+  (store_script_param, ":fcurrentpos", 3),
+  (store_script_param, ":direction", 4),
+  (copy_position, pos1, ":fcurrentpos"),
+  (call_script, "script_team_get_position_of_enemies", pos60, ":fteam", grc_everyone),
+  (try_begin),
+    (neq, reg0, 0), #more than 0 enemies still alive?
+    (copy_position, pos1, ":fcurrentpos"),  #restore current formation "position"
+    (call_script, "script_point_y_toward_position", pos1, pos60), #record angle from center to enemy
+    (assign, ":distance_to_enemy", reg0),
+#   (team_get_order_position, pos61, ":fteam", ":fdivision"),
+    (call_script, "script_get_formation_position", pos61, ":fteam", ":fdivision"),
+    (get_distance_between_positions, ":move_amount", pos1, pos61),  #distance already moving from previous orders
+    (val_add, ":move_amount", 1000),
+    (try_begin),
+      (gt, ":direction", 0),  #moving forward?
+      (gt, ":move_amount", ":distance_to_enemy"),
+      (assign, ":move_amount", ":distance_to_enemy"),
+    (try_end),
+    (val_mul, ":move_amount", ":direction"),
+    (position_move_y, pos1, ":move_amount", 0),
+    (try_begin),
+      (lt, ":distance_to_enemy", 1000), #less than a move away?
+      (position_copy_rotation, pos1, pos61),  #avoid rotating formation
+    (try_end),
+#   (team_set_order_position, ":fteam", ":fdivision", pos1),
+    (call_script, "script_set_formation_position", ":fteam", ":fdivision", pos1),
+    (store_add, ":slot", slot_team_d0_size, ":fdivision"),
+    (team_get_slot, ":num_troops", ":fteam", ":slot"),
+    (store_add, ":slot", slot_team_d0_formation_space, ":fdivision"),
+    (team_get_slot, ":formation_extra_spacing", ":fteam", ":slot"),
+    (try_begin),
+      (store_add, ":slot", slot_team_d0_type, ":fdivision"),
+      (neg|team_slot_eq, ":fteam", ":slot", sdt_archer),
+      (store_add, ":slot", slot_team_d0_formation, ":fdivision"),
+      (team_get_slot, ":fformation", ":fteam", ":slot"),
+      (call_script, "script_get_centering_amount", ":fformation", ":num_troops", ":formation_extra_spacing"),
+    (else_try),
+      (call_script, "script_get_centering_amount", formation_default, ":num_troops", ":formation_extra_spacing"),
+      (val_mul, reg0, -1),
+    (try_end),
+    (position_move_x, pos1, reg0, 0),
+  (try_end),
+  ]),
+
+  # script_set_formation_position by motomataru
+  # Input: team, troop class, position
+  # Kluge around buggy *_order_position functions for teams 0-3
+  ("set_formation_position", [
+  (store_script_param, ":fteam", 1),
+  (store_script_param, ":fdivision", 2),
+  (store_script_param, ":fposition", 3),
+  
+  (position_get_x, ":x", ":fposition"),
+  (position_get_y, ":y", ":fposition"),
+  (position_get_rotation_around_z, ":zrot", ":fposition"),
+  
+  (store_add, ":slot", slot_team_d0_formation_x, ":fdivision"),
+  (team_set_slot, ":fteam", ":slot", ":x"), 
+  (store_add, ":slot", slot_team_d0_formation_y, ":fdivision"),
+  (team_set_slot, ":fteam", ":slot", ":y"), 
+  (store_add, ":slot", slot_team_d0_formation_zrot, ":fdivision"),
+  (team_set_slot, ":fteam", ":slot", ":zrot"),
+  
+  (team_set_order_position, ":fteam", ":fdivision", ":fposition"),
+  ]), 
+
+  # script_get_formation_position by motomataru
+  # Input: position, team, troop class
+  # Output: input position (pos0 used)
+  # Kluge around buggy *_order_position functions for teams 0-3
+  ("get_formation_position", [
+  (store_script_param, ":fposition", 1),
+  (store_script_param, ":fteam", 2),
+  (store_script_param, ":fdivision", 3),
+  (init_position, ":fposition"),
+  (try_begin),
+      (is_between, ":fteam", 0, 4),
+    (store_add, ":slot", slot_team_d0_formation_x, ":fdivision"),
+    (team_get_slot, ":x", ":fteam", ":slot"),
+    (store_add, ":slot", slot_team_d0_formation_y, ":fdivision"),
+    (team_get_slot, ":y", ":fteam", ":slot"),
+    (store_add, ":slot", slot_team_d0_formation_zrot, ":fdivision"),
+    (team_get_slot, ":zrot", ":fteam", ":slot"),
+    
+    (position_set_x, ":fposition", ":x"),
+    (position_set_y, ":fposition", ":y"),
+    (position_rotate_z, ":fposition", ":zrot"),
+  (else_try), #CABA - When would this ever be called?
+    (store_add, ":slot", slot_team_d0_first_member, ":fdivision"),
+    (team_get_slot, reg0, ":fteam", ":slot"),
+    (try_begin),    # "launder" team_get_order_position shutting down position_move_x
+      (gt, reg0, -1),
+      (team_get_order_position, ":fposition", ":fteam", ":fdivision"),
+      (agent_get_position, pos0, reg0),
+      (agent_set_position, reg0, ":fposition"),
+      (agent_get_position, ":fposition", reg0),
+      (agent_set_position, reg0, pos0),
+    (try_end),
+  (try_end),
+  (position_set_z_to_ground_level, ":fposition"),
+  ]), 
+
+  # script_cf_battlegroup_valid_formation by Caba'drin
+  # Input: team, division, formation
+  # Output: reg0: troop count/1 if too few troops/0 if wrong type
+  ("cf_battlegroup_valid_formation", [
+    (store_script_param, ":fteam", 1),
+  (store_script_param, ":fdivision", 2),
+  (store_script_param, ":fformation", 3),
+  
+  (assign, ":valid_type", 0),
+  (store_add, ":slot", slot_team_d0_type, ":fdivision"),
+  (team_get_slot, ":sd_type", ":fteam", ":slot"),
+  (try_begin), #Eventually make this more complex with the sub-divisions
+    (this_or_next|eq, ":sd_type", sdt_cavalry),
+    (eq, ":sd_type", sdt_harcher),
+    (assign, ":size_minimum", formation_min_cavalry_troops),
+    (try_begin),
+      (eq, ":fformation", formation_wedge),
+      (assign, ":valid_type", 1),
+    (try_end),
+  (else_try),
+    (eq, ":sd_type", sdt_archer),
+    (assign, ":size_minimum", formation_min_foot_troops),
+    (try_begin),
+      (this_or_next|eq, ":fformation", formation_ranks),
+      (eq, ":fformation", formation_default),
+      (assign, ":valid_type", 1),
+    (try_end),
+  (else_try),
+    (assign, ":size_minimum", formation_min_foot_troops),
+    (neq, ":fformation", formation_none),
+    (assign, ":valid_type", 1), #all types valid
+  (try_end),
+  
+  (try_begin),
+      (eq, ":valid_type", 0),
+    (assign, ":num_troops", 0),
+  (else_try),
+    (store_add, ":slot", slot_team_d0_size, ":fdivision"),
+      (team_get_slot, ":num_troops", ":fteam", ":slot"),
+      (le, ":num_troops", ":size_minimum"),
+    (assign, ":num_troops", 1),
+  (try_end),
+  
+  (assign, reg0, ":num_troops"),
+  (gt, ":num_troops", 1)
+  ]),
+
+  # script_cf_valid_formation_member by motomataru #CABA - Modified for Classify_agent phase out
+  # Input: team, division, agent number of team leader, test agent
+  # Output: failure indicates agent is not member of formation
+  ("cf_valid_formation_member", [
+  (store_script_param, ":fteam", 1),
+  (store_script_param, ":fdivision", 2),
+  (store_script_param, ":fleader", 3),
+  (store_script_param, ":agent", 4),
+  (neq, ":fleader", ":agent"),
+  (agent_get_division, ":bgroup", ":agent"),
+  (eq, ":bgroup", ":fdivision"),
+  #(call_script, "script_classify_agent", ":agent"),
+  #(eq, reg0, ":fdivision"),
+  (agent_get_team, ":team", ":agent"),
+  (eq, ":team", ":fteam"),
+  (agent_is_alive, ":agent"),
+  (agent_is_human, ":agent"),
+  (agent_slot_eq, ":agent", slot_agent_is_running_away, 0),
+  ]),
+
+# #Player team formations functions
+  # script_player_attempt_formation
+  # Inputs: arg1: division
+  #     arg2: formation identifier (formation_*)
+  # Output: none
+  ("player_attempt_formation", [
+  (store_script_param, ":fdivision", 1),
+  (store_script_param, ":fformation", 2),
+  (set_fixed_point_multiplier, 100),
+  (try_begin),
+    (eq, ":fformation", formation_ranks),
+    (str_store_string, s1, "@ranks"),
+  (else_try),
+    (eq, ":fformation", formation_shield),
+    (str_store_string, s1, "@shield wall"),
+  (else_try),
+    (eq, ":fformation", formation_wedge),
+    (str_store_string, s1, "@wedge"),
+  (else_try),
+    (eq, ":fformation", formation_square),
+    (str_store_string, s1, "@square"),
+  (else_try),
+    (str_store_string, s1, "@up"),
+  (try_end),
+  (str_store_class_name, s2, ":fdivision"),
+
+  (try_begin),
+    (call_script, "script_cf_battlegroup_valid_formation", "$fplayer_team_no", ":fdivision", ":fformation"),
+    (try_begin),  #new formation?
+      (store_add, ":slot", slot_team_d0_formation, ":fdivision"),
+      (neg|team_slot_eq, "$fplayer_team_no", ":slot", ":fformation"),
+      (team_set_slot, "$fplayer_team_no", ":slot", ":fformation"),
+      (display_message, "@{!}{s2} forming {s1}."),
+      (store_add, ":slot", slot_team_d0_formation_space, ":fdivision"),
+      (team_get_slot, ":div_spacing", "$fplayer_team_no", ":slot"),
+      
+      #bring unformed divisions into sync with formations' minimum
+      (set_show_messages, 0),
+      (assign, reg0, ":div_spacing"),
+      (try_for_range, reg1, reg0, formation_start_spread_out),  #spread out for ease of forming up  
+        (team_give_order, "$fplayer_team_no", ":fdivision", mordr_spread_out),
+        (val_add, ":div_spacing", 1),
+      (try_end),
+      (set_show_messages, 1),
+      (team_set_slot, "$fplayer_team_no", ":slot", ":div_spacing"),
+    (try_end),
+    
+  (else_try),
+    (assign, ":return_val", reg0),
+    (call_script, "script_formation_end", "$fplayer_team_no", ":fdivision"),
+    (neq, ":fformation", formation_none),
+    (try_begin),
+      (gt, ":return_val", 0),
+      (display_message, "@Not enough troops in {s2} to form {s1}, but holding."),
+    (else_try),
+      (store_add, ":slot", slot_team_d0_type, ":fdivision"),
+      (team_get_slot, reg0, "$fplayer_team_no", ":slot"),
+      (call_script, "script_str_store_division_type_name", s3, reg0),
+      (display_message, "@{!}{s2} is an {s3} division and cannot form {s1}, so is holding."),
+    (try_end),
+  (try_end),
+  (call_script, "script_battlegroup_place_around_leader", "$fplayer_team_no", ":fdivision"),
+  ]),
+
+  # script_str_store_division_type_name by motomataru
+  # Input:  destination, division type (sdt_*)
+  # Output: none
+  ("str_store_division_type_name", [
+  (store_script_param, ":str_reg", 1),
+  (store_script_param, ":division_type", 2),
+  (try_begin),
+    (eq, ":division_type", sdt_infantry),
+    (str_store_string, ":str_reg", "@infantry"),
+  (else_try),
+    (eq, ":division_type", sdt_archer),
+    (str_store_string, ":str_reg", "@archer"),
+  (else_try),
+    (eq, ":division_type", sdt_cavalry),
+    (str_store_string, ":str_reg", "@cavalry"),
+  (else_try),
+    (eq, ":division_type", sdt_polearm),
+    (str_store_string, ":str_reg", "@polearm"),
+  (else_try),
+    (eq, ":division_type", sdt_skirmisher),
+    (str_store_string, ":str_reg", "@skirmisher"),
+  (else_try),
+    (eq, ":division_type", sdt_harcher),
+    (str_store_string, ":str_reg", "@mounted archer"),
+  (else_try),
+    (eq, ":division_type", sdt_support),
+    (str_store_string, ":str_reg", "@support"),
+  (else_try),
+    (eq, ":division_type", sdt_bodyguard),
+    (str_store_string, ":str_reg", "@bodyguard"),
+  (else_try),
+    (str_store_string, ":str_reg", "@undetermined type of"),
+  (try_end),
+  ]),
+  
+  # script_player_order_formations by motomataru
+  # Inputs: arg1: order to formation (mordr_*)
+  # Output: none
+  ("player_order_formations", [
+  (store_script_param, ":forder", 1),
+  (set_fixed_point_multiplier, 100),
+  
+  (try_begin), #On hold, any formations reform in new location    
+    (eq, ":forder", mordr_hold),
+    (call_script, "script_division_reset_places"),
+    (try_for_range, ":division", 0, 9),
+        (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_size, ":division"), #apply to all divisions (not just formations)
+      (team_slot_ge, "$fplayer_team_no", ":slot", 1),
+      (store_add, ":slot", slot_team_d0_formation, ":division"),
+      (team_get_slot, ":formation", "$fplayer_team_no", ":slot"),
+      (call_script, "script_player_attempt_formation", ":division", ":formation"),
+    (try_end),
+    
+  (else_try), #Follow is hold repeated frequently
+    (eq, ":forder", mordr_follow),
+    (try_for_range, ":division", 0, 9),
+        (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_size, ":division"), #apply to all divisions (not just formations)
+      (team_slot_ge, "$fplayer_team_no", ":slot", 1),
+      
+      (store_add, ":slot", slot_team_d0_formation, ":division"),  #update formations
+      (team_get_slot, ":formation", "$fplayer_team_no", ":slot"),
+      (call_script, "script_player_attempt_formation", ":division", ":formation"),
+
+      (store_add, ":slot", slot_team_d0_move_order, ":division"),
+      (team_set_slot, "$fplayer_team_no", ":slot", ":forder"),
+    (try_end),
+    
+  (else_try), #charge or retreat ends formation
+    (this_or_next|eq, ":forder", mordr_charge),
+    (eq, ":forder", mordr_retreat),
+    (try_for_range, ":division", 0, 9),
+        (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_move_order, ":division"),
+      (team_set_slot, "$fplayer_team_no", ":slot", ":forder"),
+      
+      (store_add, ":slot", slot_team_d0_formation, ":division"),
+      (neg|team_slot_eq, "$fplayer_team_no", ":slot", formation_none),
+      (call_script, "script_formation_end", "$fplayer_team_no", ":division"),
+      
+      (store_add, ":slot", slot_team_d0_type, ":division"),
+      (store_add, reg0, ":division", 1),
+      (try_begin),
+          (this_or_next|team_slot_eq, "$fplayer_team_no", ":slot", sdt_infantry),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_polearm),
+        (display_message, "@Division {reg0}: infantry formation disassembled."),
+      (else_try),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_archer),
+        (display_message, "@Division {reg0}: archer formation disassembled."),
+      (else_try),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_skirmisher),
+        (display_message, "@Division {reg0}: skirmisher formation disassembled."),
+      (else_try),
+        (this_or_next|team_slot_eq, "$fplayer_team_no", ":slot", sdt_cavalry),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_harcher),
+        (display_message, "@Division {reg0}: cavalry formation disassembled."),
+      (else_try),
+        (display_message, "@Division {reg0}: formation disassembled."),     
+      (try_end),
+    (try_end),
+    
+  (else_try), #dismount ends formation
+    (eq, ":forder", mordr_dismount),
+    (try_for_range, ":division", 0, 9),
+        (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_type, ":division"),
+      (this_or_next|team_slot_eq, "$fplayer_team_no", ":slot", sdt_cavalry),
+      (team_slot_eq, "$fplayer_team_no", ":slot", sdt_harcher),
+      (store_add, ":slot", slot_team_d0_formation, ":division"),
+      (neg|team_slot_eq, "$fplayer_team_no", ":slot", formation_none),
+      (call_script, "script_formation_end", "$fplayer_team_no", ":division"),
+      (display_message, "@Cavalry formation disassembled."),
+        (try_end),
+      
+  (else_try), 
+    (eq, ":forder", mordr_advance),
+    (try_for_range, ":division", 0, 9),
+        (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_move_order, ":division"),
+      (team_get_slot, ":prev_order", "$fplayer_team_no", ":slot"),  
+      (team_set_slot, "$fplayer_team_no", ":slot", ":forder"),  
+      
+      (store_add, ":slot", slot_team_d0_formation, ":division"),
+      (team_get_slot, ":formation", "$fplayer_team_no", ":slot"),
+      (neq, ":formation", formation_none),
+      
+      (call_script, "script_formation_current_position", pos63, "$fplayer_team_no", ":division"),
+      (try_begin),
+        (neq, ":prev_order", mordr_advance),
+        (call_script, "script_set_formation_position", "$fplayer_team_no", ":division", pos63),
+      (try_end),
+      (call_script, "script_formation_move_position", "$fplayer_team_no", ":division", pos63, 1),
+
+      (store_add, ":slot", slot_team_d0_formation_space, ":division"),
+      (team_get_slot, ":div_spacing", "$fplayer_team_no", ":slot"),
+      (store_add, ":slot", slot_team_d0_type, ":division"),
+      (try_begin),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_archer),
+        (call_script, "script_form_archers", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":formation"),
+      (else_try),
+          (this_or_next|team_slot_eq, "$fplayer_team_no", ":slot", sdt_cavalry),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_harcher),
+        (call_script, "script_form_cavalry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing"),
+      (else_try),
+        (call_script, "script_form_infantry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":formation"),
+      (try_end),
+        (try_end),      
+
+  (else_try),
+    (eq, ":forder", mordr_fall_back),
+    (try_for_range, ":division", 0, 9),
+        (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_move_order, ":division"),
+      (team_get_slot, ":prev_order", "$fplayer_team_no", ":slot"),  
+      (team_set_slot, "$fplayer_team_no", ":slot", ":forder"),  
+      
+      (store_add, ":slot", slot_team_d0_formation, ":division"),
+      (team_get_slot, ":formation", "$fplayer_team_no", ":slot"),
+      (neq, ":formation", formation_none),
+      
+      (call_script, "script_formation_current_position", pos63, "$fplayer_team_no", ":division"),
+      (try_begin),
+        (neq, ":prev_order", mordr_fall_back),
+        (call_script, "script_set_formation_position", "$fplayer_team_no", ":division", pos63),
+      (try_end),
+      (call_script, "script_formation_move_position", "$fplayer_team_no", ":division", pos63, -1),      
+
+      (store_add, ":slot", slot_team_d0_formation_space, ":division"),
+      (team_get_slot, ":div_spacing", "$fplayer_team_no", ":slot"),
+      (store_add, ":slot", slot_team_d0_type, ":division"),
+      (try_begin),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_archer),
+        (call_script, "script_form_archers", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":formation"),
+      (else_try),
+          (this_or_next|team_slot_eq, "$fplayer_team_no", ":slot", sdt_cavalry),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_harcher),
+        (call_script, "script_form_cavalry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing"),
+      (else_try),
+        (call_script, "script_form_infantry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":formation"),
+      (try_end),
+        (try_end),    
+
+  (else_try),
+    (eq, ":forder", mordr_stand_closer),    
+    (try_for_range, ":division", 0, 9),
+        (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_formation_space, ":division"),
+      (team_get_slot, ":div_spacing", "$fplayer_team_no", ":slot"),
+      (gt, ":div_spacing", -3), #Native formations go down to four ranks
+      (val_sub, ":div_spacing", 1),
+      (team_set_slot, "$fplayer_team_no", ":slot", ":div_spacing"),
+      
+      (store_add, ":slot", slot_team_d0_formation, ":division"),
+      (team_get_slot, ":formation", "$fplayer_team_no", ":slot"),
+      (neq, ":formation", formation_none),
+      
+      (try_begin),  #bring unformed divisions into sync with formations' minimum
+        (lt, ":div_spacing", 0),
+        (set_show_messages, 0),
+        (assign, reg0, ":div_spacing"),
+        (try_for_range, reg1, reg0, 0),
+          (team_give_order, "$fplayer_team_no", ":division", mordr_spread_out),
+          (val_add, ":div_spacing", 1),
+        (try_end),
+        (set_show_messages, 1),
+        (store_add, ":slot", slot_team_d0_formation_space, ":division"),
+        (team_set_slot, "$fplayer_team_no", ":slot", ":div_spacing"),
+        
+      (else_try),
+        (call_script, "script_get_formation_position", pos1, "$fplayer_team_no", ":division"),
+        (store_add, ":slot", slot_team_d0_type, ":division"),
+        (try_begin),
+          (team_slot_eq, "$fplayer_team_no", ":slot", sdt_archer),
+          (store_add, ":slot", slot_team_d0_size, ":division"),
+          (team_get_slot, ":troop_count", "$fplayer_team_no", ":slot"),
+          (call_script, "script_get_centering_amount", formation_default, ":troop_count", ":div_spacing"),
+          (val_mul, reg0, -1),
+          (position_move_x, pos1, reg0),        
+          (call_script, "script_form_archers", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":formation"),
+        (else_try),
+          (this_or_next|team_slot_eq, "$fplayer_team_no", ":slot", sdt_cavalry),
+          (team_slot_eq, "$fplayer_team_no", ":slot", sdt_harcher),
+          (call_script, "script_form_cavalry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing"),
+        (else_try),
+          (store_add, ":slot", slot_team_d0_size, ":division"),
+          (team_get_slot, ":troop_count", "$fplayer_team_no", ":slot"),
+          (call_script, "script_get_centering_amount", ":formation", ":troop_count", ":div_spacing"),
+          (position_move_x, pos1, reg0),
+          (call_script, "script_form_infantry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":formation"),
+        (try_end),
+      (try_end),
+    (try_end),
+
+  (else_try),
+    (eq, ":forder", mordr_spread_out),
+    (try_for_range, ":division", 0, 9),
+        (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_formation, ":division"),
+      (team_get_slot, ":formation", "$fplayer_team_no", ":slot"),
+      (store_add, ":slot", slot_team_d0_formation_space, ":division"),
+      (team_get_slot, ":div_spacing", "$fplayer_team_no", ":slot"),
+      (try_begin),
+        (this_or_next|neq, ":formation", formation_none),
+        (lt, ":div_spacing", 2),  #Native maxes at 2
+        (val_add, ":div_spacing", 1),
+      (try_end),
+      (team_set_slot, "$fplayer_team_no", ":slot", ":div_spacing"),
+      
+      (neq, ":formation", formation_none),
+
+      #bring unformed divisions into sync with formations' minimum
+      (set_show_messages, 0),
+      (assign, reg0, ":div_spacing"),
+      (try_for_range, reg1, reg0, 1),
+        (team_give_order, "$fplayer_team_no", ":division", mordr_spread_out),
+        (val_add, ":div_spacing", 1),
+      (try_end),
+      (set_show_messages, 1),
+      (store_add, ":slot", slot_team_d0_formation_space, ":division"),
+      (team_set_slot, "$fplayer_team_no", ":slot", ":div_spacing"),
+
+      (call_script, "script_get_formation_position", pos1, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_type, ":division"),
+      (try_begin),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_archer),
+          (store_add, ":slot", slot_team_d0_size, ":division"),
+              (team_get_slot, ":troop_count", "$fplayer_team_no", ":slot"),
+          (call_script, "script_get_centering_amount", formation_default, ":troop_count", ":div_spacing"),
+          (val_mul, reg0, -1),
+          (position_move_x, pos1, reg0),        
+        (call_script, "script_form_archers", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":formation"),
+      (else_try),
+          (this_or_next|team_slot_eq, "$fplayer_team_no", ":slot", sdt_cavalry),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_harcher),
+        (call_script, "script_form_cavalry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing"),
+      (else_try),
+        (store_add, ":slot", slot_team_d0_size, ":division"), 
+              (team_get_slot, ":troop_count", "$fplayer_team_no", ":slot"),
+        (call_script, "script_get_centering_amount", ":formation", ":troop_count", ":div_spacing"),
+          (position_move_x, pos1, reg0),
+        (call_script, "script_form_infantry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":formation"), 
+      (try_end),
+    (try_end),
+
+  (else_try),
+    (eq, ":forder", mordr_stand_ground),
+    (try_for_range, ":division", 0, 9),
+        (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_move_order, ":division"),
+      (team_set_slot, "$fplayer_team_no", ":slot", ":forder"),  
+      
+      (store_add, ":slot", slot_team_d0_formation, ":division"),
+      (team_get_slot, ":formation", "$fplayer_team_no", ":slot"),
+      (neq, ":formation", formation_none),
+      
+      (call_script, "script_formation_current_position", pos63, "$fplayer_team_no", ":division"),
+      (copy_position, pos1, pos63),   
+      (store_add, ":slot", slot_team_d0_formation_space, ":division"),
+      (team_get_slot, ":div_spacing", "$fplayer_team_no", ":slot"),
+      
+      (store_add, ":slot", slot_team_d0_type, ":division"),
+      (try_begin),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_archer),
+          (store_add, ":slot", slot_team_d0_size, ":division"),
+              (team_get_slot, ":troop_count", "$fplayer_team_no", ":slot"),
+          (call_script, "script_get_centering_amount", formation_default, ":troop_count", ":div_spacing"),
+          (val_mul, reg0, -1),
+          (position_move_x, pos1, reg0),        
+        (call_script, "script_form_archers", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":formation"),
+      (else_try),
+          (this_or_next|team_slot_eq, "$fplayer_team_no", ":slot", sdt_cavalry),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_harcher),
+        (call_script, "script_form_cavalry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing"),
+      (else_try),
+        (store_add, ":slot", slot_team_d0_size, ":division"),
+              (team_get_slot, ":troop_count", "$fplayer_team_no", ":slot"), 
+        (call_script, "script_get_centering_amount", ":formation", ":troop_count", ":div_spacing"),
+          (position_move_x, pos1, reg0),
+        (call_script, "script_form_infantry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":formation"),
+      (try_end),
+      (call_script, "script_set_formation_position", "$fplayer_team_no", ":division", pos63),
+    (try_end),      
+  (try_end)
+  ]),
+
+  
+# #Utilities used by formations
+  # script_point_y_toward_position by motomataru
+  # Input: from position, to position
+  # Output: reg0 fixed point distance
+  ("point_y_toward_position", [
+  (store_script_param, ":from_position", 1),
+  (store_script_param, ":to_position", 2),
+  (position_get_x, ":dist_x_to_cosine", ":to_position"),
+  (position_get_x, ":from_coord", ":from_position"),
+  (val_sub, ":dist_x_to_cosine", ":from_coord"),
+  (store_mul, ":sum_square", ":dist_x_to_cosine", ":dist_x_to_cosine"),
+  (position_get_y, ":dist_y_to_sine", ":to_position"),
+  (position_get_y, ":from_coord", ":from_position"),
+  (val_sub, ":dist_y_to_sine", ":from_coord"),
+  (store_mul, reg0, ":dist_y_to_sine", ":dist_y_to_sine"),
+  (val_add, ":sum_square", reg0),
+  (convert_from_fixed_point, ":sum_square"),
+  (store_sqrt, ":distance_between", ":sum_square"),
+  (convert_to_fixed_point, ":dist_x_to_cosine"),
+  (val_div, ":dist_x_to_cosine", ":distance_between"),
+  (convert_to_fixed_point, ":dist_y_to_sine"),
+  (val_div, ":dist_y_to_sine", ":distance_between"),
+  (try_begin),
+    (lt, ":dist_x_to_cosine", 0),
+    (assign, ":bound_a", 90),
+    (assign, ":bound_b", 270),
+    (assign, ":theta", 180),
+  (else_try),
+    (assign, ":bound_a", 90),
+    (assign, ":bound_b", -90),
+    (assign, ":theta", 0),
+  (try_end),
+  (assign, ":sine_theta", 0), #avoid error on compile
+  (convert_to_fixed_point, ":theta"),
+  (convert_to_fixed_point, ":bound_a"),
+  (convert_to_fixed_point, ":bound_b"),
+  (try_for_range, reg0, 0, 6),  #precision 90/2exp6 (around 2 degrees)
+    (store_sin, ":sine_theta", ":theta"),
+    (try_begin),
+      (gt, ":sine_theta", ":dist_y_to_sine"),
+      (assign, ":bound_a", ":theta"),
+    (else_try),
+      (lt, ":sine_theta", ":dist_y_to_sine"),
+      (assign, ":bound_b", ":theta"),
+    (try_end),
+    (store_add, ":angle_sum", ":bound_b", ":bound_a"),
+    (store_div, ":theta", ":angle_sum", 2),
+  (try_end),
+  (convert_from_fixed_point, ":theta"),
+  (position_get_rotation_around_z, reg0, ":from_position"),
+  (val_sub, ":theta", reg0),
+  (val_sub, ":theta", 90),  #point y-axis at destination
+  (position_rotate_z, ":from_position", ":theta"),
+  (assign, reg0, ":distance_between"),
+  ]),
+
+  # script_store_battlegroup_type by Caba'drin   ##NEEDS EDIT per PMs with moto
+  # Input: team, division
+  # Output: reg0 and slot_team_dx_type with sdt_* value
+  # Automatically called from store_battlegroup_data
+  ("store_battlegroup_type", [
+    (store_script_param_1, ":fteam"),
+  (store_script_param_2, ":fdivision"),
+  
+  #hard-code the traditional three
+  (try_begin),
+    (eq, ":fdivision", grc_infantry),
+    (assign, ":div_type", sdt_infantry),
+  (else_try),
+    (eq, ":fdivision", grc_archers),
+    (assign, ":div_type", sdt_archer),
+  (else_try),
+    (eq, ":fdivision", grc_cavalry),
+    (assign, ":div_type", sdt_cavalry),
+    
+  #attempt to type the rest
+  (else_try),
+    (assign, ":count_infantry", 0),
+    (assign, ":count_archer", 0),
+    (assign, ":count_cavalry", 0),
+    (assign, ":count_harcher", 0),
+    (assign, ":count_polearms", 0),
+    (assign, ":count_skirmish", 0),
+    (assign, ":count_support", 0),
+    (assign, ":count_bodyguard", 0),  
+
+    (try_for_agents, ":cur_agent"),
+      (agent_is_alive, ":cur_agent"),      
+      (agent_is_human, ":cur_agent"), 
+      (agent_slot_eq, ":cur_agent", slot_agent_is_running_away, 0),
+      (agent_get_team, ":bgteam", ":cur_agent"),
+      (eq, ":bgteam", ":fteam"),
+      #(call_script, "script_classify_agent", ":cur_agent"),
+      #(assign, ":bgroup", reg0),
+      (team_get_leader, ":leader", ":fteam"),
+      (neq, ":leader", ":cur_agent"),
+      (agent_get_division, ":bgroup", ":cur_agent"),
+      (eq, ":bgroup", ":fdivision"),
+      (agent_get_troop_id, ":cur_troop", ":cur_agent"),
+      (agent_get_ammo, ":cur_ammo", ":cur_agent", 0),
+      (agent_get_wielded_item, reg0, ":cur_agent", 0),
+      
+      (try_begin),
+        (lt, reg0, 0),
+        (assign, ":cur_weapon_type", 0),
+      (else_try),
+        (item_get_type, ":cur_weapon_type", reg0), 
+      (try_end),
+      
+      (try_begin),
+        (neg|troop_is_hero, ":cur_troop"),
+        (try_begin), #Cavalry 
+          (agent_get_horse, reg0, ":cur_agent"),
+          (ge, reg0, 0),
+          (try_begin),        
+            (gt, ":cur_ammo", 0),
+            (val_add, ":count_harcher", 1),
+          (else_try),
+            (val_add, ":count_cavalry", 1),
+          (try_end),
+        (else_try), #Archers
+          (gt, ":cur_ammo", 0),
+          (try_begin),
+            (eq, ":cur_weapon_type", itp_type_thrown),
+            (val_add, ":count_skirmish", 1),
+          (else_try),
+            (val_add, ":count_archer", 1),
+          (try_end),
+        (else_try), #Infantry
+          (try_begin),
+            (eq, ":cur_weapon_type", itp_type_polearm),
+            (val_add, ":count_polearms", 1),
+          (else_try),
+            (val_add, ":count_infantry", 1),
+          (try_end),          
+        (try_end),
+      (else_try), #Heroes
+        (assign, ":support_skills", 0), #OPEN TO SUGGESTIONS HERE    ?skl_trade, skl_spotting, skl_pathfinding, skl_tracking?
+        (store_skill_level, reg0, skl_engineer, ":cur_troop"),
+        (val_add, ":support_skills", reg0),
+        (store_skill_level, reg0, skl_first_aid, ":cur_troop"),
+        (val_add, ":support_skills", reg0),
+        (store_skill_level, reg0, skl_surgery, ":cur_troop"),
+        (val_add, ":support_skills", reg0),
+        (store_skill_level, reg0, skl_wound_treatment, ":cur_troop"),
+        (val_add, ":support_skills", reg0),
+        (try_begin),
+          (gt, ":support_skills", 5),
+          (val_add, ":count_support", 1),
+        (else_try),
+          (val_add, ":count_bodyguard", 1),
+        (try_end),    
+      (try_end), #Regular v Hero    
+    (try_end), #Agent Loop  
+      
+    #Do Comparisons With Counts, set ":div_type"
+    (assign, ":slot", slot_team_d0_type),
+    (team_set_slot, 7, ":slot", ":count_infantry"),
+    (val_add, ":slot", 1),
+    (team_set_slot, 7, ":slot", ":count_archer"),
+    (val_add, ":slot", 1),
+    (team_set_slot, 7, ":slot", ":count_cavalry"),
+    (val_add, ":slot", 1),
+    (team_set_slot, 7, ":slot", ":count_polearms"),
+    (val_add, ":slot", 1),
+    (team_set_slot, 7, ":slot", ":count_skirmish"),
+    (val_add, ":slot", 1),
+    (team_set_slot, 7, ":slot", ":count_harcher"),
+    (val_add, ":slot", 1),
+    (team_set_slot, 7, ":slot", ":count_support"),
+    (val_add, ":slot", 1),
+    (team_set_slot, 7, ":slot", ":count_bodyguard"),
+
+    (assign, ":count_to_beat", 0),
+    (assign, ":count_total", 0),
+    (try_for_range, ":type", sdt_infantry, sdt_infantry + 8), #only 8 sdt_types at the moment
+      (store_add, ":slot", slot_team_d0_type, ":type"),
+      (team_get_slot, ":count", 7, ":slot"),
+      (val_add, ":count_total", ":count"),
+      (lt, ":count_to_beat", ":count"),
+      (assign, ":count_to_beat", ":count"),
+      (assign, ":div_type", ":type"),
+    (try_end),
+    
+    (val_mul, ":count_to_beat", 2),
+    (try_begin),
+      (lt, ":count_to_beat", ":count_total"), #Less than half of this division
+      (assign, ":count_to_beat", 0),
+      (assign, ":div_type", -1),
+      (try_for_range, ":type", sdt_infantry, sdt_infantry + 3), #check main types for a majority
+        (store_add, ":slot", slot_team_d0_type, ":type"),
+        (team_get_slot, ":count", 7, ":slot"),
+        (val_add, ":slot", 3),  #subtype is three more than main type
+        (team_get_slot, reg0, 7, ":slot"),
+        (val_add, ":count", reg0),
+        (lt, ":count_to_beat", ":count"),
+        (assign, ":count_to_beat", ":count"),
+        (assign, ":div_type", ":type"),
+      (try_end),
+    
+      (val_mul, ":count_to_beat", 2),
+      (lt, ":count_to_beat", ":count_total"), #Less than half of this division
+      (assign, ":div_type", sdt_unknown), #Or 0
+    (try_end),
+  (try_end),  #divisions 3-8
+  
+  (store_add, ":slot", slot_team_d0_type, ":fdivision"),
+  (team_set_slot, ":fteam", ":slot", ":div_type"),
+  (assign, reg0, ":div_type"),  
+  ]),
+
+  # script_store_battlegroup_data by motomataru #EDITED TO SLOTS FOR MANY DIVISIONS BY CABA'DRIN
+  # Input: none
+  # Output: sets positions and globals to track data on ALL groups in a battle
+  # Globals used: pos1, reg0, reg1, #CABA - NO LONGER USED: positions 24-45
+  ("store_battlegroup_data", [
+  (assign, ":team0_leader", 0),
+  (assign, ":team0_x_leader", 0),
+  (assign, ":team0_y_leader", 0),
+  (assign, ":team0_level_leader", 0),
+  (assign, ":team1_leader", 0),
+  (assign, ":team1_x_leader", 0),
+  (assign, ":team1_y_leader", 0),
+  (assign, ":team1_level_leader", 0),
+  (assign, ":team2_leader", 0),
+  (assign, ":team2_x_leader", 0),
+  (assign, ":team2_y_leader", 0),
+  (assign, ":team2_level_leader", 0),
+  (assign, ":team3_leader", 0),
+  (assign, ":team3_x_leader", 0),
+  (assign, ":team3_y_leader", 0),
+  (assign, ":team3_level_leader", 0),
+  
+  #Team Slots reset every mission, like agent slots, but just to be sure for when it gets called during the mission
+  (try_for_range, ":team", 0, 4),
+      (try_for_range, ":slot", reset_team_stats_begin, reset_team_stats_end), #Those within the "RESET GROUP" in formations_constants
+        (team_set_slot, ":team", ":slot", 0),
+    (try_end),
+    (try_for_range, ":bgroup", 0, 9),
+      (store_add, ":slot", slot_team_d0_first_member, ":bgroup"),
+      (team_set_slot, ":team", ":slot", -1),
+    (try_end),
+  (try_end),
+
+  (try_for_agents, ":cur_agent"),
+    (agent_is_alive, ":cur_agent"),      
+    (agent_is_human, ":cur_agent"), 
+    (agent_slot_eq, ":cur_agent", slot_agent_is_running_away, 0),
+    (agent_get_team, ":bgteam", ":cur_agent"),
+    #(call_script, "script_classify_agent", ":cur_agent"),
+    #(assign, ":bgroup", reg0),
+    (agent_get_division, ":bgroup", ":cur_agent"),
+    (try_begin),
+      (team_get_leader, ":leader", ":bgteam"),
+        (eq, ":leader", ":cur_agent"),
+      (assign, ":bgroup", -1),
+    (try_end),
+    (agent_get_troop_id, ":cur_troop", ":cur_agent"),
+    (store_character_level, ":cur_level", ":cur_troop"),
+    (agent_get_ammo, ":cur_ammo", ":cur_agent", 0),
+    (assign, ":cur_weapon_type", 0),
+    (assign, ":cur_weapon_length", 0),
+    (agent_get_wielded_item, reg0, ":cur_agent", 0),
+    (try_begin),
+      (gt, reg0, itm_no_item),
+      (item_get_type, ":cur_weapon_type", reg0),
+      (this_or_next|eq, ":cur_weapon_type", itp_type_one_handed_wpn),
+      (this_or_next|eq, ":cur_weapon_type", itp_type_two_handed_wpn),
+      (this_or_next|eq, ":cur_weapon_type", itp_type_polearm),
+      (eq, ":cur_weapon_type", itp_type_thrown),
+      (item_get_slot, ":cur_weapon_length", reg0, slot_item_length),
+    (try_end),
+    (agent_get_position, pos1, ":cur_agent"),
+    (position_get_x, ":x_value", pos1),
+    (position_get_y, ":y_value", pos1),
+    (try_begin),
+        (eq, ":bgroup", -1), #Leaders
+      (try_begin),
+        (eq, ":bgteam", 0),
+        (assign, ":team0_leader", 1),
+        (assign, ":team0_x_leader", ":x_value"),
+        (assign, ":team0_y_leader", ":y_value"),
+        (assign, ":team0_level_leader", ":cur_level"),
+      (else_try),
+        (eq, ":bgteam", 1),
+        (assign, ":team1_leader", 1),
+        (assign, ":team1_x_leader", ":x_value"),
+        (assign, ":team1_y_leader", ":y_value"),
+        (assign, ":team1_level_leader", ":cur_level"),
+      (else_try),
+        (eq, ":bgteam", 2),
+        (assign, ":team2_leader", 1),
+        (assign, ":team2_x_leader", ":x_value"),
+        (assign, ":team2_y_leader", ":y_value"),
+        (assign, ":team2_level_leader", ":cur_level"),
+      (else_try),
+        (eq, ":bgteam", 3),
+        (assign, ":team3_leader", 1),
+        (assign, ":team3_x_leader", ":x_value"),
+        (assign, ":team3_y_leader", ":y_value"),
+        (assign, ":team3_level_leader", ":cur_level"),
+      (try_end),
+    (else_try),
+      (try_begin),  #First Agent
+        (store_add, ":slot", slot_team_d0_first_member, ":bgroup"),
+        (neg|team_slot_ge, ":bgteam", ":slot", 0),
+        (team_set_slot, ":bgteam", ":slot", ":cur_agent"),
+      (try_end),
+      
+      (store_add, ":slot", slot_team_d0_size, ":bgroup"), #Division Count
+      (team_get_slot, ":value", ":bgteam", ":slot"),
+      (val_add, ":value", 1),
+      (team_set_slot, ":bgteam", ":slot", ":value"),
+      
+      (try_begin),
+        (gt, ":cur_ammo", 0),
+        (store_add, ":slot", slot_team_d0_percent_ranged, ":bgroup"), #Division Percentage are Archers
+        (team_get_slot, ":value", ":bgteam", ":slot"),
+        (val_add, ":value", 1),
+        (team_set_slot, ":bgteam", ":slot", ":value"),
+      (else_try),
+        (store_add, ":slot", slot_team_d0_low_ammo, ":bgroup"), #Division Running out of Ammo Flag
+        (team_set_slot, ":bgteam", ":slot", 1),
+      (try_end),
+      
+      (try_begin),
+        (eq, ":cur_weapon_type", itp_type_thrown),
+        (store_add, ":slot", slot_team_d0_percent_throwers, ":bgroup"), #Division Percentage are Throwers
+        (team_get_slot, ":value", ":bgteam", ":slot"),
+        (val_add, ":value", 1),
+        (team_set_slot, ":bgteam", ":slot", ":value"),
+      (try_end),
+      
+      (store_add, ":slot", slot_team_d0_level, ":bgroup"), #Division Level
+      (team_get_slot, ":value", ":bgteam", ":slot"),
+      (val_add, ":value", ":cur_level"),
+      (team_set_slot, ":bgteam", ":slot", ":value"),
+      
+      (store_add, ":slot", slot_team_d0_weapon_length, ":bgroup"), #Division Weapon Length
+      (team_get_slot, ":value", ":bgteam", ":slot"),
+      (val_add, ":value", ":cur_weapon_length"),
+      (team_set_slot, ":bgteam", ":slot", ":value"),
+      
+      (store_add, ":slot", slot_team_d0_x, ":bgroup"), #Position X
+      (team_get_slot, ":value", ":bgteam", ":slot"),
+      (val_add, ":value", ":x_value"),
+      (team_set_slot, ":bgteam", ":slot", ":value"),
+      
+      (store_add, ":slot", slot_team_d0_y, ":bgroup"), #Position Y
+      (team_get_slot, ":value", ":bgteam", ":slot"),
+      (val_add, ":value", ":y_value"),
+      (team_set_slot, ":bgteam", ":slot", ":value"),
+    (try_end), #Leader vs Regular
+  (try_end), #Agent Loop
+
+  #calculate team sizes, sum positions; within calculate battle group averages
+  (try_for_range, ":team", 0, 4),
+      (assign, ":team_size", 0),
+    (assign, ":team_level", 0),
+    (assign, ":team_x", 0),
+    (assign, ":team_y", 0),
+    
+    (assign, ":num_infantry", 0),
+    (assign, ":num_archers", 0),
+    (assign, ":num_cavalry", 0),
+    
+      (try_for_range, ":division", 0, 9),
+        #sum for team averages
+        (store_add, ":slot", slot_team_d0_size, ":division"),
+        (team_get_slot, ":division_size", ":team", ":slot"),
+      (gt, ":division_size", 0),
+      (val_add, ":team_size", ":division_size"),
+      
+      (store_add, ":slot", slot_team_d0_level, ":division"),
+        (team_get_slot, ":division_level", ":team", ":slot"),
+      (val_add, ":team_level", ":division_level"),
+      
+      (store_add, ":slot", slot_team_d0_x, ":division"),
+        (team_get_slot, ":division_x", ":team", ":slot"),
+      (val_add, ":team_x", ":division_x"),
+      
+      (store_add, ":slot", slot_team_d0_y, ":division"),
+        (team_get_slot, ":division_y", ":team", ":slot"),
+      (val_add, ":team_y", ":division_y"),
+      
+            #calculate battle group averages
+      (store_add, ":slot", slot_team_d0_level, ":division"),
+      (val_div, ":division_level", ":division_size"),     
+      (team_set_slot, ":team", ":slot", ":division_level"),
+      
+      (store_add, ":slot", slot_team_d0_percent_ranged, ":division"),
+      (team_get_slot, ":value", ":team", ":slot"),
+      (val_mul, ":value", 100),
+      (val_div, ":value", ":division_size"), 
+      (team_set_slot, ":team", ":slot", ":value"),  
+
+      (store_add, ":slot", slot_team_d0_percent_throwers, ":division"),
+      (team_get_slot, ":value", ":team", ":slot"),
+      (val_mul, ":value", 100),
+      (val_div, ":value", ":division_size"), 
+      (team_set_slot, ":team", ":slot", ":value"),  
+    
+      (store_add, ":slot", slot_team_d0_weapon_length, ":division"),
+        (team_get_slot, ":value", ":team", ":slot"),
+      (val_div, ":value", ":division_size"),
+      (team_set_slot, ":team", ":slot", ":value"),
+      
+      (store_add, ":slot", slot_team_d0_x, ":division"),
+      (val_div, ":division_x", ":division_size"),
+        (team_set_slot, ":team", ":slot", ":division_x"),
+      
+      (store_add, ":slot", slot_team_d0_y, ":division"),
+      (val_div, ":division_y", ":division_size"),
+        (team_set_slot, ":team", ":slot", ":division_y"),
+      
+      #(try_begin),
+      #    (lt, ":division", 3), #CABA - This works right now, as only the player has other divisions enabled...NEED TO RECONSIDER LATER
+      #    (store_mul, ":team_shift", ":team", 4),
+        #    (store_add, ":position_number", Team0_Infantry_Pos, ":team_shift"),
+      #    (val_add, ":position_number", ":division"),
+      #(else_try),
+      #    (store_sub, ":team_shift", ":division", 3),
+      # (store_add, ":position_number", Player_Battle_Group3_Pos, ":team_shift"),
+      #(try_end),         
+        #(init_position, ":position_number"), #CABA - REMOVED AUTOMATIC initialization of positions...problem?
+      
+      #(val_div, ":division_x", ":division_size"),
+      #(position_set_x, ":position_number", ":division_x"),
+      #(val_div, ":division_y", ":division_size"),
+      #(position_set_y, ":position_number", ":division_y"),
+      #(position_set_z_to_ground_level, ":position_number"),
+
+      (store_add, ":slot", slot_team_d0_type, ":division"),
+      (team_get_slot, reg0, ":team", ":slot"),
+      (try_begin),
+        (neg|is_between, reg0, 0, 8), #TODO reset on reinforcements
+                (call_script, "script_store_battlegroup_type", ":team", ":division"),
+      (try_end),
+            (try_begin),
+                (this_or_next|eq, reg0, sdt_infantry),
+        (eq, reg0, sdt_polearm),
+        (val_add, ":num_infantry", ":division_size"),
+      (else_try),
+          (this_or_next|eq, reg0, sdt_archer),
+        (eq, reg0, sdt_skirmisher),
+        (val_add, ":num_archers", ":division_size"),
+      (else_try),
+          (this_or_next|eq, reg0, sdt_cavalry),
+        (eq, reg0, sdt_harcher),
+        (val_add, ":num_cavalry", ":division_size"),
+      (try_end),
+    (try_end), #Division Loop
+    
+    (team_set_slot, ":team", slot_team_num_infantry, ":num_infantry"),
+    (team_set_slot, ":team", slot_team_num_archers, ":num_archers"),
+    (team_set_slot, ":team", slot_team_num_cavalry, ":num_cavalry"),
+
+    #Team Leader Additions
+    (try_begin),
+        (eq, ":team", 0),
+      (val_add, ":team_size", ":team0_leader"),
+      (val_add, ":team_level", ":team0_level_leader"),
+      (val_add, ":team_x", ":team0_x_leader"),
+      (val_add, ":team_y", ":team0_y_leader"),
+    (else_try),
+        (eq, ":team", 1),
+      (val_add, ":team_size", ":team1_leader"),
+      (val_add, ":team_level", ":team1_level_leader"),
+      (val_add, ":team_x", ":team1_x_leader"),
+      (val_add, ":team_y", ":team1_y_leader"),
+    (else_try),
+      (eq, ":team", 2),
+      (val_add, ":team_size", ":team2_leader"),
+      (val_add, ":team_level", ":team2_level_leader"),
+      (val_add, ":team_x", ":team2_x_leader"),
+      (val_add, ":team_y", ":team2_y_leader"),
+    (else_try),
+      (eq, ":team", 3),
+      (val_add, ":team_size", ":team3_leader"),
+      (val_add, ":team_level", ":team3_level_leader"),
+      (val_add, ":team_x", ":team3_x_leader"),
+      (val_add, ":team_y", ":team3_y_leader"),    
+    (try_end),
+    
+    #calculate team averages 
+    (gt, ":team_size", 0),
+    (team_set_slot, ":team", slot_team_size, ":team_size"),
+    (val_div, ":team_level", ":team_size"),
+    (team_set_slot, ":team", slot_team_level, ":team_level"), 
+      
+    (val_div, ":team_x", ":team_size"),
+    (team_set_slot, ":team", slot_team_avg_x, ":team_x"),
+    (val_div, ":team_y", ":team_size"),
+    (team_set_slot, ":team", slot_team_avg_y, ":team_y"),
+    
+    #(store_mul, ":team_shift", ":team", 4),
+    #(store_add, ":position_number", Team0_Average_Pos, ":team_shift"),
+    # (store_add, ":position_number", Team0_Average_Pos, ":team"),
+    # (init_position, ":position_number"),    
+    # (val_div, ":team_x", ":team_size"),
+    # (position_set_x, ":position_number", ":team_x"),
+    # (val_div, ":team_y", ":team_size"),
+    # (position_set_y, ":position_number", ":team_y"),
+    # (position_set_z_to_ground_level, ":position_number"),
+  (try_end), #Team Loop
+  ]),
+
+  # script_team_get_position_of_enemies by motomataru
+  # Input: destination position, team, troop class/division
+  # Output: destination position: average position if reg0 > 0
+  #     reg0: number of enemies
+  # Run script_store_battlegroup_data before calling!
+  ("team_get_position_of_enemies", [
+  (store_script_param, ":enemy_position", 1),
+  (store_script_param, ":team_no", 2),
+  (store_script_param, ":troop_type", 3),
+  (assign, ":pos_x", 0),
+  (assign, ":pos_y", 0),
+  (assign, ":total_size", 0),
+  
+  (try_for_range, ":other_team", 0, 4),
+    (teams_are_enemies, ":other_team", ":team_no"),
+    (try_begin),
+      (eq, ":troop_type", grc_everyone),
+      (team_get_slot, ":team_size", ":other_team", slot_team_size),
+      (try_begin),
+        (gt, ":team_size", 0),
+        (call_script, "script_battlegroup_get_position", ":enemy_position", ":other_team", grc_everyone),
+        (position_get_x, reg0, ":enemy_position"),
+        (val_mul, reg0, ":team_size"),
+        (val_add, ":pos_x", reg0),
+        (position_get_y, reg0, ":enemy_position"),
+        (val_mul, reg0, ":team_size"),
+        (val_add, ":pos_y", reg0),
+      (try_end),
+    (else_try), #MOTO: this doesn't work -- for multiple divisions, should find the CLOSEST of a given type
+      (assign, ":team_size", 0),
+      (try_for_range, ":enemy_battle_group", 0, 9),
+        (eq, ":enemy_battle_group", ":troop_type"),
+        (store_add, ":slot", slot_team_d0_size, ":troop_type"),
+              (team_get_slot, ":troop_count", ":other_team", ":slot"),
+        (gt, ":troop_count", 0),
+        (val_add, ":team_size", ":troop_count"),
+        (call_script, "script_battlegroup_get_position", ":enemy_position", ":other_team", ":troop_type"),
+        (position_get_x, reg0, ":enemy_position"),
+        (val_mul, reg0, ":team_size"),
+        (val_add, ":pos_x", reg0),
+        (position_get_y, reg0, ":enemy_position"),
+        (val_mul, reg0, ":team_size"),
+        (val_add, ":pos_y", reg0),
+      (try_end),
+    (try_end),
+    (val_add, ":total_size", ":team_size"),
+  (try_end),
+  
+  (try_begin),
+    (eq, ":total_size", 0),
+    (init_position, ":enemy_position"),
+  (else_try),
+    (val_div, ":pos_x", ":total_size"),
+    (position_set_x, ":enemy_position", ":pos_x"),
+    (val_div, ":pos_y", ":total_size"),
+    (position_set_y, ":enemy_position", ":pos_y"),
+    (position_set_z_to_ground_level, ":enemy_position"),
+  (try_end),
+
+  (assign, reg0, ":total_size"),
+  ]),
+
+# # M&B Standard AI with changes for formations #CABA - OK; Need expansion when new AI divisions to work with
+  # script_formation_battle_tactic_init_aux
+  # Input: team_no, battle_tactic
+  # Output: none
+  ("formation_battle_tactic_init_aux",
+    [
+      (store_script_param, ":team_no", 1),
+      (store_script_param, ":battle_tactic", 2),
+      (team_get_leader, ":ai_leader", ":team_no"),
+      (try_begin),
+        (eq, ":battle_tactic", btactic_hold),
+        (agent_get_position, pos1, ":ai_leader"),
+        (call_script, "script_find_high_ground_around_pos1", ":team_no", 30),
+        (copy_position, pos1, pos52),
+        (call_script, "script_find_high_ground_around_pos1", ":team_no", 30), # call again just in case we are not at peak point.
+        (copy_position, pos1, pos52),
+        (call_script, "script_find_high_ground_around_pos1", ":team_no", 30), # call again just in case we are not at peak point.
+        (team_give_order, ":team_no", grc_everyone, mordr_hold),
+        (team_set_order_position, ":team_no", grc_everyone, pos52),
+        (team_give_order, ":team_no", grc_archers, mordr_advance),
+        (team_give_order, ":team_no", grc_archers, mordr_advance),
+      (else_try),
+        (eq, ":battle_tactic", btactic_follow_leader),
+        (team_get_leader, ":ai_leader", ":team_no"),
+        (ge, ":ai_leader", 0),
+        (agent_set_speed_limit, ":ai_leader", 8),
+        (agent_get_position, pos60, ":ai_leader"),
+        (team_give_order, ":team_no", grc_everyone, mordr_hold),
+        (team_set_order_position, ":team_no", grc_everyone, pos60),
+      (try_end),
+# formations additions
+    (call_script, "script_division_reset_places"),
+#    (call_script, "script_get_default_formation", ":team_no"),
+    (assign, ":fformation", reg0),
+    
+    (try_begin),
+    (call_script, "script_cf_battlegroup_valid_formation", ":team_no", grc_infantry, ":fformation"),
+    (store_add, ":slot", slot_team_d0_formation, grc_infantry),
+    (team_set_slot, ":team_no", ":slot", ":fformation"),
+    (store_add, ":slot", slot_team_d0_formation_space, grc_infantry),
+    (team_set_slot, ":team_no", ":slot", 0),
+    (else_try),
+    (call_script, "script_formation_end", ":team_no", grc_infantry),
+    (try_end),
+    (call_script, "script_battlegroup_place_around_leader", ":team_no", grc_infantry),
+    
+    (try_begin),
+    (call_script, "script_cf_battlegroup_valid_formation", ":team_no", grc_archers, formation_default),
+    (store_add, ":slot", slot_team_d0_formation, grc_archers),
+    (team_set_slot, ":team_no", ":slot", formation_default),
+    (store_add, ":slot", slot_team_d0_formation_space, grc_archers),
+    (team_set_slot, ":team_no", ":slot", 2),
+    (else_try),
+    (call_script, "script_formation_end", ":team_no", grc_archers),
+    (try_end),
+    (call_script, "script_battlegroup_place_around_leader", ":team_no", grc_archers),
+    
+    (try_begin),
+    (call_script, "script_cf_battlegroup_valid_formation", ":team_no", grc_cavalry, formation_wedge),
+    (store_add, ":slot", slot_team_d0_formation, grc_cavalry),
+    (team_set_slot, ":team_no", ":slot", formation_wedge),
+    (store_add, ":slot", slot_team_d0_formation_space, grc_cavalry),
+    (team_set_slot, ":team_no", ":slot", 0),
+    (else_try),
+    (call_script, "script_formation_end", ":team_no", grc_cavalry),
+    (try_end),
+    (call_script, "script_battlegroup_place_around_leader", ":team_no", grc_cavalry),
+    
+    (team_give_order, ":team_no", grc_archers, mordr_spread_out),
+    (team_give_order, ":team_no", grc_archers, mordr_spread_out),
+# end formations additions
+  ]),
+  
+  # script_formation_battle_tactic_apply_aux #CABA - OK; Need expansion when new AI divisions to work with
+  # Input: team_no, battle_tactic
+  # Output: battle_tactic
+  ("formation_battle_tactic_apply_aux",
+    [
+      (store_script_param, ":team_no", 1),
+      (store_script_param, ":battle_tactic", 2),
+      (store_mission_timer_a, ":mission_time"),
+      (try_begin),
+        (eq, ":battle_tactic", btactic_hold),
+        (copy_position, pos1, pos52),
+        (call_script, "script_get_closest3_distance_of_enemies_at_pos1", ":team_no", 1),
+        (assign, ":avg_dist", reg0),
+        (assign, ":min_dist", reg1),
+        (try_begin),
+          (this_or_next|lt, ":min_dist", 1000),
+          (lt, ":avg_dist", 4000),
+          (assign, ":battle_tactic", 0),
+      (call_script, "script_formation_end", ":team_no", grc_infantry),  #formations
+      (call_script, "script_formation_end", ":team_no", grc_archers), #formations
+      (call_script, "script_formation_end", ":team_no", grc_cavalry), #formations
+          (team_give_order, ":team_no", grc_everyone, mordr_charge),
+        (try_end),
+      (else_try),
+        (eq, ":battle_tactic", btactic_follow_leader),
+        (team_get_leader, ":ai_leader", ":team_no"),
+        (try_begin),
+          (agent_is_alive, ":ai_leader"),
+          (agent_set_speed_limit, ":ai_leader", 9),
+          (call_script, "script_team_get_average_position_of_enemies", ":team_no"),
+          (copy_position, pos60, pos0),
+          (ge, ":ai_leader", 0),
+          (agent_get_position, pos61, ":ai_leader"),
+          (position_transform_position_to_local, pos62, pos61, pos60), #pos62 = vector to enemy w.r.t leader
+          (position_normalize_origin, ":distance_to_enemy", pos62),
+          (convert_from_fixed_point, ":distance_to_enemy"),
+          (assign, reg17, ":distance_to_enemy"),
+          (position_get_x, ":dir_x", pos62),
+          (position_get_y, ":dir_y", pos62),
+          (val_mul, ":dir_x", 23),
+          (val_mul, ":dir_y", 23), #move 23 meters
+          (position_set_x, pos62, ":dir_x"),
+          (position_set_y, pos62, ":dir_y"),
+        
+          (position_transform_position_to_parent, pos63, pos61, pos62), #pos63 is 23m away from leader in the direction of the enemy.
+          (position_set_z_to_ground_level, pos63),
+        
+          (team_give_order, ":team_no", grc_everyone, mordr_hold),
+          (team_set_order_position, ":team_no", grc_everyone, pos63),
+#formations code
+      (call_script, "script_point_y_toward_position", pos63, pos60),
+      (agent_get_position, pos49, ":ai_leader"),
+      (agent_set_position, ":ai_leader", pos63),  #fake out script_battlegroup_place_around_leader
+      (call_script, "script_division_reset_places"),
+      (call_script, "script_get_default_formation", ":team_no"),
+      (assign, ":fformation", reg0),
+      
+      (try_begin),
+      (call_script, "script_cf_battlegroup_valid_formation", ":team_no", grc_infantry, ":fformation"),
+      (store_add, ":slot", slot_team_d0_formation, grc_infantry),
+      (team_set_slot, ":team_no", ":slot", ":fformation"),
+      (store_add, ":slot", slot_team_d0_formation_space, grc_infantry),
+      (team_set_slot, ":team_no", ":slot", 0),
+      (else_try),
+      (call_script, "script_formation_end", ":team_no", grc_infantry),
+      (try_end),
+      (call_script, "script_battlegroup_place_around_leader", ":team_no", grc_infantry),
+      
+      (try_begin),
+      (call_script, "script_cf_battlegroup_valid_formation", ":team_no", grc_archers, formation_default),
+      (store_add, ":slot", slot_team_d0_formation, grc_archers),
+      (team_set_slot, ":team_no", ":slot", formation_default),
+      (store_add, ":slot", slot_team_d0_formation_space, grc_archers),
+      (team_set_slot, ":team_no", ":slot", 2),
+      (else_try),
+      (call_script, "script_formation_end", ":team_no", grc_archers),
+      (try_end),
+      (call_script, "script_battlegroup_place_around_leader", ":team_no", grc_archers),
+      
+      (try_begin),
+      (call_script, "script_cf_battlegroup_valid_formation", ":team_no", grc_cavalry, formation_wedge),
+      (store_add, ":slot", slot_team_d0_formation, grc_cavalry),
+      (team_set_slot, ":team_no", ":slot", formation_wedge),
+      (store_add, ":slot", slot_team_d0_formation_space, grc_cavalry),
+      (team_set_slot, ":team_no", ":slot", 0),
+      (else_try),
+      (call_script, "script_formation_end", ":team_no", grc_cavalry),
+      (try_end),
+      (call_script, "script_battlegroup_place_around_leader", ":team_no", grc_cavalry),
+    
+      (agent_set_position, ":ai_leader", pos49),
+#end formations code
+          (agent_get_position, pos1, ":ai_leader"),
+          (try_begin),
+            (lt, ":distance_to_enemy", 50),
+            (ge, ":mission_time", 30),
+            (assign, ":battle_tactic", 0),
+      (call_script, "script_formation_end", ":team_no", grc_infantry),  #formations
+      (call_script, "script_formation_end", ":team_no", grc_archers), #formations
+      (call_script, "script_formation_end", ":team_no", grc_cavalry), #formations
+            (team_give_order, ":team_no", grc_everyone, mordr_charge),
+            (agent_set_speed_limit, ":ai_leader", 60),
+          (try_end),
+        (else_try),
+          (assign, ":battle_tactic", 0),
+      (call_script, "script_formation_end", ":team_no", grc_infantry),  #formations
+      (call_script, "script_formation_end", ":team_no", grc_archers), #formations
+      (call_script, "script_formation_end", ":team_no", grc_cavalry), #formations
+          (team_give_order, ":team_no", grc_everyone, mordr_charge),
+        (try_end),
+      (try_end),
+      
+      (try_begin), # charge everyone after a while
+        (neq, ":battle_tactic", 0),
+        (ge, ":mission_time", 300),
+        (assign, ":battle_tactic", 0),
+    (call_script, "script_formation_end", ":team_no", grc_infantry),  #formations
+    (call_script, "script_formation_end", ":team_no", grc_archers), #formations
+    (call_script, "script_formation_end", ":team_no", grc_cavalry), #formations
+        (team_give_order, ":team_no", grc_everyone, mordr_charge),
+        (team_get_leader, ":ai_leader", ":team_no"),
+        (agent_set_speed_limit, ":ai_leader", 60),
+      (try_end),
+      (assign, reg0, ":battle_tactic"),
+  ]),
+  
+  # Replacement script for battle_tactic_init_aux to switch between using
+  # M&B Standard AI with changes for formations and original based on
+  # NOTE: original script "battle_tactic_init_aux" should be renamed to "orig_battle_tactic_init_aux"
+  # constant formation_native_ai_use_formation ( 0: original, 1: use formation )
+  # script_battle_tactic_init_aux
+  # Input: team_no, battle_tactic
+  # Output: none
+  ("battle_tactic_init_aux",
+    [
+      (store_script_param, ":team_no", 1),
+      (store_script_param, ":battle_tactic", 2),
+    (try_begin),
+    (eq, formation_native_ai_use_formation, 1),
+    (call_script, "script_formation_battle_tactic_init_aux", ":team_no", ":battle_tactic"),
+    (else_try),
+    (call_script, "script_orig_battle_tactic_init_aux", ":team_no", ":battle_tactic"),
+    (try_end),
+    ]),
+
+  # Replacement script for battle_tactic_init_aux to switch between using
+  # M&B Standard AI with changes for formations and original based on
+  # NOTE: original script "battle_tactic_apply_aux" should be renamed to "orig_battle_tactic_apply_aux"
+  # constant formation_native_ai_use_formation ( 0: original, 1: use formation )
+  # script_battle_tactic_apply_aux
+  # Input: team_no, battle_tactic
+  # Output: battle_tactic
+  ("battle_tactic_apply_aux",
+    [
+      (store_script_param, ":team_no", 1),
+      (store_script_param, ":battle_tactic", 2),
+    (try_begin),
+    (eq, formation_native_ai_use_formation, 1),
+    (call_script, "script_formation_battle_tactic_apply_aux", ":team_no", ":battle_tactic"),
+    (else_try),
+    (call_script, "script_orig_battle_tactic_apply_aux", ":team_no", ":battle_tactic"),
+    (try_end),
+  ]),
+  
+# # AI with Formations Scripts
+  # script_calculate_decision_numbers by motomataru
+  # Input: AI team, size relative to battle in %
+  # Output: reg0 - battle presence plus level bump, reg1 - level bump (team avg level / 3)
+  ("calculate_decision_numbers", [
+  (store_script_param, ":team_no", 1),
+  (store_script_param, ":battle_presence", 2),
+  (try_begin),
+    (team_get_slot, reg0, ":team_no", slot_team_level),
+    (store_div, reg1, reg0, 3),
+    (store_add, reg0, ":battle_presence", reg1),  #decision w.r.t. all enemy teams
+  (try_end)
+  ]),
+  
+  
+
+  # script_team_field_ranged_tactics by motomataru
+  # Input: AI team, size relative to largest team in %, size relative to battle in %
+  # Output: none
+  ("team_field_ranged_tactics", [
+  (store_script_param, ":team_no", 1),
+  (store_script_param, ":rel_army_size", 2),
+  (store_script_param, ":battle_presence", 3),
+  (assign, ":bgroup", grc_archers), #Pre-Many Divisions
+  (assign, ":bg_pos", Archers_Pos), #Pre-Many Divisions
+
+  (store_add, ":slot", slot_team_d0_size, ":bgroup"),
+  (try_begin),
+    (team_slot_ge, ":team_no", ":slot", 1),
+    (call_script, "script_battlegroup_get_position", ":bg_pos", ":team_no", ":bgroup"),
+    (call_script, "script_team_get_position_of_enemies", Enemy_Team_Pos, ":team_no", grc_everyone),
+    (call_script, "script_point_y_toward_position", ":bg_pos", Enemy_Team_Pos),
+    (call_script, "script_get_nearest_enemy_battlegroup_location", Nearest_Enemy_Battlegroup_Pos, ":team_no", ":bg_pos"),
+    (assign, ":distance_to_enemy", reg0),
+      
+    (call_script, "script_calculate_decision_numbers", ":team_no", ":battle_presence"),
+    (assign, ":decision_index", reg0),
+    (assign, ":level_bump", reg1),
+    (try_begin),
+      (gt, ":decision_index", 86),  #outpower enemies more than 6:1?
+      (team_get_movement_order, reg0, ":team_no", ":bgroup"),
+      (try_begin),
+        (neq, reg0, mordr_charge),
+        (team_give_order, ":team_no", ":bgroup", mordr_charge),
+      (try_end),
+
+    (else_try),
+      (ge, "$battle_phase", BP_Jockey),
+      (store_add, ":slot", slot_team_d0_low_ammo, ":bgroup"),
+      (team_slot_ge, ":team_no", ":slot", 1), #running out of ammo?
+      (team_get_movement_order, reg0, ":team_no", ":bgroup"),
+      (try_begin),
+        (neq, reg0, mordr_charge),
+        (team_give_order, ":team_no", ":bgroup", mordr_charge),
+      (try_end),
+
+    (else_try),
+      (gt, "$cur_casualties", 0),
+      (eq, "$cur_casualties", "$prev_casualties"),  #no new casualties since last function call?
+      (gt, ":decision_index", Advance_More_Point),
+      (le, ":distance_to_enemy", AI_long_range),  #closer than reposition?
+      (team_give_order, ":team_no", ":bgroup", mordr_advance),
+
+    #hold somewhere
+    (else_try),
+      (store_add, ":decision_index", ":rel_army_size", ":level_bump"),  #decision w.r.t. largest enemy team
+      (assign, ":move_archers", 0),
+      (try_begin),
+        (eq, "$battle_phase", BP_Setup),
+        (assign, ":move_archers", 1),
+      (else_try),
+        (ge, "$battle_phase", BP_Fight),
+        (try_begin),
+          (neg|is_between, ":distance_to_enemy", AI_charge_distance, AI_long_range),
+          (assign, ":move_archers", 1),
+        (else_try),
+          (lt, ":decision_index", Hold_Point),  #probably coming from a defensive position (see below)
+          (gt, ":distance_to_enemy", AI_firing_distance),
+          (assign, ":move_archers", 1),
+        (try_end),
+      (else_try),
+        (ge, ":decision_index", Hold_Point),  #not starting in a defensive position (see below)
+        (store_add, ":slot", slot_team_d0_size, grc_infantry), #CABA - EDIT NEEDED????
+        (team_get_slot, reg0, ":team_no", ":slot"),
+        (try_begin),
+          (this_or_next|eq, reg0, 0),
+          (gt, ":distance_to_enemy", AI_long_range),
+          (assign, ":move_archers", 1),
+        (else_try), #don't outstrip infantry when closing
+          (call_script, "script_battlegroup_get_position", Infantry_Pos, ":team_no", grc_infantry), #CABA - POS EDIT
+          (get_distance_between_positions, ":infantry_to_enemy", Infantry_Pos, Nearest_Enemy_Battlegroup_Pos),
+          (val_sub, ":infantry_to_enemy", ":distance_to_enemy"),
+          (le, ":infantry_to_enemy", 1500),
+          (assign, ":move_archers", 1),
+        (try_end),
+      (try_end),
+      
+      (try_begin),
+        (gt, ":move_archers", 0),
+        (try_begin), #CABA - POS EDIT?
+          (eq, ":team_no", 0),
+          (assign, ":team_start_pos", Team0_Starting_Point),
+        (else_try),
+          (eq, ":team_no", 1),
+          (assign, ":team_start_pos", Team1_Starting_Point),
+        (else_try),
+          (eq, ":team_no", 2),
+          (assign, ":team_start_pos", Team2_Starting_Point),
+        (else_try),
+          (eq, ":team_no", 3),
+          (assign, ":team_start_pos", Team3_Starting_Point),
+        (try_end),
+
+        (try_begin),
+          (lt, ":decision_index", Hold_Point),  #outnumbered?
+          (lt, "$battle_phase", BP_Fight),
+          (store_div, ":distance_to_move", ":distance_to_enemy", 6),  #middle of rear third of battlefield
+          (assign, ":hill_search_radius", ":distance_to_move"),
+
+        (else_try),
+          (assign, ":from_start_pos", 0),         
+          (try_begin),
+            (ge, "$battle_phase", BP_Fight),
+            (assign, ":from_start_pos", 1),
+          (else_try),
+            (gt, "$battle_phase", BP_Setup),
+            (call_script, "script_point_y_toward_position", ":team_start_pos", ":bg_pos"),
+            (position_get_rotation_around_z, reg0, ":team_start_pos"),
+            (position_get_rotation_around_z, reg1, ":bg_pos"),
+            (val_sub, reg0, reg1),
+            (neg|is_between, reg0, -45, 45),
+            (assign, ":from_start_pos", 1),
+          (try_end),
+          
+          (try_begin),
+            (gt, ":from_start_pos", 0),
+            (copy_position, ":bg_pos", ":team_start_pos"),
+            (call_script, "script_point_y_toward_position", ":bg_pos", Enemy_Team_Pos),
+            (call_script, "script_get_nearest_enemy_battlegroup_location", Nearest_Enemy_Battlegroup_Pos, ":team_no", ":bg_pos"),
+            (assign, ":distance_to_enemy", reg0),
+          (try_end),
+
+          (try_begin),
+            (eq, "$battle_phase", BP_Setup),
+            (assign, ":shot_distance", AI_long_range),
+          (else_try),
+            (assign, ":shot_distance", AI_firing_distance),
+            (store_sub, reg1, AI_firing_distance, AI_charge_distance),
+            (val_sub, reg1, 200), #subtract two meters to prevent automatically provoking melee from forward enemy infantry
+            (store_add, ":slot", slot_team_d0_percent_throwers, ":bgroup"),
+            (team_get_slot, reg0, ":team_no", ":slot"),
+            (val_mul, reg1, reg0),
+            (val_div, reg1, 100),
+            (val_sub, ":shot_distance", reg1),
+          (try_end),
+
+          (store_sub, ":distance_to_move", ":distance_to_enemy", ":shot_distance"),
+          (store_div, ":hill_search_radius", ":shot_distance", 3),  #limit so as not to run into enemy
+          (try_begin),
+            (lt, "$battle_phase", BP_Fight),
+            (try_begin),
+              (this_or_next|eq, "$battle_phase", BP_Setup),
+              (lt, ":battle_presence", Advance_More_Point), #expect to meet halfway?
+              (val_div, ":distance_to_move", 2),
+            (try_end),
+          (try_end),
+        (try_end),
+
+        (position_move_y, ":bg_pos", ":distance_to_move", 0),
+        (try_begin),
+          (lt, "$battle_phase", BP_Fight),
+          (copy_position, pos1, ":bg_pos"),
+          (store_div, reg0, ":hill_search_radius", 100),
+          (call_script, "script_find_high_ground_around_pos1_corrected", ":bg_pos", reg0),
+        (try_end),
+      (try_end),
+
+      (team_get_movement_order, reg0, ":team_no", ":bgroup"),
+      (try_begin),
+        (neq, reg0, mordr_hold),
+        (team_give_order, ":team_no", ":bgroup", mordr_hold),
+      (try_end),
+      (team_set_order_position, ":team_no", ":bgroup", ":bg_pos"),
+    (try_end),
+  (try_end)
+  ]),
+                              
+  # script_team_field_melee_tactics by motomataru #EDITED FOR SLOTS BY CABA...many divisions changes necessary
+  # Input: AI team, size relative to largest team in %, size relative to battle in %
+  # Output: none
+  ("team_field_melee_tactics", [
+  (store_script_param, ":team_no", 1),
+# (store_script_param, ":rel_army_size", 2),
+  (store_script_param, ":battle_presence", 3),
+  (call_script, "script_calculate_decision_numbers", ":team_no", ":battle_presence"),
+
+  #mop up if outnumber enemies more than 6:1
+  (try_begin),
+    (gt, reg0, 86),
+    (try_for_range, ":division", 0, 9),
+        (store_add, ":slot", slot_team_d0_size, ":division"),
+      (team_slot_ge, ":team_no", ":slot", 1),
+        (store_add, ":slot", slot_team_d0_type, ":division"),
+        (neg|team_slot_eq, ":team_no", ":slot", sdt_archer),
+      (neg|team_slot_eq, ":team_no", ":slot", sdt_skirmisher),
+      (call_script, "script_formation_end", ":team_no", ":division"),
+      (team_get_movement_order, reg0, ":team_no", ":division"),
+      (try_begin),
+        (neq, reg0, mordr_charge),
+        (team_give_order, ":team_no", ":division", mordr_charge),
+      (try_end),
+    (try_end),
+
+  (else_try),
+    #find closest distance of enemy to infantry, cavalry troops
+    (assign, ":inf_closest_dist", Far_Away),
+    (assign, ":inf_closest_non_cav_dist", Far_Away),
+    (assign, ":cav_closest_dist", Far_Away),
+    (assign, ":num_enemies_in_melee", 0),
+    (assign, ":num_enemies_supporting_melee", 0),
+    (assign, ":num_enemy_infantry", 0),
+    (assign, ":num_enemy_cavalry", 0),
+    (assign, ":num_enemy_others", 0),
+    (assign, ":sum_level_enemy_infantry", 0),
+    (assign, ":x_enemy", 0),
+    (assign, ":y_enemy", 0),
+    (try_for_agents, ":enemy_agent"),
+      (agent_is_alive, ":enemy_agent"),
+      (agent_is_human, ":enemy_agent"),
+      (agent_get_team, ":enemy_team_no", ":enemy_agent"),
+      (teams_are_enemies, ":enemy_team_no", ":team_no"),
+      (agent_slot_eq, ":enemy_agent", slot_agent_is_running_away, 0),
+      (agent_get_class, ":enemy_class_no", ":enemy_agent"),
+      (try_begin),
+        (eq, ":enemy_class_no", grc_infantry),
+        (val_add, ":num_enemy_infantry", 1),
+        (agent_get_troop_id, ":enemy_troop", ":enemy_agent"),
+        (store_character_level, ":enemy_level", ":enemy_troop"),
+        (val_add, ":sum_level_enemy_infantry", ":enemy_level"),
+      (else_try),
+        (eq, ":enemy_class_no", grc_cavalry),
+        (val_add, ":num_enemy_cavalry", 1),
+      (else_try),
+        (val_add, ":num_enemy_others", 1),
+      (try_end),
+      (agent_get_position, pos0, ":enemy_agent"),
+      (position_get_x, ":value", pos0),
+      (val_add, ":x_enemy", ":value"),
+      (position_get_y, ":value", pos0),
+      (val_add, ":y_enemy", ":value"),
+      (assign, ":enemy_in_melee", 0),
+      (assign, ":enemy_supporting_melee", 0),
+      (try_for_agents, ":cur_agent"),
+        (agent_is_alive, ":cur_agent"),
+        (agent_is_human, ":cur_agent"),
+        (agent_get_team, ":cur_team_no", ":cur_agent"),
+        (eq, ":cur_team_no", ":team_no"),
+        (agent_slot_eq, ":cur_agent", slot_agent_is_running_away, 0),
+        (agent_get_class, ":cur_class_no", ":cur_agent"),
+        (try_begin),
+          (eq, ":cur_class_no", grc_infantry),
+          (agent_get_position, pos1, ":cur_agent"),
+          (get_distance_between_positions, ":distance_of_enemy", pos0, pos1),
+          (try_begin),
+            (gt, ":inf_closest_dist", ":distance_of_enemy"),
+            (assign, ":inf_closest_dist", ":distance_of_enemy"),
+            (copy_position, Nearest_Enemy_Troop_Pos, pos0),
+            (assign, ":enemy_nearest_troop_distance", ":distance_of_enemy"),
+            (assign, ":enemy_nearest_agent", ":enemy_agent"),
+          (try_end),
+          (try_begin),
+            (neq, ":enemy_class_no", grc_cavalry),
+            (gt, ":inf_closest_non_cav_dist", ":distance_of_enemy"),
+            (assign, ":inf_closest_non_cav_dist", ":distance_of_enemy"),
+            (copy_position, Nearest_Non_Cav_Enemy_Troop_Pos, pos0),
+            (assign, ":enemy_nearest_non_cav_troop_distance", ":distance_of_enemy"),
+            (assign, ":enemy_nearest_non_cav_agent", ":enemy_agent"),
+          (try_end),
+          (try_begin),
+            (lt, ":distance_of_enemy", 150),
+            (assign, ":enemy_in_melee", 1),
+          (try_end),
+          (try_begin),
+            (lt, ":distance_of_enemy", 350),
+            (assign, ":enemy_supporting_melee", 1),
+          (try_end),
+        (else_try),
+          (eq, ":cur_class_no", grc_cavalry),
+          (agent_get_position, pos1, ":cur_agent"),
+          (get_distance_between_positions, ":distance_of_enemy", pos0, pos1),
+          (try_begin),
+            (gt, ":cav_closest_dist", ":distance_of_enemy"),
+            (assign, ":cav_closest_dist", ":distance_of_enemy"),
+          (try_end),
+        (try_end),
+      (try_end),
+      (try_begin),
+        (eq, ":enemy_in_melee", 1),
+        (val_add, ":num_enemies_in_melee", 1),
+      (try_end),
+      (try_begin),
+        (eq, ":enemy_supporting_melee", 1),
+        (val_add, ":num_enemies_supporting_melee", 1),
+      (try_end),
+    (try_end), #IS THERE A WAY TO SIMPLIFY THESE NESTED AGENT LOOPS?
+    
+    (store_add, ":num_enemies", ":num_enemy_infantry", ":num_enemy_cavalry"),
+    (val_add, ":num_enemies", ":num_enemy_others"),
+    (gt, ":num_enemies", 0),
+    #WHY NOT USING STORED DATA?
+    (init_position, Enemy_Team_Pos),
+    (val_div, ":x_enemy", ":num_enemies"),
+    (position_set_x, Enemy_Team_Pos, ":x_enemy"),
+    (val_div, ":y_enemy", ":num_enemies"),
+    (position_set_y, Enemy_Team_Pos, ":y_enemy"),
+    (position_set_z_to_ground_level, Enemy_Team_Pos),
+
+    (store_add, ":slot", slot_team_d0_size, grc_archers),
+    (team_get_slot, ":num_archers", ":team_no", ":slot"),
+    (try_begin),
+      (eq, ":num_archers", 0),
+      (assign, ":enemy_from_archers", Far_Away),
+      (assign, ":archer_order", mordr_charge),
+    (else_try),
+      (call_script, "script_battlegroup_get_position", Archers_Pos, ":team_no", grc_archers),
+      (call_script, "script_point_y_toward_position", Archers_Pos, Enemy_Team_Pos),
+      (call_script, "script_get_nearest_enemy_battlegroup_location", pos0, ":team_no", Archers_Pos),
+      (assign, ":enemy_from_archers", reg0),
+      (team_get_movement_order, ":archer_order", ":team_no", grc_archers),
+    (try_end),
+
+    (store_add, ":slot", slot_team_d0_size, grc_infantry),
+    (team_get_slot, ":num_infantry", ":team_no", ":slot"),
+    (try_begin),
+      (eq, ":num_infantry", 0),
+      (assign, ":enemy_from_infantry", Far_Away),
+    (else_try),
+      (call_script, "script_battlegroup_get_position", Infantry_Pos, ":team_no", grc_infantry),
+      (call_script, "script_get_nearest_enemy_battlegroup_location", pos0, ":team_no", Infantry_Pos),
+      (assign, ":enemy_from_infantry", reg0),
+    (try_end),
+
+    (store_add, ":slot", slot_team_d0_size, grc_cavalry),
+    (team_get_slot, ":num_cavalry", ":team_no", ":slot"),
+    (try_begin),
+      (eq, ":num_cavalry", 0),
+      (assign, ":enemy_from_cavalry", Far_Away),
+    (else_try),
+      (call_script, "script_battlegroup_get_position", Cavalry_Pos, ":team_no", grc_cavalry),
+      (call_script, "script_get_nearest_enemy_battlegroup_location", pos0, ":team_no", Cavalry_Pos),
+      (assign, ":enemy_from_cavalry", reg0),
+    (try_end),
+
+    (try_begin),
+      (lt, "$battle_phase", BP_Fight),
+      (this_or_next|le, ":enemy_from_infantry", AI_charge_distance),
+      (this_or_next|le, ":enemy_from_cavalry", AI_charge_distance),
+      (le, ":enemy_from_archers", AI_charge_distance),
+      (assign, "$battle_phase", BP_Fight),
+    (else_try),
+      (lt, "$battle_phase", BP_Jockey),
+      (this_or_next|le, ":inf_closest_dist", AI_long_range),
+      (le, ":cav_closest_dist", AI_long_range),
+      (assign, "$battle_phase", BP_Jockey),
+    (try_end),
+    
+    (team_get_leader, ":team_leader", ":team_no"),
+    
+    #infantry AI
+    (assign, ":place_leader_by_infantry", 0),
+    (try_begin),
+      (le, ":num_infantry", 0),
+      (assign, ":infantry_order", ":archer_order"),
+      
+      #deal with mounted heroes that team_give_order() treats as infantry   #CABA...could change their division?
+      (team_get_movement_order, reg0, ":team_no", grc_infantry),
+      (try_begin),
+        (neq, reg0, ":infantry_order"),
+        (team_give_order, ":team_no", grc_infantry, ":infantry_order"),
+      (try_end),
+      (try_begin),
+        (gt, ":num_archers", 0),
+        (copy_position, pos1, Archers_Pos),
+        (position_move_y, pos1, 1000, 0),
+        (team_set_order_position, ":team_no", grc_infantry, pos1),
+      (else_try),
+        (team_set_order_position, ":team_no", grc_infantry, Cavalry_Pos),
+      (try_end),
+    (else_try),
+      (store_mul, ":percent_level_enemy_infantry", ":sum_level_enemy_infantry", 100),
+      (val_div, ":percent_level_enemy_infantry", ":num_enemies"),
+      (try_begin),
+        (teams_are_enemies, ":team_no", "$fplayer_team_no"),
+        (assign, ":combined_level", 0),
+        (assign, ":combined_team_size", 0),
+        (assign, ":combined_num_infantry", ":num_infantry"),
+      (else_try),
+        (store_add, ":slot", slot_team_d0_level, grc_infantry),
+            (team_get_slot, ":combined_level", "$fplayer_team_no", ":slot"),
+            (team_get_slot, ":combined_team_size", "$fplayer_team_no", slot_team_size),
+        (store_add, ":slot", slot_team_d0_size, grc_infantry),
+        (team_get_slot, ":combined_num_infantry", "$fplayer_team_no", ":slot"),
+        (val_add, ":combined_num_infantry", ":num_infantry"),
+      (try_end),
+      (store_mul, ":percent_level_infantry", ":combined_num_infantry", 100),
+      (store_add, ":slot", slot_team_d0_level, grc_infantry),
+      (team_get_slot, ":level_infantry", ":team_no", ":slot"),
+      (val_add, ":combined_level", ":level_infantry"),
+      (val_mul, ":percent_level_infantry", ":combined_level"),
+      (team_get_slot, reg0, ":team_no", slot_team_size),
+      (val_add, ":combined_team_size", reg0),
+      (val_div, ":percent_level_infantry", ":combined_team_size"),
+
+      (assign, ":infantry_order", mordr_charge),
+      (try_begin),  #enemy far away AND ranged not charging
+        (gt, ":enemy_from_archers", AI_charge_distance),
+        (gt, ":inf_closest_dist", AI_charge_distance),
+        (neq, ":archer_order", mordr_charge),
+        (try_begin),  #fighting not started OR not enough infantry
+          (this_or_next|le, "$battle_phase", BP_Jockey),
+          (lt, ":percent_level_infantry", ":percent_level_enemy_infantry"),
+          (assign, ":infantry_order", mordr_hold),
+        (try_end),
+      (try_end),
+
+      #if low level troops outnumber enemies in melee by 2:1, attempt to whelm
+      (try_begin),
+        (le, ":level_infantry", 12),
+        (gt, ":num_enemies_in_melee", 0),
+        (store_mul, reg0, ":num_enemies_supporting_melee", 2),
+        (is_between, reg0, 1, ":num_infantry"),
+        (get_distance_between_positions, reg0, Infantry_Pos, Nearest_Enemy_Troop_Pos),
+        (le, reg0, AI_charge_distance),
+        (call_script, "script_formation_end", ":team_no", grc_infantry),
+        (team_get_movement_order, reg0, ":team_no", grc_infantry),
+        (try_begin),
+          (neq, reg0, mordr_charge),
+          (team_give_order, ":team_no", grc_infantry, mordr_charge),
+        (try_end),
+        
+      #else attempt to form formation somewhere
+      (else_try),
+          (team_get_slot, ":infantry_formation", ":team_no", slot_team_default_formation),
+        (try_begin),
+            (eq, ":infantry_formation", formation_default),
+            (call_script, "script_get_default_formation", ":team_no"),
+            (assign, ":infantry_formation", reg0),
+            (team_set_slot, ":team_no", slot_team_default_formation, ":infantry_formation"),
+        (try_end),
+        
+        (agent_get_division, ":enemy_nearest_troop_battlegroup", ":enemy_nearest_agent"),
+        (agent_get_class, ":enemy_nearest_troop_class", ":enemy_nearest_agent"), 
+        (agent_get_team, ":enemy_nearest_troop_team", ":enemy_nearest_agent"),
+        (team_get_leader, ":enemy_leader", ":enemy_nearest_troop_team"),
+        (store_mul, ":percent_enemy_cavalry", ":num_enemy_cavalry", 100),
+        (val_div, ":percent_enemy_cavalry", ":num_enemies"),
+        (try_begin),
+          (neq, ":infantry_formation", formation_none),
+          (try_begin),
+            (gt, ":percent_enemy_cavalry", 66),
+            (assign, ":infantry_formation", formation_square),
+          (else_try),
+            (neq, ":enemy_nearest_troop_class", grc_cavalry),
+            (neq, ":enemy_nearest_troop_class", grc_archers),
+            (neq, ":enemy_nearest_agent", ":enemy_leader"),
+            (store_add, ":slot", slot_team_d0_size, ":enemy_nearest_troop_battlegroup"),
+            (team_get_slot, reg0, ":enemy_nearest_troop_team", ":slot"),
+            (gt, reg0, ":num_infantry"),  #got fewer troops?
+            (store_add, ":slot", slot_team_d0_level, grc_infantry),
+            (team_get_slot, ":average_level", ":team_no", ":slot"),
+            (store_add, ":slot", slot_team_d0_level, ":enemy_nearest_troop_battlegroup"),
+            (team_get_slot, reg0, ":enemy_nearest_troop_team", ":slot"),
+            (gt, ":average_level", reg0), #got better troops?
+            (assign, ":infantry_formation", formation_wedge),
+          (try_end),
+        (try_end),
+        
+        #hold near archers?
+        (try_begin),
+          (eq, ":infantry_order", mordr_hold),
+          (gt, ":num_archers", 0),
+          (copy_position, pos1, Archers_Pos),
+          (position_move_x, pos1, -100, 0),
+          (try_begin),
+            (this_or_next|eq, ":enemy_nearest_troop_battlegroup", grc_cavalry),
+            (gt, ":percent_level_infantry", ":percent_level_enemy_infantry"),
+            (position_move_y, pos1, 1000, 0), #move ahead of archers in anticipation of charges
+          (else_try),
+            (position_move_y, pos1, -1000, 0),
+          (try_end),
+          (assign, ":spacing", 1),
+
+        #advance to nearest (preferably unmounted) enemy
+        (else_try),
+          (assign, ":target_battlegroup", -1),
+          (assign, ":target_size", 1),
+          (try_begin),
+            (eq, ":num_enemies_in_melee", 0), #not engaged?
+            (gt, ":enemy_from_archers", AI_charge_distance),
+            (lt, ":percent_enemy_cavalry", 100),
+            (assign, ":distance_to_enemy_troop", ":enemy_nearest_non_cav_troop_distance"),
+            (copy_position, pos60, Nearest_Non_Cav_Enemy_Troop_Pos),
+            (agent_get_team, ":enemy_non_cav_team", ":enemy_nearest_non_cav_agent"),
+            (assign, ":target_team", ":enemy_non_cav_team"),
+            (team_get_leader, reg0, ":enemy_non_cav_team"),
+            (try_begin),
+              (eq, ":enemy_nearest_non_cav_agent", reg0),
+              (assign, ":distance_to_enemy_group", Far_Away),
+            (else_try),
+              (agent_get_division, ":target_battlegroup", ":enemy_nearest_non_cav_agent"),
+              (call_script, "script_battlegroup_get_position", pos0, ":enemy_non_cav_team", ":target_battlegroup"),
+              (get_distance_between_positions, ":distance_to_enemy_group", Infantry_Pos, pos0),
+              (store_add, ":slot", slot_team_d0_size, ":target_battlegroup"),
+              (team_get_slot, ":target_size", ":enemy_non_cav_team", ":slot"),
+            (try_end),
+          (else_try),
+            (assign, ":distance_to_enemy_troop", ":enemy_nearest_troop_distance"),
+            (copy_position, pos60, Nearest_Enemy_Troop_Pos),
+            (assign, ":target_team", ":enemy_nearest_troop_team"),
+            (try_begin),
+              (eq, ":enemy_nearest_agent", ":enemy_leader"),
+              (assign, ":distance_to_enemy_group", Far_Away),
+            (else_try),
+              (assign, ":target_battlegroup", ":enemy_nearest_troop_battlegroup"),
+              (call_script, "script_battlegroup_get_position", pos0, ":enemy_nearest_troop_team", ":target_battlegroup"),
+              (get_distance_between_positions, ":distance_to_enemy_group", Infantry_Pos, pos0),
+              (store_add, ":slot", slot_team_d0_size, ":target_battlegroup"),
+              (team_get_slot, ":target_size", ":enemy_nearest_troop_team", ":slot"),
+            (try_end),
+          (try_end),
+          
+          (store_sub, reg0, ":distance_to_enemy_group", ":distance_to_enemy_troop"),
+          #attack troop if its unit is far off
+          (try_begin),
+            (gt, reg0, AI_charge_distance),
+            (copy_position, pos0, pos60),
+            (assign, ":distance_to_move", ":distance_to_enemy_troop"),
+            
+          #attack unit
+          (else_try),
+            (assign, ":distance_to_move", ":distance_to_enemy_group"),
+            #wedge pushes through to last enemy infantry rank
+            (try_begin),
+              (eq, ":infantry_formation", formation_wedge),
+              (val_sub, ":distance_to_move", formation_minimum_spacing),
+
+            #non-wedge stops before first rank of enemy
+            (else_try),
+              (store_mul, reg0, formation_minimum_spacing, 1.5),
+              (val_sub, ":distance_to_move", reg0),
+              
+              #back up for enemies in deep formation
+              (eq, ":target_battlegroup", grc_infantry),
+              (ge, ":target_size", formation_min_foot_troops),
+              (try_begin),
+                (neq, ":target_team", "$fplayer_team_no"),
+                (val_sub, ":distance_to_move", formation_minimum_spacing),
+              (else_try),
+                (neg|team_slot_eq, "$fplayer_team_no", slot_team_d0_formation, formation_none),
+                (val_sub, ":distance_to_move", formation_minimum_spacing),
+              (try_end),
+            (try_end),
+          (try_end),
+
+          #slow for formation appearance on approach
+          (try_begin),
+            (lt, ":num_infantry", formation_min_foot_troops),
+            (assign, ":speed_adjust", 0),
+          (else_try),
+            (eq, ":infantry_formation", formation_square),
+            (assign, reg0, ":num_infantry"),
+            (convert_to_fixed_point, reg0),
+            (store_sqrt, ":speed_adjust", reg0),
+            (val_mul, ":speed_adjust", formation_minimum_spacing),
+            (val_div, ":speed_adjust", 2),
+            (convert_from_fixed_point, ":speed_adjust"),
+          (else_try),
+            (eq, ":infantry_formation", formation_wedge),
+            (assign, reg0, ":num_infantry"),
+            (convert_to_fixed_point, reg0),
+            (store_sqrt, ":speed_adjust", reg0),
+            (val_mul, ":speed_adjust", formation_minimum_spacing),
+            (val_mul, ":speed_adjust", 2),
+            (val_div, ":speed_adjust", 3),
+            (convert_from_fixed_point, ":speed_adjust"),
+          (else_try),
+            (assign, ":speed_adjust", formation_minimum_spacing),
+          (try_end),
+          (try_begin),
+            (le, ":distance_to_move", AI_charge_distance),
+            (val_add, ":speed_adjust", 600),
+          (else_try),
+            (le, ":distance_to_move", AI_firing_distance),
+            (val_add, ":speed_adjust", 1200),
+          (else_try),
+            (le, ":distance_to_move", AI_long_range),
+            (val_add, ":speed_adjust", 1800),
+          (try_end),
+          (try_begin),
+            (le, ":distance_to_move", AI_long_range),
+            (val_min, ":distance_to_move", ":speed_adjust"),
+          (try_end),
+
+          #adjust position
+          (copy_position, pos1, Infantry_Pos),
+          (try_begin),
+            (eq, ":num_enemies_in_melee", 0),
+            (call_script, "script_point_y_toward_position", pos1, pos0),
+            (position_move_y, pos1, ":distance_to_move"),
+          (else_try),
+            (call_script, "script_get_formation_position", pos2, ":team_no", grc_infantry),
+            (position_copy_rotation, pos1, pos2),
+            (position_move_y, pos1, -2000),
+            (call_script, "script_point_y_toward_position", pos1, pos0),
+            (position_move_y, pos1, 2000),
+            (position_move_y, pos1, ":distance_to_move"),
+          (try_end),
+          (assign, ":spacing", 0),
+        (try_end),
+
+        (copy_position, pos61, pos1),
+        (call_script, "script_get_centering_amount", ":infantry_formation", ":num_infantry", 0),
+        (assign, ":centering", reg0),
+        (try_begin),
+          (call_script, "script_cf_battlegroup_valid_formation", ":team_no", grc_infantry, ":infantry_formation"),
+          (position_move_x, pos1, ":centering"),
+          (call_script, "script_form_infantry", ":team_no", grc_infantry, ":team_leader", ":spacing", ":infantry_formation"),   
+          (store_add, ":slot", slot_team_d0_formation, grc_infantry),
+          (team_set_slot, ":team_no", ":slot", ":infantry_formation"),
+          (assign, ":place_leader_by_infantry", 1),
+        (else_try),
+          (call_script, "script_formation_end", ":team_no", grc_infantry),
+          (team_get_movement_order, reg0, ":team_no", grc_infantry),
+          (try_begin),
+            (neq, reg0, ":infantry_order"),
+            (team_give_order, ":team_no", grc_infantry, ":infantry_order"),
+          (try_end),
+          (eq, ":infantry_order", mordr_hold),
+          (assign, ":place_leader_by_infantry", 1),
+        (try_end),
+        (call_script, "script_set_formation_position", ":team_no", grc_infantry, pos61),
+        (position_move_x, pos61, ":centering"), #for possible leader positioning
+      (try_end),
+    (try_end),  
+    
+    #cavalry AI
+    (try_begin),
+      (gt, ":num_cavalry", 0),
+
+      #get distance to nearest enemy battlegroup(s)
+      (store_add, ":slot", slot_team_d0_level, grc_cavalry),
+      (team_get_slot, ":average_level", ":team_no", ":slot"),
+      (assign, ":nearest_threat_distance", Far_Away),
+      (assign, ":nearest_target_distance", Far_Away),
+      (assign, ":num_targets", 0),
+      (try_for_range, ":enemy_team_no", 0, 4),
+        (team_slot_ge, ":enemy_team_no", slot_team_size, 1),
+        (teams_are_enemies, ":enemy_team_no", ":team_no"),
+        (try_for_range, ":enemy_battle_group", 0, 9),
+          (store_add, ":slot", slot_team_d0_size, ":enemy_battle_group"),
+          (team_get_slot, ":size_enemy_battle_group", ":enemy_team_no", ":slot"),
+          (gt, ":size_enemy_battle_group", 0),
+          (call_script, "script_battlegroup_get_position", pos0, ":enemy_team_no", ":enemy_battle_group"),
+          (get_distance_between_positions, ":distance_of_enemy", Cavalry_Pos, pos0),
+          (try_begin),  #threat or target?
+            (store_add, ":slot", slot_team_d0_weapon_length, ":enemy_battle_group"),
+            (team_get_slot, reg0, ":enemy_team_no", ":slot"),
+            (assign, ":decision_index", reg0),
+            (store_add, ":slot", slot_team_d0_level, ":enemy_battle_group"),
+            (team_get_slot, reg0, ":enemy_team_no", ":slot"),
+            (val_mul, ":decision_index", reg0),
+            (val_mul, ":decision_index", ":size_enemy_battle_group"),
+            (val_div, ":decision_index", ":average_level"),
+            (val_div, ":decision_index", ":num_cavalry"),
+            (try_begin),
+              (neq, ":enemy_battle_group", grc_cavalry),
+              (val_div, ":decision_index", 2),  #double count cavalry vs. foot soldiers
+            (try_end),
+            (gt, ":decision_index", 100),
+            (try_begin),
+              (gt, ":nearest_threat_distance", ":distance_of_enemy"),
+              (copy_position, Nearest_Threat_Pos, pos0),
+              (assign, ":nearest_threat_distance", ":distance_of_enemy"),
+            (try_end),
+          (else_try),
+            (val_add, ":num_targets", 1),
+            (gt, ":nearest_target_distance", ":distance_of_enemy"),
+            (copy_position, Nearest_Target_Pos, pos0),
+            (assign, ":nearest_target_distance", ":distance_of_enemy"),
+          (try_end),
+        (try_end),
+      (try_end),
+      (try_begin),
+        (eq, ":nearest_threat_distance", Far_Away),
+        (assign, ":nearest_target_guarded", 0),
+      (else_try),
+        (eq, ":nearest_target_distance", Far_Away),
+        (assign, ":nearest_target_guarded", 1),
+      (else_try),
+        (get_distance_between_positions, reg0, Nearest_Target_Pos, Nearest_Threat_Pos),
+        (store_div, reg1, AI_charge_distance, 2),
+        (try_begin),  #ignore target too close to threat
+          (le, reg0, reg1),
+          (assign, ":nearest_target_guarded", 1),
+        (else_try),
+          (assign, ":nearest_target_guarded", 0),
+        (try_end),
+      (try_end),
+
+      (assign, ":cavalry_order", mordr_charge), ##CABA HERE
+      (try_begin),
+        (teams_are_enemies, ":team_no", 0),
+        (neg|team_slot_ge, 1, slot_team_reinforcement_stage, AI_Max_Reinforcements),
+        (neg|team_slot_eq, 1, slot_team_reinforcement_stage, "$attacker_reinforcement_stage"),
+        (assign, ":cavalry_order", mordr_hold),
+      (else_try),
+        (teams_are_enemies, ":team_no", 1),
+        (neg|team_slot_ge, 0, slot_team_reinforcement_stage, AI_Max_Reinforcements),
+        (neg|team_slot_eq, 0, slot_team_reinforcement_stage, "$defender_reinforcement_stage"),
+        (assign, ":cavalry_order", mordr_hold),
+      (else_try),
+        (neq, ":infantry_order", mordr_charge),
+        (try_begin),
+          (le, "$battle_phase", BP_Jockey),
+          (assign, ":cavalry_order", mordr_hold),
+        (else_try),
+          (eq, ":nearest_target_distance", Far_Away),
+          (try_begin),
+            (eq, ":num_archers", 0),
+            (assign, ":distance_to_archers", 0),
+          (else_try),
+            (get_distance_between_positions, ":distance_to_archers", Cavalry_Pos, Archers_Pos),
+          (try_end),
+          (try_begin),
+            (this_or_next|gt, ":cav_closest_dist", AI_charge_distance),
+            (gt, ":distance_to_archers", AI_charge_distance),
+            (assign, ":cavalry_order", mordr_hold),
+          (try_end),
+        (try_end),
+      (try_end),
+
+      (try_begin),
+        (eq, ":team_no", 0),
+        (assign, ":cav_destination", Team0_Cavalry_Destination),
+      (else_try),
+        (eq, ":team_no", 1),
+        (assign, ":cav_destination", Team1_Cavalry_Destination),
+      (else_try),
+        (eq, ":team_no", 2),
+        (assign, ":cav_destination", Team2_Cavalry_Destination),
+      (else_try),
+        (eq, ":team_no", 3),
+        (assign, ":cav_destination", Team3_Cavalry_Destination),
+      (try_end),
+      (store_add, ":slot", slot_team_d0_percent_ranged, grc_cavalry),
+      (team_get_slot, reg0, ":team_no", ":slot"),
+      
+      #horse archers don't use wedge
+      (try_begin),
+        (ge, reg0, 50),
+        (call_script, "script_formation_end", ":team_no", grc_cavalry),
+        (try_begin),
+          (eq, ":num_archers", 0),
+          (team_get_movement_order, reg0, ":team_no", grc_cavalry),
+          (try_begin),
+            (neq, reg0, mordr_charge),
+            (team_give_order, ":team_no", grc_cavalry, mordr_charge),
+          (try_end),
+        (else_try),
+          (team_get_movement_order, reg0, ":team_no", grc_cavalry),
+          (try_begin),
+            (neq, reg0, ":cavalry_order"),
+            (team_give_order, ":team_no", grc_cavalry, ":cavalry_order"),
+          (try_end),
+          (copy_position, ":cav_destination", Archers_Pos),
+          (position_move_y, ":cav_destination", -500, 0),
+          (team_set_order_position, ":team_no", grc_cavalry, ":cav_destination"),
+        (try_end),
+        
+      #close in with no unguarded target farther off, free fight
+      (else_try),
+        (eq, ":cavalry_order", mordr_charge),
+        (le, ":cav_closest_dist", AI_charge_distance),
+        (try_begin),
+          (eq, ":num_targets", 1),
+          (eq, ":nearest_target_guarded", 0),
+          (gt, ":nearest_target_distance", ":nearest_threat_distance"),
+          (assign, reg0, 0),
+        (else_try),
+          (ge, ":num_targets", 2),
+          (eq, ":nearest_target_guarded", 1),
+          (assign, reg0, 0),
+        (else_try),
+          (assign, reg0, 1),
+        (try_end),
+        (eq, reg0, 1),
+        (call_script, "script_formation_end", ":team_no", grc_cavalry),
+        (team_get_movement_order, reg0, ":team_no", grc_cavalry),
+        (try_begin),
+          (neq, reg0, mordr_charge),
+          (team_give_order, ":team_no", grc_cavalry, mordr_charge),
+        (try_end),
+
+      #grand charge if target closer than threat AND not guarded
+      (else_try),
+        (lt, ":nearest_target_distance", ":nearest_threat_distance"),
+        (eq, ":nearest_target_guarded", 0),
+        (call_script, "script_formation_end", ":team_no", grc_cavalry),
+        (team_get_movement_order, reg0, ":team_no", grc_cavalry),
+        (try_begin),
+          (neq, reg0, mordr_hold),
+          (team_give_order, ":team_no", grc_cavalry, mordr_hold),
+        (try_end),
+        
+        #lead archers up to firing point
+        (try_begin),
+          (gt, ":nearest_target_distance", AI_firing_distance),
+          (eq, ":cavalry_order", mordr_hold),
+          (try_begin),
+            (eq, ":num_archers", 0),
+            (copy_position, ":cav_destination", Cavalry_Pos), #must be reinforcements, so gather at average position
+          (else_try),           
+            (copy_position, ":cav_destination", Archers_Pos),
+            (position_move_y, ":cav_destination", AI_charge_distance, 0),
+          (try_end),
+          
+        #then CHARRRRGE!
+        (else_try),
+          (copy_position, ":cav_destination", Cavalry_Pos),
+          (call_script, "script_point_y_toward_position", ":cav_destination", Nearest_Target_Pos),
+          (position_move_y, ":cav_destination", ":nearest_target_distance", 0),
+        (try_end),
+        (team_set_order_position, ":team_no", grc_cavalry, ":cav_destination"),
+        
+      #make a wedge somewhere
+      (else_try),
+        (try_begin),
+          (eq, ":cavalry_order", mordr_charge),
+          (neq, ":nearest_target_distance", Far_Away),
+          (copy_position, ":cav_destination", Cavalry_Pos),
+          (call_script, "script_point_y_toward_position", ":cav_destination", Nearest_Target_Pos),
+          (position_move_y, ":cav_destination", ":nearest_target_distance", 0),
+          (position_move_y, ":cav_destination", AI_charge_distance, 0), #charge on through to the other side
+        (else_try),
+          (neq, ":cavalry_order", mordr_charge),
+          (eq, ":num_archers", 0),
+          (copy_position, ":cav_destination", Cavalry_Pos), #must be reinforcements, so gather at average position
+        (else_try),
+          (copy_position, ":cav_destination", Archers_Pos), #hold near archers
+          (position_move_x, ":cav_destination", 500, 0),
+          (position_move_y, ":cav_destination", -1000, 0),
+        (try_end),
+        
+        #move around threat in the way to destination
+        (try_begin),
+          (neq, ":nearest_threat_distance", Far_Away),
+          (call_script, "script_point_y_toward_position", Cavalry_Pos, Nearest_Threat_Pos),
+          (call_script, "script_point_y_toward_position", Nearest_Threat_Pos, ":cav_destination"),
+          (position_get_rotation_around_z, reg0, Cavalry_Pos),
+          (position_get_rotation_around_z, reg1, Nearest_Threat_Pos),
+          (store_sub, ":rotation_diff", reg0, reg1),
+          (try_begin),
+            (lt, ":rotation_diff", -180),
+            (val_add, ":rotation_diff", 360),
+          (else_try),
+            (gt, ":rotation_diff", 180),
+            (val_sub, ":rotation_diff", 360),
+          (try_end),
+          
+          (try_begin),
+            (is_between, ":rotation_diff", -135, 136),
+            (copy_position, ":cav_destination", Cavalry_Pos),
+            (assign, ":distance_to_move", AI_firing_distance),
+            (try_begin),  #target is left of threat
+              (is_between, ":rotation_diff", -135, 0),
+              (val_mul, ":distance_to_move", -1),
+            (try_end),
+            (position_move_x, ":cav_destination", ":distance_to_move", 0),
+            (store_sub, ":distance_to_move", ":nearest_threat_distance", AI_firing_distance),
+            (position_move_y, ":cav_destination", ":distance_to_move", 0),
+            (call_script, "script_point_y_toward_position", ":cav_destination", Cavalry_Pos),
+            (position_rotate_z, ":cav_destination", 180),
+          (try_end),
+        (try_end),
+        (get_scene_boundaries, pos0, pos1),
+        (position_get_x, reg0, ":cav_destination"),
+        (position_get_x, reg1, pos0),
+        (val_max, reg0, reg1),
+        (position_get_x, reg1, pos1),
+        (val_min, reg0, reg1),
+        (position_set_x, ":cav_destination", reg0),
+        (position_get_y, reg0, ":cav_destination"),
+        (position_get_y, reg1, pos0),
+        (val_max, reg0, reg1),
+        (position_get_y, reg1, pos1),
+        (val_min, reg0, reg1),
+        (position_set_y, ":cav_destination", reg0),
+        (position_set_z_to_ground_level, ":cav_destination"),
+        
+        (try_begin),
+          (call_script, "script_cf_battlegroup_valid_formation", ":team_no", grc_cavalry, formation_wedge),
+          (copy_position, pos1, ":cav_destination"),
+          (call_script, "script_form_cavalry", ":team_no", grc_cavalry, ":team_leader", 0),
+          (store_add, ":slot", slot_team_d0_formation, grc_cavalry),
+          (team_set_slot, ":team_no", ":slot", formation_wedge),
+          # (team_give_order, ":team_no", grc_cavalry, mordr_hold),
+        (else_try),
+          (call_script, "script_formation_end", ":team_no", grc_cavalry),
+          (team_get_movement_order, reg0, ":team_no", grc_cavalry),
+          (try_begin),
+            (neq, reg0, ":cavalry_order"),
+            (team_give_order, ":team_no", grc_cavalry, ":cavalry_order"),
+          (try_end),
+        (try_end),
+        (call_script, "script_set_formation_position", ":team_no", grc_cavalry, ":cav_destination"),
+      (try_end),
+    (try_end),
+
+    #place leader
+    (try_begin),
+      (ge, ":team_leader", 0),
+      (agent_is_alive, ":team_leader"),
+      (try_begin),
+        (le, ":num_infantry", 0),
+        (try_begin),
+          (eq, ":archer_order", mordr_charge),
+          (agent_clear_scripted_mode, ":team_leader"),
+        (else_try),
+          (copy_position, pos1, Archers_Pos),
+          (position_move_y, pos1, -1000, 0),
+          (agent_set_scripted_destination, ":team_leader", pos1, 1),
+        (try_end),
+      (else_try),
+        (neq, ":place_leader_by_infantry", 0),
+        (agent_slot_eq, ":team_leader", slot_agent_is_running_away, 0),
+        (position_move_x, pos61, 100, 0),
+        (agent_set_scripted_destination, ":team_leader", pos61, 1),
+      (else_try),
+        (agent_clear_scripted_mode, ":team_leader"),
+      (try_end),
+    (try_end),
+  (try_end)
+  ]),
+          
+                
+  # script_field_tactics by motomataru
+  # Input: flag 1 to include ranged
+  # Output: none
+  ("field_tactics", [
+  (store_script_param, ":include_ranged", 1),
+  
+  (assign, ":largest_team_size", 0),
+  (assign, ":num_teams", 0),
+  (assign, ":battle_size", 0),
+  (try_for_range, ":team_no", 0, 4),
+      (team_get_slot, ":team_size", ":team_no", slot_team_size),
+    (gt, ":team_size", 0),
+      (team_get_slot, ":team_cav_size", ":team_no", slot_team_num_cavalry),
+    (store_add, ":team_adj_size", ":team_size", ":team_cav_size"),  #double count cavalry to capture effect on battlefield
+    (val_add, ":num_teams", 1),   
+    (val_add, ":battle_size", ":team_adj_size"),
+    
+    #tom
+    (try_begin),
+        (neq, ":team_no", "$fplayer_team_no"),
+      (neg|teams_are_enemies, ":team_no", "$fplayer_team_no"),
+        (team_get_slot, ":player_team_adj_size", "$fplayer_team_no", slot_team_adj_size),
+      (val_add, ":team_adj_size", ":player_team_adj_size"), #ally team takes player team into account
+    (try_end),
+    #tom
+    (team_set_slot, ":team_no", slot_team_adj_size, ":team_adj_size"),
+    
+      (lt, ":largest_team_size", ":team_adj_size"),
+    (assign, ":largest_team_size", ":team_adj_size"),
+  (try_end),
+
+  #apply tactics to every AI team
+    (set_show_messages, 0),
+  #(try_for_range, ":ai_team", 0, ":num_teams"), #tom
+  (try_for_range, ":ai_team", 0, 4),
+    (team_get_slot, ":ai_team_size", ":ai_team", slot_team_adj_size),
+    (gt, ":ai_team_size", 0),
+    
+    (assign, ":do_it", 0),
+    (try_begin),
+      (neq, ":ai_team", "$fplayer_team_no"),
+      (assign, ":do_it", 1),
+    (else_try),
+      (main_hero_fallen),    #have AI take over for mods with post-player battle action
+      (eq, "$enable_deahtcam", 1),
+      (eq, AI_Replace_Dead_Player, 1),
+      (assign, ":do_it", 1),
+    (try_end),
+    (eq, ":do_it", 1),
+    
+    (team_get_slot, ":ai_faction", ":ai_team", slot_team_faction),
+    (try_begin),
+      (this_or_next|eq, AI_for_kingdoms_only, 0),
+      (this_or_next|eq, ":ai_faction", fac_deserters),  #deserters have military training
+      (is_between, ":ai_faction", fac_kingdom_1, fac_kingdoms_end),
+      (val_mul, ":ai_team_size", 100),
+      (store_div, ":team_percentage", ":ai_team_size", ":largest_team_size"),
+      (store_div, ":team_battle_presence", ":ai_team_size", ":battle_size"),
+      (try_begin),
+        (eq, ":include_ranged", 1),
+        (call_script, "script_team_field_ranged_tactics", ":ai_team", ":team_percentage", ":team_battle_presence"),
+      (try_end),
+      (call_script, "script_team_field_melee_tactics", ":ai_team", ":team_percentage", ":team_battle_presence"),
+    (try_end),
+  (try_end),
+    (set_show_messages, 1),
+
+  (try_begin),
+    (eq, ":include_ranged", 1),     
+    (assign, "$prev_casualties", "$cur_casualties"),
+  (try_end)
+  ]),
+
+    
+    
+  # script_find_high_ground_around_pos1_corrected by motomataru
+  # Input:  arg1: destination position
+  #     arg2: search_radius (in meters)
+  #     pos1 should hold center_position_no
+  # Output: destination contains highest ground within a <search_radius> meter square around pos1
+  # Also uses position registers: pos0
+  ("find_high_ground_around_pos1_corrected", [
+  (store_script_param, ":destination_pos", 1),
+  (store_script_param, ":search_radius", 2),
+  (assign, ":fixed_point_multiplier", 1),
+  (convert_to_fixed_point, ":fixed_point_multiplier"),
+  (set_fixed_point_multiplier, 1),
+  
+  (position_get_x, ":o_x", pos1),
+  (position_get_y, ":o_y", pos1),
+  (store_sub, ":min_x", ":o_x", ":search_radius"),
+  (store_sub, ":min_y", ":o_y", ":search_radius"),
+  (store_add, ":max_x", ":o_x", ":search_radius"),
+  (store_add, ":max_y", ":o_y", ":search_radius"),
+  
+  (get_scene_boundaries, ":destination_pos", pos0),
+  (position_get_x, ":scene_min_x", ":destination_pos"),
+  (position_get_x, ":scene_max_x", pos0),
+  (position_get_y, ":scene_min_y", ":destination_pos"),
+  (position_get_y, ":scene_max_y", pos0),
+  (val_max, ":min_x", ":scene_min_x"),
+  (val_max, ":min_y", ":scene_min_y"),
+  (val_min, ":max_x", ":scene_max_x"),
+  (val_min, ":max_y", ":scene_max_y"),
+
+  (assign, ":highest_pos_z", -100),
+  (copy_position, ":destination_pos", pos1),
+  (init_position, pos0),
+
+  (try_for_range, ":i_x", ":min_x", ":max_x"),
+    (try_for_range, ":i_y", ":min_y", ":max_y"),
+      (position_set_x, pos0, ":i_x"),
+      (position_set_y, pos0, ":i_y"),
+      (position_set_z_to_ground_level, pos0),
+      (position_get_z, ":cur_pos_z", pos0),
+      (try_begin),
+        (gt, ":cur_pos_z", ":highest_pos_z"),
+        (copy_position, ":destination_pos", pos0),
+        (assign, ":highest_pos_z", ":cur_pos_z"),
+      (try_end),
+    (try_end),
+  (try_end),
+  
+  (set_fixed_point_multiplier, ":fixed_point_multiplier"),
+  ]),
+    
+    
+  # script_cf_count_casualties by motomataru
+  # Input: none
+  # Output: evalates T/F, reg0 num casualties
+  ("cf_count_casualties", [
+    (assign, ":num_casualties", 0),
+  (try_for_agents,":cur_agent"),
+      (try_begin),
+      (this_or_next|agent_is_wounded, ":cur_agent"),
+      (this_or_next|agent_slot_eq, ":cur_agent", slot_agent_is_running_away, 1),
+      (neg|agent_is_alive, ":cur_agent"),
+      (val_add, ":num_casualties", 1),
+    (try_end),
+  (try_end),
+  (assign, reg0, ":num_casualties"),
+  (gt, ":num_casualties", 0)
+  ]),
+  
+    
+  # script_battlegroup_get_position by motomataru #CABA - EDITED TO USE SLOTS, NOT STORED POS NUMBERS
+#MOTO need rotation?
+  # Input: destination position, team, battle group (troop class)
+  # Output: battle group position
+  #     average team position if "troop class" input NOT set to 0-8
+  # NB: Assumes that battle groups beyond 2 are PLAYER team
+  # Positions 24-45 reserved (!)  NOW none are reserved...all calculated with slots
+  ("battlegroup_get_position", [
+  (store_script_param, ":bgposition", 1),
+  (store_script_param, ":bgteam", 2),
+  (store_script_param, ":bgroup", 3),
+  
+  (assign, ":x", 0),
+  (assign, ":y", 0),
+  (init_position, ":bgposition"),
+  (try_begin),
+    (neg|is_between, ":bgroup", 0, 9),
+    (team_slot_ge, ":bgteam", slot_team_size, 1),
+    (team_get_slot, ":x", ":bgteam", slot_team_avg_x),
+    (team_get_slot, ":y", ":bgteam", slot_team_avg_y),
+  (else_try),
+    (is_between, ":bgroup", 0, 9),
+    (store_add, ":slot", slot_team_d0_size, ":bgroup"),
+    (team_slot_ge, ":bgteam", ":slot", 1),
+    
+    (store_add, ":slot", slot_team_d0_x, ":bgroup"),
+    (team_get_slot, ":x", ":bgteam", ":slot"),
+    
+    (store_add, ":slot", slot_team_d0_y, ":bgroup"),
+    (team_get_slot, ":y", ":bgteam", ":slot"),
+  (try_end),
+  (position_set_x, ":bgposition", ":x"),
+  (position_set_y, ":bgposition", ":y"),
+  (position_set_z_to_ground_level, ":bgposition"),
+  ]), 
+    
+  # script_get_nearest_enemy_battlegroup_location by motomataru
+  # Input: destination position, fron team, from position
+  # Output: destination position, reg0 with distance
+  # Run script_store_battlegroup_data before calling!
+  ("get_nearest_enemy_battlegroup_location", [
+  (store_script_param, ":bgposition", 1),
+  (store_script_param, ":team_no", 2),
+  (store_script_param, ":from_pos", 3),
+  (assign, ":distance_to_nearest_enemy_battlegoup", Far_Away),
+  (try_for_range, ":enemy_team_no", 0, 4),
+    (team_slot_ge, ":enemy_team_no", slot_team_size, 1),
+    (teams_are_enemies, ":enemy_team_no", ":team_no"),
+    (try_for_range, ":enemy_battle_group", 0, 9),
+      (store_add, ":slot", slot_team_d0_size, ":enemy_battle_group"),
+      (team_slot_ge, ":enemy_team_no", ":slot", 1),
+      (call_script, "script_battlegroup_get_position", pos0, ":enemy_team_no", ":enemy_battle_group"),
+      (get_distance_between_positions, reg0, pos0, ":from_pos"),
+      (try_begin),
+        (gt, ":distance_to_nearest_enemy_battlegoup", reg0),
+        (assign, ":distance_to_nearest_enemy_battlegoup", reg0),
+        (copy_position, ":bgposition", pos0),
+      (try_end),
+    (try_end),
+  (try_end),
+  (assign, reg0, ":distance_to_nearest_enemy_battlegoup")
+  ]),
+    
+# # Line added to clear scripted mode right before each (agent_start_running_away, ":cur_agent")
+  # script_decide_run_away_or_not
+  # Input: none
+  # Output: none
+  ("decide_run_away_or_not",
+    [
+      (store_script_param, ":cur_agent", 1),
+      (store_script_param, ":mission_time", 2),
+      
+      (assign, ":force_retreat", 0),
+      (agent_get_team, ":agent_team", ":cur_agent"),
+      (agent_get_division, ":agent_division", ":cur_agent"),
+      (try_begin),
+        (lt, ":agent_division", 9), #static classes
+        (team_get_movement_order, ":agent_movement_order", ":agent_team", ":agent_division"),
+        (eq, ":agent_movement_order", mordr_retreat),
+        (assign, ":force_retreat", 1),
+      (try_end),
+
+      (agent_get_slot, ":is_cur_agent_running_away", ":cur_agent", slot_agent_is_running_away),
+      (try_begin),
+        (eq, ":is_cur_agent_running_away", 0),
+        (try_begin),
+          (eq, ":force_retreat", 1),
+          (agent_clear_scripted_mode, ":cur_agent"),  #handle scripted mode troops - motomataru
+          (agent_start_running_away, ":cur_agent"),
+          (agent_set_slot, ":cur_agent",  slot_agent_is_running_away, 1),
+        (else_try),
+          (ge, ":mission_time", 45), #first 45 seconds anyone does not run away whatever happens.
+          (agent_get_slot, ":agent_courage_score", ":cur_agent",  slot_agent_courage_score),
+          (store_agent_hit_points, ":agent_hit_points", ":cur_agent"),
+          (val_mul, ":agent_hit_points", 4),
+          (try_begin),
+            (agent_is_ally, ":cur_agent"),
+            (val_sub, ":agent_hit_points", 100), #ally agents will be more tend to run away, to make game more funnier/harder
+          (try_end),
+          (val_mul, ":agent_hit_points", 10),
+          (store_sub, ":start_running_away_courage_score_limit", 3500, ":agent_hit_points"), 
+          (lt, ":agent_courage_score", ":start_running_away_courage_score_limit"), #if (courage score < 3500 - (agent hit points * 40)) and (agent is not running away) then start running away, average hit points : 50, average running away limit = 1500
+
+          (agent_get_troop_id, ":troop_id", ":cur_agent"), #for now do not let heroes to run away from battle
+          (neg|troop_is_hero, ":troop_id"),
+                                
+          (agent_clear_scripted_mode, ":cur_agent"),  #handle scripted mode troops - motomataru
+          (agent_start_running_away, ":cur_agent"),
+          (agent_set_slot, ":cur_agent",  slot_agent_is_running_away, 1),
+        (try_end),
+      (else_try),
+        (neq, ":force_retreat", 1),
+        (agent_get_slot, ":agent_courage_score", ":cur_agent",  slot_agent_courage_score),
+        (store_agent_hit_points, ":agent_hit_points", ":cur_agent"),      
+        (val_mul, ":agent_hit_points", 4),
+        (try_begin),
+          (agent_is_ally, ":cur_agent"),
+          (val_sub, ":agent_hit_points", 100), #ally agents will be more tend to run away, to make game more funnier/harder
+        (try_end),
+        (val_mul, ":agent_hit_points", 10),
+        (store_sub, ":stop_running_away_courage_score_limit", 3700, ":agent_hit_points"), 
+        (ge, ":agent_courage_score", ":stop_running_away_courage_score_limit"), #if (courage score > 3700 - agent hit points) and (agent is running away) then stop running away, average hit points : 50, average running away limit = 1700
+        (agent_stop_running_away, ":cur_agent"),
+        (agent_set_slot, ":cur_agent",  slot_agent_is_running_away, 0),
+      (try_end),      
+  ]), #ozan
 
 ]

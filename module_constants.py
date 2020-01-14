@@ -220,12 +220,6 @@ slot_faction_war_damage_inflicted_on_factions_end 	= slot_faction_sum_advice_abo
 slot_faction_sum_advice_about_factions_end			= 160
 ##diplomacy end+
 
-#-## TBS - Beer drinking
-# These are troop slots, so check for conflicting numbers in your mod.
-slot_beers_for_the_day = 420
-slot_last_beers_time   = 421
-#-## TBS - Beer drinking end
-
 #revolts -- notes for self
 #type 1 -- minor revolt, aimed at negotiating change without changing the ruler
 #type 2 -- alternate ruler revolt (ie, pretender, chinese dynastic revolt -- keep the same polity but switch the ruler)
@@ -1474,12 +1468,7 @@ reinforcement_cost_hard = 300
 
 merchant_toll_duration        = 72 #Tolls are valid for 72 hours
 
-#SB : const some of these
-companion_escape_after_defeat_chance = 50
 hero_escape_after_defeat_chance = 70
-hero_escape_from_player_chance = 50
-hero_escape_from_center_chance = 30
-hero_escape_from_tower_chance = 5
 
 
 raid_distance = 4
@@ -1715,11 +1704,16 @@ spawn_points_end = "p_spawn_points_end"
 regular_troops_begin       = "trp_novice_fighter"
 regular_troops_end         = "trp_tournament_master"
 
-# swadian_merc_parties_begin = "p_town_1_mercs"
-# swadian_merc_parties_end   = "p_town_8_mercs"
+swadian_merc_parties_begin = "p_town_1_mercs"
+swadian_merc_parties_end   = "p_town_8_mercs"
 
-# vaegir_merc_parties_begin  = "p_town_8_mercs"
-# vaegir_merc_parties_end    = "p_zendar"
+vaegir_merc_parties_begin  = "p_town_8_mercs"
+vaegir_merc_parties_end    = "p_zendar"
+
+# Merc Camp Begin
+mercenary_camp_begin  = "p_merc_camp_geroia"
+mercenary_camp_end    = "p_merc_camp_end"
+# Merc Camp End
 
 arena_masters_begin    = "trp_town_1_arena_master"
 arena_masters_end      = "trp_town_1_armorer"
@@ -1902,6 +1896,10 @@ num_taiga_bandit_spawn_points = 1
 num_desert_bandit_spawn_points = 1
 num_black_khergit_spawn_points = 1
 num_sea_raider_spawn_points = 2
+num_robber_knights_spawn_points = 1
+num_roving_knights_spawn_points = 1
+num_mercenaries_spawn_points = 1
+
 
 peak_prisoner_trains = 4
 peak_kingdom_caravans = 12
@@ -2311,7 +2309,6 @@ DPLMC_GOLD_CHANGES_HIGH    =  2
 # - Village elder now receives the gold when you buy cattle
 # - Resting at neutral centers cost extra for wounded troops
 # - Tournament wins are modified and applied to NPC
-# - Amount of items looted from village is no longer always 30
 #
 #High:
 # - The total amount of weekly bonus gold awarded to kings in Calradia
@@ -2392,10 +2389,6 @@ dplmc_command_renown_limit = 300
 dplmc_ransom_commission = 500
 dplmc_ransom_debt_mask = 100000
 
-dplmc_tournament_renown = 20
-dplmc_taken_prisoner_renown = -5
-dplmc_escape_prisoner_renown = 3
-
 dplmc_companion_skill_renown = 3
 dplmc_companion_emissary_renown = 2
 dplmc_companion_battle_renown = 1
@@ -2445,6 +2438,8 @@ disguise_guard = 8 #trp_caravan_guard
 disguise_merchant = 16 #trp_caravan_master
 disguise_bard = 32
 
+slot_faction_peasant_rebellion_last = 103
+
 ## VERSION NUMBERS FOR TRACKING NEEDED CHANGES
 #(These change numbers are only for things which require the game to alter saved games.)
 #Version 0: Diplomacy 3.3.2 and prior, and all Diplomacy 3.3.2+ versions released before 2011-06-06
@@ -2464,6 +2459,12 @@ DPLMC_VERSION_LOW_7_BITS = 68 #Number that comes after the rest of the version c
 
 DPLMC_DIPLOMACY_VERSION_STRING = "4.3+ for Steam"
 DPLMC_NUM_PREFERENCE_OPTIONS = 12 #for prsnt_adv_diplomacy_preferences
+
+slot_agent_volley_fire             = 33
+slot_team_d0_order_volley     = 10 #plus 8 more for the other divisions
+
+from header_triggers import *
+key_for_volley   = key_f8
 
 # #Perform a check to make sure constants are defined in a reasonable way.
 # def _validate_constants(verbose=False):
@@ -2490,9 +2491,189 @@ DPLMC_NUM_PREFERENCE_OPTIONS = 12 #for prsnt_adv_diplomacy_preferences
 # #during building.
 # _validate_constants(verbose=(__name__=="__main__"))
 # ##diplomacy end+
+# Formations for Warband by Motomataru
+# rel. 05/02/11
 
-#camel fear start
+#Formation modes
+formation_none	= 0
+formation_default	= 1
+formation_ranks	= 2
+formation_shield	= 3
+formation_wedge	= 4
+formation_square	= 5
+
+#Formation tweaks
+formation_minimum_spacing	= 67
+formation_minimum_spacing_horse_length	= 300
+formation_minimum_spacing_horse_width	= 200
+formation_start_spread_out	= 2
+formation_min_foot_troops	= 12
+formation_min_cavalry_troops	= 5
+formation_autorotate_at_player	= 1
+formation_native_ai_use_formation = 1
+formation_delay_for_spawn	= .4
+formation_reequip	= 0 #1 Tom - disable, as we use our formation thing	#TO DO: One-time-on-form option when formation slots integrated
+
+from module_constants import slot_town_rebellion_readiness, slot_town_arena_melee_mission_tpl
+
+#Other constants (not tweaks)
+Third_Max_Weapon_Length = 250 / 3
+slot_party_cabadrin_order_d0 = slot_town_arena_melee_mission_tpl #78
+slot_party_gk_order          = slot_town_rebellion_readiness #77
+
+###################################################################################
+# AutoLoot: Modified Constants
+# Most of these are slot definitions, make sure they do not clash with your mod's other slot usage
+###################################################################################
+# This is an item slot
+# slot_item_difficulty = 5
+
+# # Autoloot improved by rubik begin
+# slot_item_weight                  = 6
+
+# slot_item_cant_on_horseback       = 10
+# slot_item_type_not_for_sell       = 11
+# slot_item_modifier_multiplier     = 12
+
+slot_item_needs_two_hands	= 41
+slot_item_length	= 42
+slot_item_speed	= 43
+slot_item_thrust_damage	= 44
+slot_item_swing_damage	= 45
+
+slot_item_head_armor	= slot_item_needs_two_hands
+slot_item_body_armor	= slot_item_thrust_damage
+slot_item_leg_armor	= slot_item_swing_damage
+
+slot_item_horse_speed	= slot_item_needs_two_hands
+slot_item_horse_armor	= slot_item_thrust_damage
+slot_item_horse_charge	= slot_item_swing_damage
+# # Autoloot end
+
+#positions used through formations and AI triggers
+# Player_Battle_Group3_Pos	= 24	#pos24
+# Player_Battle_Group4_Pos	= 25	#pos25
+# Player_Battle_Group5_Pos	= 26	#pos26
+# Player_Battle_Group6_Pos	= 27	#pos27
+# Player_Battle_Group7_Pos	= 28	#pos28
+# Player_Battle_Group8_Pos	= 29	#pos29
+
+# Team0_Infantry_Pos	= 30	#pos30
+# Team0_Archers_Pos	= 31	#pos31
+# Team0_Cavalry_Pos	= 32	#pos32
+# Team0_Average_Pos	= 33	#pos33
+# Team1_Infantry_Pos	= 34	#pos34
+# Team1_Archers_Pos	= 35	#pos35
+# Team1_Cavalry_Pos	= 36	#pos36
+# Team1_Average_Pos	= 37	#pos37
+# Team2_Infantry_Pos	= 38	#pos38
+# Team2_Archers_Pos	= 39	#pos39
+# Team2_Cavalry_Pos	= 40	#pos40
+# Team2_Average_Pos	= 41	#pos41
+# Team3_Infantry_Pos	= 42	#pos42
+# Team3_Archers_Pos	= 43	#pos43
+# Team3_Cavalry_Pos	= 44	#pos44
+# Team3_Average_Pos	= 45	#pos45
+
+#keys used for old M&B
+from header_triggers import *
+key_for_ranks	= key_j
+key_for_shieldwall	= key_k
+key_for_wedge	= key_l
+key_for_square	= key_semicolon
+key_for_undo	= key_u
+
+#slots used instead of more global variables
+slot_team_faction                      = 1
+slot_team_default_formation            = 2	#used for infantry formations
+slot_team_reinforcement_stage          = 3
+#Reset with every call of Store_Battlegroup_Data
+slot_team_size                         = 4
+slot_team_adj_size                     = 5 #cavalry double counted for AI considerations
+slot_team_level                        = 6
+slot_team_num_infantry                 = 7	#these may not be needed anymore (duplicate division size)
+slot_team_num_archers                  = 8
+slot_team_num_cavalry                  = 9
+slot_team_avg_x                        = 10 # **used instead of POS registers
+slot_team_avg_y                        = 11 # **used instead of POS registers
+slot_team_d0_size                      = 12 #plus 8 more for the other divisions
+slot_team_d0_percent_ranged            = 21 #plus 8 more for the other divisions
+slot_team_d0_percent_throwers          = 30 #plus 8 more for the other divisions
+slot_team_d0_low_ammo                  = 39 #plus 8 more for the other divisions
+slot_team_d0_level                     = 48 #plus 8 more for the other divisions
+slot_team_d0_weapon_length             = 57 #plus 8 more for the other divisions
+slot_team_d0_x                         = 66 #plus 8 more for the other divisions **used instead of POS registers
+slot_team_d0_y                         = 75 #plus 8 more for the other divisions **used instead of POS registers
+#End Reset Group
+slot_team_d0_type                      = 84 #plus 8 more for the other divisions
+slot_team_d0_formation                 = 93 #plus 8 more for the other divisions
+slot_team_d0_formation_space           = 102 #plus 8 more for the other divisions
+slot_team_d0_move_order                = 111 #plus 8 more for the other divisions
+slot_team_d0_first_member              = 120 #plus 8 more for the other divisions
+slot_team_d0_formation_x               = 129 #plus 8 more for the other divisions
+slot_team_d0_formation_y               = 138 #plus 8 more for the other divisions
+slot_team_d0_formation_zrot            = 147 #plus 8 more for the other divisions
+
+reset_team_stats_begin = slot_team_size  
+reset_team_stats_end   = slot_team_d0_y + 8 + 1
+
+#Slot Division Type definitions
+sdt_infantry   = 0
+sdt_archer     = 1
+sdt_cavalry    = 2
+sdt_polearm    = 3
+sdt_skirmisher = 4
+sdt_harcher    = 5
+sdt_support    = 6
+sdt_bodyguard  = 7
+sdt_unknown    = -1
+
+#AI variables
+AI_long_range	= 13000	#do not put over 130m if you want archers to always fire
+AI_firing_distance	= AI_long_range / 2
+AI_charge_distance	= 2000
+AI_for_kingdoms_only	= 0
+Far_Away	= 1000000
+Percentage_Cav_For_New_Dest	= 40
+Hold_Point	= 100	#archer hold if outnumbered
+Advance_More_Point	= 100 - Hold_Point * 100 / (Hold_Point + 100)	#advance 'cause expect other side is holding
+AI_Delay_For_Spawn	= formation_delay_for_spawn + .1	#fire AFTER formations init
+AI_Max_Reinforcements	=	2	#maximum number of reinforcement stages in a battle
+AI_Replace_Dead_Player	=	1
+
+#Battle Phases
+BP_Setup	= 1
+BP_Jockey	= 2
+BP_Fight	= 3
+
+#positions used in a script, named for convenience
+Nearest_Enemy_Troop_Pos	= 32	#pos32
+Nearest_Non_Cav_Enemy_Troop_Pos	= 33	#pos33
+Nearest_Threat_Pos	= 34	#pos34
+Nearest_Target_Pos	= 35	#pos35
+Infantry_Pos	= 36	#pos36
+Archers_Pos	= 37	#pos37
+Cavalry_Pos	= 38	#pos38
+Enemy_Team_Pos	= 39	#pos39
+Nearest_Enemy_Battlegroup_Pos	= 40	#pos40
+
+#positions used through battle
+Team0_Cavalry_Destination	= 41	#pos41
+Team1_Cavalry_Destination	= 42	#pos42
+Team2_Cavalry_Destination	= 43	#pos43
+Team3_Cavalry_Destination	= 44	#pos44
+Team0_Starting_Point	= 45	#pos45
+Team1_Starting_Point	= 46	#pos46
+Team2_Starting_Point	= 47	#pos47
+Team3_Starting_Point	= 48	#pos48
+slot_agent_banner = 107
+
+#-## TBS - Beer drinking
+# These are troop slots, so check for conflicting numbers in your mod.
+slot_beers_for_the_day = 520
+slot_last_beers_time   = 521
+#-## TBS - Beer drinking end
+
+#camel fear mod do not remove
 camels_begin = "itm_pack_camel"
 camels_end = "itm_arrows"
-#camel fear end
-

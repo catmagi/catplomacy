@@ -28,5 +28,3 @@ suf_other_bits   = 20
 
 def other(other_troop_id):
   return other_troop_id << suf_other_bits
-
-

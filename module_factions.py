@@ -28,7 +28,7 @@ factions = [
   ("innocents","Innocents", ff_always_hide_label, 0.5,[("outlaws",-0.05)], []),
   ("merchants","Merchants", ff_always_hide_label, 0.5,[("outlaws",-0.5),], []),
 
-  ("dark_knights","{!}Dark Knights", 0, 0.5,[("innocents",-0.9),("player_faction",-0.4)], []),
+  ("dark_knights","Dark Knights", 0, 0.5,[("innocents",-0.9),("player_faction",-0.4)], []),
 
   ("culture_1",  "{!}culture_1", 0, 0.9, [], []),
   ("culture_2",  "{!}culture_2", 0, 0.9, [], []),
@@ -43,7 +43,7 @@ factions = [
   ("player_faction","Player Faction",0, 0.9, [], []),
   ("player_supporters_faction","Player's Supporters",0, 0.9, [("player_faction",1.00),("outlaws",-0.05),("peasant_rebels", -0.1),("deserters", -0.02),("mountain_bandits", -0.05),("forest_bandits", -0.05)], [], 0xFF4433), #changed name so that can tell difference if shows up on map
   ("kingdom_1",  "Kingdom of Swadia", 0, 0.9, [("outlaws",-0.05),("peasant_rebels", -0.1),("deserters", -0.02),("mountain_bandits", -0.05),("forest_bandits", -0.05)], [], 0xEE7744),
-  ("kingdom_2",  "Kingdom of Vaegirs",    0, 0.9, [("outlaws",-0.05),("peasant_rebels", -0.1),("deserters", -0.02),("mountain_bandits", -0.05),("forest_bandits", -0.05)], [], 0xCCBB99),
+  ("kingdom_2",  "Vaegir Tsardom",    0, 0.9, [("outlaws",-0.05),("peasant_rebels", -0.1),("deserters", -0.02),("mountain_bandits", -0.05),("forest_bandits", -0.05)], [], 0xCCBB99),
   ("kingdom_3",  "Khergit Khanate", 0, 0.9, [("outlaws",-0.05),("peasant_rebels", -0.1),("deserters", -0.02),("mountain_bandits", -0.05),("forest_bandits", -0.05)], [], 0xCC99FF),
   ("kingdom_4",  "Kingdom of Nords",    0, 0.9, [("outlaws",-0.05),("peasant_rebels", -0.1),("deserters", -0.02),("mountain_bandits", -0.05),("forest_bandits", -0.05)], [], 0x33DDDD),
   ("kingdom_5",  "Kingdom of Rhodoks",  0, 0.9, [("outlaws",-0.05),("peasant_rebels", -0.1),("deserters", -0.02),("mountain_bandits", -0.05),("forest_bandits", -0.05)], [], 0x33DD33),
@@ -57,7 +57,7 @@ factions = [
 
   ("kingdoms_end","{!}kingdoms_end", 0, 0,[], []),
 
-  ("robber_knights",  "{!}robber_knights", 0, 0.1, [], []),
+  ("robber_knights",  "Robber_knights", 0, 0.1,[("noble_refugees",-1.0),("player_faction",-0.4),("kingdom_1",-0.5),("kingdom_2",-0.5),("kingdom_3",-0.5),("kingdom_4",-0.5),("kingdom_5",-0.5),("kingdom_6",-0.5),("outlaws",-0.5)], []),
 
   ("khergits","{!}Khergits", 0, 0.5,[("player_faction",0.0)], []),
   ("black_khergits","{!}Black Khergits", 0, 0.5,[("player_faction",-0.3),("kingdom_1",-0.02),("kingdom_2",-0.02)], []),
@@ -69,10 +69,12 @@ factions = [
   ("mountain_bandits","Mountain Bandits", 0, 0.5,[("commoners",-0.2),("merchants",-0.5),("manhunters",-0.6),("player_faction",-0.15)], [], 0x888888),
   ("forest_bandits","Forest Bandits", 0, 0.5,[("commoners",-0.2),("merchants",-0.5),("manhunters",-0.6),("player_faction",-0.15)], [], 0x888888),
 
+  ("peasant_rebels","Peasant Rebels", 0, 1.0,[("noble_refugees",-1.0),("player_faction",-0.4),("kingdom_1",-0.5),("kingdom_2",-0.5),("kingdom_3",-0.5),("kingdom_4",-0.5),("kingdom_5",-0.5),("kingdom_6",-0.5)], []),
+  ("noble_refugees","{!}Noble Refugees", 0, 0.5,[], []),
+
   ("undeads","{!}Undeads", max_player_rating(-30), 0.5,[("commoners",-0.7),("player_faction",-0.5)], []),
   ("slavers","{!}Slavers", 0, 0.1, [], []),
-  ("peasant_rebels","{!}Peasant Rebels", 0, 1.0,[("noble_refugees",-1.0),("player_faction",-0.4)], []),
-  ("noble_refugees","{!}Noble Refugees", 0, 0.5,[], []),
+  ("culture_7",  "{!}culture_7", 0, 0.9, [], []), #new culture for common troops
   ("ccoop_all_stars","All Stars", 0, 0.5,[], []), #INVASION MODE (because renaming an existing one is so hard)
 ]
 

@@ -227,4 +227,5 @@ sounds = [
  ("ccoop_sea_raider_taunt_3",sf_vol_8, ["encounter_sea_raider_10.ogg"]),
  ("sounds_end", sf_priority_10|sf_vol_10, ["enemy_scored_a_point.ogg"]),
  #INVASION MODE END
+ ("horn", sf_priority_1|sf_vol_15, ["horn1.wav", "horn2.wav", "horn3.wav", "horn4.wav", "horn5.wav", "horn6.wav", "horn7.wav"]),
 ]

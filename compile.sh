@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /home/nick/.local/Steam/steamapps/common/Mount*nd/Modules/Diplomacy/source
+cd /home/nick/.local/Steam/steamapps/common/Mount*nd/Modules/Diplomacy_Custom_Rebased/source
 python process_init.py
 python process_global_variables.py
 python process_strings.py

@@ -42,11 +42,37 @@ from compiler import *
 game_menus = [
   ("start_game_0",menu_text_color(0xFF000000)|mnf_disable_all_keys,
   ##diplomacy begin
-    "Welcome, adventurer, to Catman's Diplomacy for Mount & Blade: Warband. Before beginning the game you must create your character. Remember that in the traditional medieval society depicted in the game, war and politics are usually dominated by male members of the nobility. That does not however mean that you should not choose to play a female character, or one who is not of noble birth. Male nobles may have a somewhat easier start, but women and commoners can attain all of the same goals -- and in fact may have a much more interesting if more challenging early game.",
+    "Welcome, adventurer, to Diplomacy for Mount & Blade: Warband. Before beginning the game you must create your character. Remember that in the traditional medieval society depicted in the game, war and politics are usually dominated by male members of the nobility. That does not however mean that you should not choose to play a female character, or one who is not of noble birth. Male nobles may have a somewhat easier start, but women and commoners can attain all of the same goals -- and in fact may have a much more interesting if more challenging early game.",
   ##diplomacy end
   "none",
     [],
     [
+    #QUICKSTART##########################
+     ("start_mod",[],"Quick Character (for mod testing)",
+       [
+         (troop_set_type,"trp_player",0),
+         (assign,"$character_gender",tf_male),   
+   (set_show_messages, 0),
+   (troop_add_gold, "trp_player", 80000),
+        (troop_add_item, "trp_player","itm_leather_jerkin",0),
+        (troop_add_item, "trp_player","itm_leather_boots",0),
+         
+        (troop_add_item, "trp_player","itm_sword_medieval_a", 0),
+        (troop_add_item, "trp_player","itm_saddle_horse",0),
+        (troop_add_item, "trp_player","itm_smoked_fish",0),         
+
+        (troop_raise_attribute, "trp_player",ca_strength,100),
+        (troop_raise_attribute, "trp_player",ca_agility,100),
+        (troop_raise_skill, "trp_player","skl_power_strike",10),
+        (troop_raise_skill, "trp_player","skl_riding",10),
+        (troop_raise_skill, "trp_player","skl_pathfinding",10),
+        (troop_raise_skill, "trp_player","skl_spotting",10),
+        (troop_raise_skill, "trp_player","skl_athletics",10),      
+   (troop_equip_items,"trp_player"),   
+   (change_screen_map),
+        ]
+      ),
+###################################   
      ("continue",[],"Continue...",
        [
        #SB : randomized quick start
@@ -67,7 +93,7 @@ game_menus = [
           (jump_to_menu, "mnu_start_game_1"),
         (try_end),
         ]
-       ),
+       ),       
       ("go_back",[],"Go back",
        [
          (change_screen_quit),
@@ -5695,18 +5721,17 @@ TOTAL:  {reg5}"),
 
               (str_store_troop_name, s1, ":stack_troop"),
               (str_store_faction_name, s3, ":defeated_faction"),
-              (faction_get_color, ":color", ":defeated_faction"),
-              #SB : colorize
               (str_store_string, s17, "@{s1} of {s3} managed to escape."),
-              (display_log_message, "@{!}{s17}", ":color"),
+              (display_log_message, "@{!}{s17}"),
               (jump_to_menu, "mnu_enemy_slipped_away"),
               (assign, ":break", 1),
             (else_try),
               (store_add, "$last_defeated_hero", ":stack_no", 1),
               (call_script, "script_remove_troop_from_prison", ":stack_troop"),
               (troop_set_slot, ":stack_troop", slot_troop_leaded_party, -1),
+
               (assign, "$talk_context", tc_hero_defeated),
-              (call_script, "script_change_troop_renown", ":stack_troop", dplmc_taken_prisoner_renown), #SB : lose some renown
+
               (call_script, "script_setup_troop_meeting", ":stack_troop", ":stack_troop_dna"),
               (assign, ":break", 1),
             (try_end),
@@ -6199,12 +6224,13 @@ TOTAL:  {reg5}"),
         (str_store_party_name, 1,"$g_encountered_party"),
         (str_store_party_name, 2,"$g_encountered_party_2"),
       ],
+    #always choose side when joining battles
     [
       ("pre_join_help_attackers",[
-          (store_faction_of_party, ":attacker_faction", "$g_encountered_party_2"),
-          (store_relation, ":attacker_relation", ":attacker_faction", "fac_player_supporters_faction"),
-          (store_faction_of_party, ":defender_faction", "$g_encountered_party"),
-          (store_relation, ":defender_relation", ":defender_faction", "fac_player_supporters_faction"),
+          #(store_faction_of_party, ":attacker_faction", "$g_encountered_party_2"),
+          #(store_relation, ":attacker_relation", ":attacker_faction", "fac_player_supporters_faction"),
+          #(store_faction_of_party, ":defender_faction", "$g_encountered_party"),
+          #(store_relation, ":defender_relation", ":defender_faction", "fac_player_supporters_faction"),
           #(ge, ":attacker_relation", 0),
           #(lt, ":defender_relation", 0),
           ],
@@ -6214,10 +6240,10 @@ TOTAL:  {reg5}"),
               (assign,"$g_ally_party","$g_encountered_party_2"),
               (jump_to_menu,"mnu_join_battle")]),
       ("pre_join_help_defenders",[
-          (store_faction_of_party, ":attacker_faction", "$g_encountered_party_2"),
-          (store_relation, ":attacker_relation", ":attacker_faction", "fac_player_supporters_faction"),
-          (store_faction_of_party, ":defender_faction", "$g_encountered_party"),
-          (store_relation, ":defender_relation", ":defender_faction", "fac_player_supporters_faction"),
+          #(store_faction_of_party, ":attacker_faction", "$g_encountered_party_2"),
+          #(store_relation, ":attacker_relation", ":attacker_faction", "fac_player_supporters_faction"),
+          #(store_faction_of_party, ":defender_faction", "$g_encountered_party"),
+          #(store_relation, ":defender_relation", ":defender_faction", "fac_player_supporters_faction"),
           #(ge, ":defender_relation", 0),
           #(lt, ":attacker_relation", 0),
           ],
@@ -6506,17 +6532,6 @@ TOTAL:  {reg5}"),
       ("enter_f3",[],"{!}Field 3",[[set_jump_mission,"mt_ai_training"],[jump_to_scene,"scn_field_3"],[change_screen_mission]]),
       ("enter_f4",[],"{!}Field 4",[[set_jump_mission,"mt_ai_training"],[jump_to_scene,"scn_field_4"],[change_screen_mission]]),
       ("enter_f5",[],"{!}Field 5",[[set_jump_mission,"mt_ai_training"],[jump_to_scene,"scn_field_5"],[change_screen_mission]]),
-      ("leave",[],"Leave.",[(leave_encounter),(change_screen_return)]),
-    ]
-  ),
-  (
-    "dhorak_keep",0,
-#    "Dhorak Keep, the stronghold of the bandits stands overlooking the barren wilderness.",
-    "You enter the Dhorak Keep",
-    "none",
-    [],
-    [
-      ("enter",[],"Enter.",[(set_jump_mission,"mt_town_center"),(jump_to_scene,"scn_dhorak_keep"),(change_screen_mission)]),
       ("leave",[],"Leave.",[(leave_encounter),(change_screen_return)]),
     ]
   ),
@@ -9784,7 +9799,8 @@ TOTAL:  {reg5}"),
             (party_slot_eq, "$current_town", slot_village_state, svs_deserted),
             (jump_to_menu, "mnu_village_enslave_complete"),
           (try_end),
-          #SB : reinforce quest state, also move completion reset after
+          (assign, "$g_player_raid_complete", 0),
+          #SB : reinforce quest state
           (try_begin),
             (check_quest_active, "qst_hunt_down_fugitive"),
             (quest_slot_eq, "qst_hunt_down_fugitive", slot_quest_target_center, "$current_town"),
@@ -11079,6 +11095,7 @@ TOTAL:  {reg5}"),
             (ge, ":relation", 0),
             (call_script, "script_diplomacy_party_attacks_neutral", "p_main_party", "$current_town"),
           (try_end),
+
           (rest_for_hours, 3, 5, 1), #rest while attackable (3 hours will be extended by the trigger)
           (party_set_slot, "$current_town", slot_town_last_nearby_fire_time, 1), #raiding mode
           # (assign, "$g_village_raid_evil", 1), #SB : to differentiate between raiding
@@ -11159,17 +11176,6 @@ TOTAL:  {reg5}"),
           (troop_remove_gold, ":village_elder", ":money_gained"),
           (val_div, ":money_gained", 2),
         (try_end),
-        
-        (try_begin),
-          (ge, "$g_dplmc_gold_changes", DPLMC_GOLD_CHANGES_MEDIUM),
-          (call_script, "script_get_max_skill_of_player_party", "skl_looting"),
-          (val_mul, reg0, 15),
-          (try_begin), #hands on experience
-            (eq, reg1, "trp_player"),
-            (val_add, ":money_gained", 50),
-          (try_end),
-          (val_add, ":money_gained", reg0),
-        (try_end),
         (val_max, ":money_gained", 50),
         (party_get_slot, ":prosperity", "$current_town", slot_town_prosperity),
         (store_mul, ":prosperity_of_village_mul_5", ":prosperity", 5),
@@ -11186,6 +11192,7 @@ TOTAL:  {reg5}"),
         (call_script, "script_change_faction_troop_morale", ":village_faction", ":morale_decrease", 1), #SB : script call
         # (val_sub, ":faction_morale", ":morale_increase_mul_2"),
         # (faction_set_slot, ":village_faction",  slot_faction_morale_of_player_troops, ":faction_morale"),
+
 
 
 #NPC companion changes begin
@@ -11214,83 +11221,64 @@ TOTAL:  {reg5}"),
           (troop_clear_inventory, "trp_temp_troop"),
 
           #below line changed with below lines to make plunder result more realistic. Now only items produced in bound town can be stolen after raid.
-          # (reset_item_probabilities,100),
+          #(reset_item_probabilities,100),
 
           #begin of changes
           (party_get_slot, ":bound_town", "$current_town", slot_village_bound_center),
           #the above line is the culprit for divide by zero
           # (store_sub, ":item_to_price_slot", slot_town_trade_good_prices_begin, trade_goods_begin),
           (assign, ":item_to_price_slot", slot_town_trade_good_prices_begin),
-          (reset_item_probabilities, 100),
-          (assign, ":total_probability", 0),
+          (reset_item_probabilities,100),
+          (assign, ":total_probability", 1), #SB  : possible div/0 if slots are reset
           (try_for_range, ":cur_goods", trade_goods_begin, trade_goods_end),
-            # (item_set_slot, ":cur_goods", slot_item_amount_available, 0),
             (party_get_slot, ":cur_price", ":bound_town", ":item_to_price_slot"),
+            (val_add, ":item_to_price_slot", 1),
             (call_script, "script_center_get_production", ":bound_town", ":cur_goods"),
             (assign, ":cur_probability", reg0),
-            (try_begin), #castles don't produce anything, need better basis
-              (eq, ":cur_probability", 0),
-              (call_script, "script_center_get_production", "$current_town", ":cur_goods", svs_looted),
-              (assign, ":cur_probability", reg0),
-            (try_end),
             (call_script, "script_center_get_consumption", ":bound_town", ":cur_goods"),
             (val_div, reg0, 3),
             (val_add, ":cur_probability", reg0),
-            (val_mul, ":cur_probability", 4 * average_price_factor),
+            (val_mul, ":cur_probability", 4),
             (try_begin),
-              (le, ":cur_price", 0), #castles usually stay at average_price_factor=1000
-              (party_get_slot, ":cur_price", "$current_town", ":item_to_price_slot"),
+              (neq, ":cur_price", 0),
+              (val_mul, ":cur_probability", average_price_factor),
+              (val_div, ":cur_probability", ":cur_price"), #divide by zero error here
             (try_end),
-            (val_div, ":cur_probability", ":cur_price"), #divide by zero error here
             #first only simulation
-            (val_add, ":item_to_price_slot", 1),
-            (item_set_slot, ":cur_goods", slot_item_amount_available, ":cur_probability"),
-            # #(set_item_probability_in_merchandise,":cur_goods",":cur_probability"),
-            # (val_add, ":total_probability", ":cur_probability"),
+            #(set_item_probability_in_merchandise,":cur_goods",":cur_probability"),
+            (val_add, ":total_probability", ":cur_probability"),
             # (assign, reg1, ":total_probability"),
             # (assign, reg2, ":cur_price"),
             # (assign, reg3, ":cur_probability"),
-            # (party_get_slot, reg4, "$current_town", ":item_to_price_slot"),
+            # (assign, reg4, ":item_to_price_slot"),
             # (str_store_item_name, s1, ":cur_goods"),
-            # (display_message, "@{s1} price : {reg2} or {reg4} at probability: {reg3};{reg1}"),
+            # (display_message, "@{s1} price : {reg2} in slot {reg4}, probability: {reg3};{reg1} total"),
           (try_end),
+          (assign, ":item_to_price_slot", slot_town_trade_good_prices_begin),
           (try_for_range, ":cur_goods", trade_goods_begin, trade_goods_end),
-            (item_get_slot, ":cur_probability", ":cur_goods", slot_item_amount_available),
-            (val_mul, ":cur_probability", num_merchandise_goods),
+            (party_get_slot, ":cur_price", ":bound_town", ":item_to_price_slot"),
+            (val_add, ":item_to_price_slot", 1),
+            (call_script, "script_center_get_production", ":bound_town", ":cur_goods"),
+            (assign, ":cur_probability", reg0),
+            (call_script, "script_center_get_consumption", ":bound_town", ":cur_goods"),
+            (val_div, reg0, 3),
+            (val_add, ":cur_probability", reg0),
+            (val_mul, ":cur_probability", 4),
             (try_begin),
-              (gt, ":total_probability", 0),
-              (val_mul, ":cur_probability", 100),
-              (val_div, ":cur_probability", ":total_probability"),
+              (neq, ":cur_price", 0),
+              (val_mul, ":cur_probability", average_price_factor),
+              (val_div, ":cur_probability", ":cur_price"), #divide by zero error here
             (try_end),
-            # (assign, reg1, ":cur_probability"),
-            # (item_get_slot, reg2, ":cur_goods", slot_item_amount_available),
-            # (assign, reg3, ":total_probability"),
-            # (str_store_item_name, s1, ":cur_goods"),
-            # (display_message, "@{s1} {reg1}/{reg3}, {reg2} raw"),
+
+            (val_mul, ":cur_probability", num_merchandise_goods),
+            (val_mul, ":cur_probability", 100),
+            (val_div, ":cur_probability", ":total_probability"),
+
             (set_item_probability_in_merchandise,":cur_goods",":cur_probability"),
           (try_end),
           #end of changes
-          (assign, "$g_player_raid_complete", 0), #SB : reset after
-          (assign, ":base_amount", merchant_inventory_space),
-          #SB : dynamic number of items
-          (try_begin),
-            (ge, "$g_dplmc_gold_changes", DPLMC_GOLD_CHANGES_MEDIUM),
-            #prosperity breakpoints are at 20
-            (party_get_slot, ":prosperity", "$current_town", slot_town_prosperity),
-            (val_div, ":prosperity", 5), #0 - 20
-            (store_random_in_range, ":prosperity", -5, ":prosperity"), #-5 to 20
-            (options_get_campaign_ai, ":reduced"),
-            (val_add, ":base_amount", ":prosperity"),
-            (call_script, "script_get_max_skill_of_player_party", "skl_looting"),
-            (options_get_campaign_ai, ":reduced"), #0-2
-            (val_mul, ":reduced", 3), #0-6
-            (val_add, ":reduced", reg0), #0-25
-            (val_div, ":reduced", 2), #0 - 12
-            (val_sub, ":reduced", 5),
-            (val_add, ":base_amount", ":reduced"),
-          (try_end),
-          (val_clamp, ":base_amount", 20, num_merchandise_goods), #previously used as divisor
-          (troop_add_merchandise,"trp_temp_troop",itp_type_goods, ":base_amount"),
+
+          (troop_add_merchandise,"trp_temp_troop",itp_type_goods,30),
           (troop_sort_inventory, "trp_temp_troop"),
           (change_screen_loot, "trp_temp_troop"),
         ]),
@@ -11343,7 +11331,6 @@ TOTAL:  {reg5}"),
       ("continue",[], "Continue...",
        [
             (assign, "$g_leave_town", 1),
-            (assign, "$g_player_raid_complete", 0),
             (jump_to_menu, "mnu_village"),
         ]),
     ],
@@ -13305,13 +13292,13 @@ TOTAL:  {reg5}"),
         (str_store_troop_name, s1, ":winner_troop"),
         (try_begin),
           (troop_is_hero, ":winner_troop"),
-          (call_script, "script_change_troop_renown", ":winner_troop", dplmc_tournament_renown),
+          (call_script, "script_change_troop_renown", ":winner_troop", 20),
           (try_begin),
             (troop_slot_eq, ":winner_troop", slot_troop_occupation, slto_kingdom_hero),
             (ge, "$g_dplmc_gold_changes", DPLMC_GOLD_CHANGES_MEDIUM),
             # (call_script, "script_dplmc_distribute_gold_to_lord_and_holdings", 200, ":troop_no"),
             (call_script, "script_dplmc_get_troop_standing_in_faction", ":winner_troop", "$g_encountered_party_faction"),
-            (store_mul, ":reward", reg0, dplmc_tournament_renown), #1200 for leader, 600 for lord etc
+            (store_mul, ":reward", reg0, 20), #1200 for leader, 600 for lord etc
             (val_add, ":reward", 150),
             (call_script, "script_dplmc_distribute_gold_to_lord_and_holdings", ":reward", ":winner_troop"), #add some wealth
           (try_end),
@@ -21929,4 +21916,80 @@ goods, and books will never be sold. ^^You can change some settings here freely.
       # ]),
     # ]
   # ),
+
+# Merc Camp Begin   
+  (
+    "mercenary_camp",0,
+    "You approach the mercenary camp...",
+    "none",
+    [],
+    [
+      ("enter_geroian_camp",[(eq, "$g_encountered_party", "p_merc_camp_geroia"),],"Visit the Geroian Camp.",[
+		(modify_visitors_at_site,"scn_geroian_camp"),
+		(reset_visitors),   
+		(assign, "$g_mt_mode", tcm_default),   		
+		(set_jump_entry, 1),
+		(set_visitor, 2, "trp_vernid"),
+		(set_visitor, 5, "trp_geroia_sergeant"),
+		(set_visitor, 6, "trp_geroia_swordsman"),
+		(set_visitor, 7, "trp_geroia_swordsman"),
+		(set_visitor, 8, "trp_geroia_pavisier"),
+		(set_visitor, 9, "trp_geroia_pavisier"),
+		(set_jump_mission,"mt_visit_town_castle"),
+		(jump_to_scene,"scn_geroian_camp"),
+		(change_screen_mission),		
+	]),	
+      ("enter_balion_camp",[(eq, "$g_encountered_party", "p_merc_camp_balion"),],"Enter the castle of the Knights of Balion.",[
+		(modify_visitors_at_site,"scn_balion_camp"),
+		(reset_visitors),   
+		(assign, "$g_mt_mode", tcm_default),   		
+		(set_jump_entry, 1),
+		(set_visitor, 2, "trp_konrad"),
+
+		(set_visitor, 5, "trp_balion_knight"),
+		(set_visitor, 6, "trp_balion_infantry"),
+		(set_visitor, 7, "trp_balion_infantry"),
+		(set_visitor, 8, "trp_balion_longbowman"),
+		(set_visitor, 9, "trp_balion_longbowman"),
+		(set_jump_mission,"mt_visit_town_castle"),
+		(jump_to_scene,"scn_balion_camp"),
+		(change_screen_mission),		
+	]),	
+      ("enter_jumne_camp",[(eq, "$g_encountered_party", "p_merc_camp_jumne"),],"Enter the Northmen camp.",[
+		(modify_visitors_at_site,"scn_jumne_camp"),
+		(reset_visitors),   
+		(assign, "$g_mt_mode", tcm_default),   		
+		(set_jump_entry, 1),
+		(set_visitor, 2, "trp_sverre"),
+
+		(set_visitor, 5, "trp_jumne_huscarl"),
+		(set_visitor, 6, "trp_jumne_raider"),
+		(set_visitor, 7, "trp_jumne_raider"),
+		(set_visitor, 8, "trp_jumne_raider"),
+		(set_visitor, 9, "trp_jumne_skirmisher"),
+		(set_jump_mission,"mt_visit_town_castle"),
+		(jump_to_scene,"scn_jumne_camp"),
+		(change_screen_mission),		
+	]),	
+      ("enter_zendar_camp",[(eq, "$g_encountered_party", "p_merc_camp_zendar"),],"Enter the ruins of Zendar.",[
+		(modify_visitors_at_site,"scn_zendar_camp"),
+		(reset_visitors),   
+		(assign, "$g_mt_mode", tcm_default),   		
+		(set_jump_entry, 1),
+		(set_visitor, 2, "trp_stavros"),
+
+		(set_visitor, 5, "trp_slaver_chief"),
+		(set_visitor, 6, "trp_manhunter"),
+		(set_visitor, 7, "trp_manhunter"),
+		(set_visitor, 8, "trp_manhunter"),
+		(set_visitor, 9, "trp_manhunter"),
+		(set_jump_mission,"mt_visit_town_castle"),
+		(jump_to_scene,"scn_zendar_camp"),
+		(change_screen_mission),		
+	]),	
+      ("leave",[],"Leave.",[(leave_encounter),(change_screen_return)]),
+    ]
+  ), 
+# Merc Camp End   
+
  ]

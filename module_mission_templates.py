@@ -7,7 +7,6 @@ from header_music import *
 from header_items import *
 from header_skills import *
 from module_constants import *
-from module_skills import *
 
 from compiler import *
 ####################################################################################################################
@@ -34,8 +33,51 @@ from compiler import *
 #  Please note that mission templates is work in progress and can be changed in the future versions.
 #
 ####################################################################################################################
-bodyguard_trigger_a = (
-   ti_after_mission_start, 0, ti_once, [(neq, "$g_mt_mode", tcm_disguised)], #condition for not sneaking in; to exclude prison-breaks, etc change to (eq, "$g_mt_mode", tcm_default")
+horses_spook = (
+	6, 0, 0, [],#Every six seconds
+	[
+	(try_for_agents,":cur_horse"),
+		(agent_is_alive,":cur_horse"),
+		(agent_get_item_id,":horse_type",":cur_horse"),
+		(is_between,":horse_type",camels_begin,camels_end),
+		(agent_get_position,pos2,":cur_horse"),	
+		(agent_get_rider,":cur_rider",":cur_horse"),		# Store rider info from camel
+			(gt, ":cur_rider", -1),						# Camel has rider (greater thn -1)
+			(agent_get_team,":agent_team",":cur_rider"),	# Store camel rider info, what team is he?
+			(try_for_agents,":enemy_horse"),				# Then  check enemy horse
+				(agent_is_alive,":enemy_horse"),#Make sure he's not dead
+				(neg|agent_is_human, ":enemy_horse"),
+				(agent_get_item_id,":enemy_horse_type",":enemy_horse"),
+				(neg|is_between, ":enemy_horse_type", camels_begin,camels_end),
+				(agent_get_position, pos1,":enemy_horse"),
+				(get_distance_between_positions,":dist",pos1,pos2),#In CM
+				(le,":dist",3500),#Within 35m
+				(store_random_in_range,":chance",1,11),
+				
+				(try_begin),		# Check if opposing team, apply horse spook. If not, don't
+					(agent_get_rider,":enemy_rider",":enemy_horse"),
+					(gt, ":enemy_rider", -1),
+					(agent_get_team,":enemy_team",":enemy_rider"),
+					(try_begin),
+						(teams_are_enemies,":agent_team",":enemy_team"),
+						(agent_get_troop_id,":enemy_rider",":enemy_rider"),
+						(store_skill_level,":riding","skl_riding",":enemy_rider"),
+					(else_try),
+						(assign,":riding", 99),
+					(try_end),
+					(val_add,":chance",":riding"),
+				(try_end),
+
+				(lt, ":chance", 10),
+				(agent_play_sound, ":enemy_horse", "snd_horse_low_whinny"),		# gives sound
+				(agent_set_animation,":enemy_horse","anim_horse_rear"),
+			(try_end),	# try_for_agents enemy_horse
+	(try_end),
+	]
+)
+
+bodyguard_triggers = [
+ (ti_after_mission_start, 0, ti_once, [(neq, "$g_mt_mode", tcm_disguised)], #condition for not sneaking in; to exclude prison-breaks, etc change to (eq, "$g_mt_mode", tcm_default")
    [
     #Get number of bodyguards
     (store_skill_level, ":leadership", skl_leadership, "trp_player"),
@@ -44,7 +86,7 @@ bodyguard_trigger_a = (
     (val_div, ":renown", 400),
     (store_add, ":max_guards", ":renown", ":leadership"),
     (val_min, ":max_guards", 4),
-
+   
     (ge, ":max_guards", 1),
 
     #Get player info
@@ -81,7 +123,7 @@ bodyguard_trigger_a = (
     (try_end),
     (store_current_scene, ":cur_scene"),
     (modify_visitors_at_site, ":cur_scene"), 
-
+   
     #Find and Spawn Bodyguards
     (assign, ":bodyguard_count", 0),   
     (party_get_num_companion_stacks, ":num_of_stacks", "p_main_party"),
@@ -91,7 +133,7 @@ bodyguard_trigger_a = (
         (troop_is_hero, ":troop_id"),
         (neg|troop_is_wounded, ":troop_id"),
         (val_add, ":bodyguard_count", 1),
-
+               
         (try_begin), #For prison-breaks
             (this_or_next|eq, "$talk_context", tc_escape),
             (eq, "$talk_context", tc_prison_break),     
@@ -107,21 +149,20 @@ bodyguard_trigger_a = (
     (set_show_messages, 0),   
     (team_give_order, ":playerteam", 8, mordr_follow), #Division 8 to avoid potential conflicts
     (set_show_messages, 1),   
-   ])
+   ]),   
 
-bodyguard_trigger_b = (
-   ti_on_agent_spawn, 0, 0, [],
+ (ti_on_agent_spawn, 0, 0, [],
    [
     (store_trigger_param_1, ":agent"),
     (agent_get_troop_id, ":troop", ":agent"),
     (neq, ":troop", "trp_player"),
     (troop_is_hero, ":troop"),
     (main_party_has_troop, ":troop"),
-
+   
     (get_player_agent_no, ":player"),
     (agent_get_team, ":playerteam", ":player"),
     (agent_get_position,pos1,":player"),       
-
+   
     (agent_set_team, ":agent", ":playerteam"),
     (agent_set_division, ":agent", 8),
     (agent_add_relation_with_agent, ":agent", ":player", 1),
@@ -138,64 +179,20 @@ bodyguard_trigger_b = (
     (try_end),
     (position_move_x, pos1, ":shift"),
     (agent_set_position, ":agent", pos1),
-   ])
-
-bodyguard_trigger_c = (
-    ti_on_agent_killed_or_wounded, 0, 0, [],
+   ]),
+ 
+ (ti_on_agent_killed_or_wounded, 0, 0, [],
     [
      (store_trigger_param_1, ":dead_agent"),
-
+       
      (agent_get_troop_id, ":troop", ":dead_agent"),
      (neq, ":troop", "trp_player"),
      (troop_is_hero, ":troop"),
      (main_party_has_troop, ":troop"),
      (party_wound_members, "p_main_party", ":troop", 1),
-    ])
+    ]),
+ ]
 
-#camel fear mod start
-horses_spook = (
-	6, 0, 0, [],#Every six seconds
-	[
-	(try_for_agents,":cur_horse"),
-		(agent_is_alive,":cur_horse"),
-		(agent_get_item_id,":horse_type",":cur_horse"),
-		(is_between,":horse_type",camels_begin,camels_end),
-		(agent_get_position,pos2,":cur_horse"),	
-		(agent_get_rider,":cur_rider",":cur_horse"),		# Store rider info from camel
-			(gt, ":cur_rider", -1),						# Camel has rider (greater thn -1)
-			(agent_get_team,":agent_team",":cur_rider"),	# Store camel rider info, what team is he?
-			(try_for_agents,":enemy_horse"),				# Then  check enemy horse
-				(agent_is_alive,":enemy_horse"),#Make sure he's not dead
-				(neg|agent_is_human, ":enemy_horse"),
-				(agent_get_item_id,":enemy_horse_type",":enemy_horse"),
-				(neg|is_between, ":enemy_horse_type", camels_begin,camels_end),
-				(agent_get_position, pos1,":enemy_horse"),
-				(get_distance_between_positions,":dist",pos1,pos2),#In CM
-				(le,":dist",3500),#Within 35m
-				(store_random_in_range,":chance",1,11),
-				
-				(try_begin),		# Check if opposing team, apply horse spook. If not, don't
-					(agent_get_rider,":enemy_rider",":enemy_horse"),
-					(gt, ":enemy_rider", -1),
-					(agent_get_team,":enemy_team",":enemy_rider"),
-					(try_begin),
-						(teams_are_enemies,":agent_team",":enemy_team"),
-						(agent_get_troop_id,":enemy_rider",":enemy_rider"),
-						(store_skill_level,":riding","skl_riding",":enemy_rider"),
-					(else_try),
-						(assign,":riding", 99),
-					(try_end),
-					(val_add,":chance",":riding"),
-				(try_end),
-
-				(lt, ":chance", 100),
-				(agent_play_sound, ":enemy_horse", "snd_horse_low_whinny"),		# gives sound
-				(agent_set_animation,":enemy_horse","anim_horse_rear"),
-			(try_end),	# try_for_agents enemy_horse
-	(try_end),
-	]
-)
-#camel fear mod end
 #SB : add new disguise sets, make sure none of them have high difficulty
 # the new flags now also have af_override_everything, so include footwear
 pilgrim_disguise = [itm_pilgrim_hood,itm_pilgrim_disguise,itm_practice_staff, itm_throwing_daggers, itm_wrapping_boots]
@@ -207,8 +204,669 @@ bard_disguise = [itm_leather_boots,itm_lyre,itm_linen_tunic,itm_winged_mace]
 #note that these are usually male clothing, especially farmer_disguise, need some female ones as well
 
 af_castle_lord = af_override_horse | af_override_weapons| af_require_civilian
-
+#Volley Trigger
+order_volley_triggers = [
+    (0, 0, 1, [(key_clicked, key_for_volley)], [(call_script, "script_order_volley_begin_end")]),
+    (1, 0, 0, [(call_script, "script_cf_order_volley_check")], [
+        (try_for_range, ":team", 0, 4),
+            (try_for_range, ":division", 0, 9),
+                (store_add, ":slot", slot_team_d0_order_volley, ":division"),
+                (team_slot_ge, ":team", ":slot", 1),
+                (team_get_slot, ":volley_counter", ":team", ":slot"),
+                (val_add, ":volley_counter", 1),
+                (team_set_slot, ":team", ":slot", ":volley_counter"),
+            (try_end),
+        (try_end),
+       
+        (try_for_agents, ":agent"),
+            (agent_is_non_player, ":agent"),
+            (agent_slot_ge, ":agent", slot_agent_volley_fire, 1),
+            (agent_get_ammo, ":ammo", ":agent", 1),
+            (gt, ":ammo", 0),
+           
+            (agent_get_team, ":team", ":agent"),
+            (agent_get_division, ":division", ":agent"),
+            (store_add, ":slot", slot_team_d0_order_volley, ":division"),
+            (team_get_slot, ":volley_counter", ":team", ":slot"),
+           
+            (agent_get_slot, ":volley_wpn_type", ":agent", slot_agent_volley_fire),
+            (try_begin),
+                (eq, ":volley_wpn_type", itp_type_bow),
+                (assign, ":delay", 3),
+            (else_try),
+                (eq, ":volley_wpn_type", itp_type_crossbow),
+                (assign, ":delay", 5),
+            (try_end),
+            (agent_get_combat_state, ":cs", ":agent"),
+            (this_or_next|eq, ":cs", 1),
+            (eq, ":cs", 3),
+                       
+            (store_mod, reg0, ":volley_counter", ":delay"),       
+            (try_begin),
+                (eq, reg0, 0),
+                (agent_set_attack_action, ":agent", 0, 0), #Fire
+            (else_try),
+                (agent_set_attack_action, ":agent", 0, 1), #Ready and Aim
+            (try_end),
+        (try_end),
+     ]),
+ 
+    (1, 0, ti_once, [(neq, "$g_battle_result", 0)], [   #Disable Volley @ end of battle
+        (try_for_range, ":team", 0, 4),
+            (try_for_range, ":slot", slot_team_d0_order_volley, slot_team_d0_order_volley + 9),
+                (team_set_slot, ":team", ":slot", 0),
+            (try_end),
+        (try_end)
+     ]),
+]
+#Volley Trigger
 ##diplomacy begin
+# Formations triggers v3 by motomataru, Warband port
+# Global variables  *_formation_type holds type of formation: see "Formation modes" in module_constants
+#         *_formation_move_order hold the current move order for the formation
+#         *_space hold the multiplier of extra space ordered into formation by the player
+
+formations_triggers = [
+  (ti_before_mission_start, 0, 0, [], [
+    (assign, "$gk_order", 0),
+    (assign, "$gk_order_hold_over_there", 0),
+    (assign, "$autorotate_at_player", formation_autorotate_at_player),
+    (assign, "$fclock", 1),
+    
+    (try_for_range, ":team", 0, 4),
+      (try_for_range, ":slot", slot_team_d0_type, slot_team_d0_type + 9),
+        (team_set_slot, ":team", ":slot", sdt_unknown), 
+      (try_end),
+    (try_end),
+    #ensure item slots are loaded whatever save game this is...
+    (neq, "$new_session", 1),
+    (assign, "$new_session", 1),
+  ]),
+
+# Start troops in formation
+  (0, formation_delay_for_spawn, ti_once, [], [
+    (get_player_agent_no, "$fplayer_agent_no"),
+    (agent_get_team, "$fplayer_team_no", "$fplayer_agent_no"),
+    (call_script, "script_store_battlegroup_data"),
+    
+    #get team faction
+    (try_for_agents, ":cur_agent"), #this part bogus; we need the mode of agent faction, not the mean. Add four faction slots for teams to help calculate efficiently.
+      (agent_is_human, ":cur_agent"),
+      (agent_get_team, ":cur_team", ":cur_agent"),
+      (agent_get_troop_id, ":cur_troop", ":cur_agent"),
+      (store_troop_faction, ":cur_faction", ":cur_troop"),
+      (team_get_slot, ":team_avg_faction", ":cur_team", slot_team_faction),
+      (val_add, ":team_avg_faction", ":cur_faction"),
+      (team_set_slot, ":cur_team", slot_team_faction, ":team_avg_faction"),
+    (try_end),
+    
+    (try_for_range, ":team", 0, 4),
+        (team_slot_ge, ":team", slot_team_size, 1),
+      (team_get_leader, ":fleader", ":team"),
+      (try_begin),
+        (ge, ":fleader", 0),
+        (agent_get_troop_id, ":fleader_troop", ":fleader"),
+        (store_troop_faction, ":team_faction", ":fleader_troop"),
+      (else_try),
+          (team_get_slot, ":team_size", ":team", slot_team_size),
+        (team_get_slot, ":team_avg_faction", ":team", slot_team_faction),
+        (store_mul, ":team_faction", ":team_avg_faction", 10),
+        (val_div, ":team_faction", ":team_size"),
+        (val_add, ":team_faction", 5),
+        (val_div, ":team_faction", 10),
+      (try_end),    
+      (team_set_slot, ":team", slot_team_faction, ":team_faction"),
+    (try_end),
+    
+    (display_message, "@Forming ranks."),
+    #keep cavalry on the map
+    # (assign, ":largest_mounted_division", -1),
+    (assign, ":largest_mounted_division_size", 0),
+    (try_for_range, ":division", 0, 9),
+      (store_add, ":slot", slot_team_d0_type, ":division"), 
+      (this_or_next|team_slot_eq, "$fplayer_team_no", ":slot", sdt_cavalry),
+      (team_slot_eq, "$fplayer_team_no", ":slot", sdt_harcher),
+      (store_add, ":slot", slot_team_d0_size, ":division"),
+      (team_get_slot, reg0, "$fplayer_team_no", ":slot"),
+      (lt, ":largest_mounted_division_size", reg0),
+      (assign, ":largest_mounted_division_size", reg0),
+      # (assign, ":largest_mounted_division", ":division"),
+    (try_end),
+    
+    (assign, ":depth_cavalry", 0),
+    (try_begin),
+      (gt, ":largest_mounted_division_size", 0),
+      (val_mul, ":largest_mounted_division_size", 2),
+      (convert_to_fixed_point, ":largest_mounted_division_size"),
+      (store_sqrt, ":depth_cavalry", ":largest_mounted_division_size"),
+      (convert_from_fixed_point, ":depth_cavalry"),
+      (val_sub, ":depth_cavalry", 1),
+      
+      # (store_add, ":slot", slot_team_d0_formation_space, ":largest_mounted_division"),
+      # (team_get_slot, ":div_spacing", "$fplayer_team_no", ":slot"),
+      # (store_mul, reg0, ":div_spacing", 50),
+      (store_mul, reg0, formation_start_spread_out, 50),
+      (val_add, reg0, formation_minimum_spacing_horse_length),
+      (val_mul, ":depth_cavalry", reg0),
+      # (val_mul, ":depth_cavalry", formation_minimum_spacing_horse_length),  #formation spacing is 0 at start for cavalry
+      
+      (store_mul, ":depth_infantry", formation_start_spread_out, 50),
+      (val_add, ":depth_infantry", formation_minimum_spacing),
+      (val_mul, ":depth_infantry", 2),
+      (val_sub, ":depth_cavalry", ":depth_infantry"),
+      
+      (try_begin),
+        (gt, ":depth_cavalry", 0),
+        (agent_get_position, pos49, "$fplayer_agent_no"),
+        (copy_position, pos2, pos49),
+        (call_script, "script_team_get_position_of_enemies", pos60, "$fplayer_team_no", grc_everyone),
+        (call_script, "script_point_y_toward_position", pos2, pos60),
+        (position_move_y, pos2, ":depth_cavalry"),
+        (agent_set_position, "$fplayer_agent_no", pos2),  #fake out script_battlegroup_place_around_leader
+      (try_end),
+    (try_end),
+
+    #initial formations
+    (call_script, "script_division_reset_places"),
+    (try_for_range, ":division", 0, 9),
+      (store_add, ":slot", slot_team_d0_size, ":division"),
+      (team_slot_ge, "$fplayer_team_no", ":slot", 1),
+      (store_add, ":slot", slot_team_d0_type, ":division"), 
+      (try_begin),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_archer),
+        (call_script, "script_player_attempt_formation", ":division", formation_default),
+      (else_try),
+        (this_or_next|team_slot_eq, "$fplayer_team_no", ":slot", sdt_cavalry),
+        (team_slot_eq, "$fplayer_team_no", ":slot", sdt_harcher),
+        (call_script, "script_player_attempt_formation", ":division", formation_wedge),
+      (try_end),
+    (try_end),
+
+    (try_begin),
+      (gt, ":depth_cavalry", 0),
+      (agent_set_position, "$fplayer_agent_no", pos49),
+    (try_end),
+  ]),
+
+  (0, .3, 0, [(game_key_clicked, gk_order_1)], [
+    (eq, "$gk_order", gk_order_1),  #next trigger set MOVE menu?
+    (try_begin),
+      (game_key_is_down, gk_order_1), #BUT player is holding down key?
+      (assign, "$gk_order_hold_over_there", 1),
+      (assign, "$gk_order", 0),
+      (assign, "$holdit", 0),
+    (else_try),
+      (eq, "$holdit", 1),
+      (assign, "$fclock", 1),
+      (call_script, "script_player_order_formations", mordr_hold),
+      (assign, "$gk_order", 0),
+      (assign, "$holdit", 0),
+    (try_end),
+  ]),
+
+  (0, 0, 0, [(game_key_clicked, gk_order_1)], [
+    (try_begin),
+      #(eq, "$gk_order", 0),
+      (neq, "$gk_order", gk_order_1),
+      (neq, "$gk_order", gk_order_2),
+      (neq, "$gk_order", gk_order_3),
+      (assign, "$gk_order", gk_order_1),
+      (assign, "$holdit", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_1),  #HOLD   
+      (assign, "$holdit", 1),
+      (call_script, "script_first_formation_member_sound_horn"),  #tom 
+      # (assign, "$fclock", 1), #sent to delayed trigger above to override Native for unformed divisions
+      # (call_script, "script_player_order_formations", mordr_hold),
+      # (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_2),  #ADVANCE
+      (assign, "$fclock", 1),
+      (call_script, "script_player_order_formations", mordr_advance),
+      (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_3),  #HOLD FIRE
+      (assign, "$gk_order", 0),
+    (try_end),
+  ]),
+  
+  (0, 0, 0, [(game_key_clicked, gk_order_2)], [
+    (try_begin),
+      #(eq, "$gk_order", 0),
+      (neq, "$gk_order", gk_order_1),
+      (neq, "$gk_order", gk_order_2),
+      (neq, "$gk_order", gk_order_3),
+      (assign, "$gk_order", gk_order_2),
+    (else_try),
+      (eq, "$gk_order", gk_order_1),  #FOLLOW
+      (assign, "$fclock", 1),
+      (call_script, "script_first_formation_member_sound_horn"),  #tom 
+      (call_script, "script_player_order_formations", mordr_follow),
+      (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_2),  #FALL BACK
+      (assign, "$fclock", 1),
+      (call_script, "script_player_order_formations", mordr_fall_back),
+      (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_3),  #FIRE AT WILL
+      (assign, "$gk_order", 0),
+    (try_end),
+  ]),
+  
+  (0, 0, 0, [(game_key_clicked, gk_order_3)], [
+    (try_begin),
+      #(eq, "$gk_order", 0),
+      (neq, "$gk_order", gk_order_1),
+      (neq, "$gk_order", gk_order_2),
+      (neq, "$gk_order", gk_order_3),
+      (assign, "$gk_order", gk_order_3),
+    (else_try),
+      (eq, "$gk_order", gk_order_1),  #CHARGE
+      (assign, "$fclock", 1),
+      (call_script, "script_first_formation_member_sound_horn"),  #tom  
+      (call_script, "script_player_order_formations", mordr_charge),
+      (assign, "$tom_yell_smelly_peasents", 1),
+      (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_2),  #SPREAD OUT
+      (assign, "$fclock", 1),
+      (call_script, "script_player_order_formations", mordr_spread_out),
+      (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_3),  #BLUNT WEAPONS
+      (assign, "$gk_order", 0),
+    (try_end),
+  ]),
+  
+  (0, 0, 0, [(game_key_clicked, gk_order_4)], [
+    (try_begin),
+        (eq, "$gk_order", 0),
+      (assign, "$gk_order", gk_order_4),
+      (start_presentation, "prsnt_order_display"),
+      
+    (else_try),
+      (eq, "$gk_order", gk_order_1),  #STAND GROUND
+      (assign, "$fclock", 1),
+      (call_script, "script_first_formation_member_sound_horn"),  #tom  
+      (call_script, "script_player_order_formations", mordr_stand_ground),  
+      (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_2),  #STAND CLOSER
+      (assign, "$fclock", 1),
+      (call_script, "script_player_order_formations", mordr_stand_closer),
+      (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_3),  #ANY WEAPON
+      (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_4),  #FORMATION - RANKS
+      (call_script, "script_division_reset_places"),
+      (try_for_range, ":division", 0, 9),
+          (class_is_listening_order, "$fplayer_team_no", ":division"),
+        (store_add, ":slot", slot_team_d0_size, ":division"),
+        (team_slot_ge, "$fplayer_team_no", ":slot", 1),
+        (assign, "$fclock", 1),
+        (call_script, "script_player_attempt_formation", ":division", formation_ranks),   
+        (call_script, "script_first_formation_member_sound_horn"),  #tom          
+      (try_end),
+      (assign, "$gk_order", 0),
+      (start_presentation, "prsnt_order_display"),
+    (try_end),
+  ]),
+  
+  (0, 0, 0, [(game_key_clicked, gk_order_5)], [
+    (try_begin),
+      (eq, "$gk_order", gk_order_1),  #RETREAT
+      (assign, "$fclock", 1),
+      (call_script, "script_first_formation_member_sound_horn"),  #tom  
+      (call_script, "script_player_order_formations", mordr_retreat),
+      (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_2),  #MOUNT
+      (assign, "$gk_order", 0),
+    (else_try),
+        (eq, "$gk_order", gk_order_4), #FORMATION - SHIELDWALL
+      (call_script, "script_division_reset_places"),
+      (try_for_range, ":division", 0, 9),
+          (class_is_listening_order, "$fplayer_team_no", ":division"),
+        (store_add, ":slot", slot_team_d0_size, ":division"),
+        (team_slot_ge, "$fplayer_team_no", ":slot", 1),
+        (assign, "$fclock", 1),
+        (call_script, "script_player_attempt_formation", ":division", formation_shield),    
+        (call_script, "script_first_formation_member_sound_horn"),  #tom          
+      (try_end),
+      (assign, "$gk_order", 0),
+      (start_presentation, "prsnt_order_display"),
+    (try_end),
+  ]),
+  
+  (0, 0, 0, [(game_key_clicked, gk_order_6)], [
+      (try_begin),
+        (eq, "$gk_order", gk_order_2),  #DISMOUNT
+        (assign, "$fclock", 1),
+        (call_script, "script_player_order_formations", mordr_dismount),
+      (assign, "$gk_order", 0),
+    (else_try),
+      (eq, "$gk_order", gk_order_4), #FORMATION - WEDGE
+      (call_script, "script_division_reset_places"),
+      (try_for_range, ":division", 0, 9),
+          (class_is_listening_order, "$fplayer_team_no", ":division"),
+        (store_add, ":slot", slot_team_d0_size, ":division"),
+        (team_slot_ge, "$fplayer_team_no", ":slot", 1),
+        (assign, "$fclock", 1),
+        (call_script, "script_player_attempt_formation", ":division", formation_wedge),   
+        (call_script, "script_first_formation_member_sound_horn"),  #tom          
+      (try_end),
+      (assign, "$gk_order", 0),
+      (start_presentation, "prsnt_order_display"),
+    (try_end),
+  ]),
+  
+  (0, 0, 0, [(key_clicked, key_f7)], [
+      (eq, "$gk_order", gk_order_4), #FORMATION - SQUARE
+    (call_script, "script_division_reset_places"),
+    (try_for_range, ":division", 0, 9),
+      (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_size, ":division"),
+      (team_slot_ge, "$fplayer_team_no", ":slot", 1),
+      (assign, "$fclock", 1),
+      (call_script, "script_player_attempt_formation", ":division", formation_square),  
+      (call_script, "script_first_formation_member_sound_horn"),  #tom        
+    (try_end),
+    (assign, "$gk_order", 0),
+    (start_presentation, "prsnt_order_display"),
+  ]),
+  
+  (0, 0, 0, [(key_clicked, key_f8)], [
+      (eq, "$gk_order", gk_order_4), #FORMATION - CANCEL
+    (assign, "$fclock", 1),
+    (call_script, "script_player_order_formations", mordr_charge),
+    (call_script, "script_first_formation_member_sound_horn"),  #tom  
+    (assign, "$gk_order", 0),
+    (start_presentation, "prsnt_order_display"),
+  ]),
+  
+  (0, 0, 0, [
+    (this_or_next|game_key_clicked, gk_group0_hear),
+    (this_or_next|game_key_clicked, gk_group1_hear),
+    (this_or_next|game_key_clicked, gk_group2_hear),
+    (this_or_next|game_key_clicked, gk_group3_hear),
+    (this_or_next|game_key_clicked, gk_group4_hear),
+    (this_or_next|game_key_clicked, gk_group5_hear),
+    (this_or_next|game_key_clicked, gk_group6_hear),
+    (this_or_next|game_key_clicked, gk_group7_hear),
+    (this_or_next|game_key_clicked, gk_group8_hear),
+    (this_or_next|game_key_clicked, gk_reverse_order_group),  #shows up as "unknown 6" on Native screen
+    (this_or_next|game_key_clicked, gk_everyone_around_hear),
+    (game_key_clicked, gk_everyone_hear),
+  ], [
+    (assign, "$gk_order", 0),
+    (start_presentation, "prsnt_order_display"),
+  ]),
+
+  (0, 0, 0, [
+    (key_is_down, key_escape),
+        (is_presentation_active, "prsnt_order_display"),
+  ], [
+    (assign, "$gk_order", 0),
+    (presentation_set_duration, 0),
+  ]),
+  
+#implement HOLD OVER THERE when player lets go of key
+  (.5, 0, 0, [(eq, "$gk_order_hold_over_there", 1),(neg|game_key_is_down, gk_order_1)], [
+    (set_fixed_point_multiplier, 100),
+    (assign, "$fclock", 1),
+    (call_script, "script_team_get_position_of_enemies", pos60, "$fplayer_team_no", grc_everyone),
+    (assign, ":num_bgroups", 0),
+    (try_for_range, ":division", 0, 9),
+      (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_size, ":division"),
+      (team_slot_ge, "$fplayer_team_no", ":slot", 1),
+      (val_add, ":num_bgroups", 1),
+    (try_end),  
+    
+    (gt, ":num_bgroups", 0),
+    (agent_get_position, pos49, "$fplayer_agent_no"),
+    (call_script, "script_division_reset_places"),
+
+        (try_for_range, ":division", 0, 9),
+        (class_is_listening_order, "$fplayer_team_no", ":division"),
+      (store_add, ":slot", slot_team_d0_size, ":division"),
+      (team_get_slot, ":troop_count", "$fplayer_team_no", ":slot"),
+      (gt, ":troop_count", 0),
+      (store_add, ":slot", slot_team_d0_formation, ":division"),
+      (team_get_slot, ":fformation", "$fplayer_team_no", ":slot"),
+      
+      (team_get_order_position, pos2, "$fplayer_team_no", ":division"),
+      (call_script, "script_point_y_toward_position", pos2, pos60),
+      (try_begin),
+        (gt, ":num_bgroups", 1),
+        (agent_set_position, "$fplayer_agent_no", pos2),  #fake out script_battlegroup_place_around_leader
+        (call_script, "script_player_attempt_formation", ":division", ":fformation"),
+      (else_try),
+        (neq, ":fformation", formation_none),
+        (call_script, "script_set_formation_position", "$fplayer_team_no", ":division", pos2),
+        (store_add, ":slot", slot_team_d0_formation_space, ":division"),
+        (team_get_slot, ":div_spacing", "$fplayer_team_no", ":slot"),
+        (try_begin),
+          (store_add, ":slot", slot_team_d0_type, ":division"),
+          (team_get_slot, ":sd_type", "$fplayer_team_no", ":slot"),
+          (neq, ":sd_type", sdt_cavalry),
+          (neq, ":sd_type", sdt_harcher),
+            (call_script, "script_get_centering_amount", ":fformation", ":troop_count", ":div_spacing"),
+          (try_begin),
+            (eq, ":sd_type", sdt_archer),
+            (val_mul, reg0, -1),
+            (assign, ":script", "script_form_archers"),
+          (else_try),
+              (assign, ":script", "script_form_infantry"),
+          (try_end),
+            (position_move_x, pos2, reg0),
+        (else_try),
+            (assign, ":script", "script_form_cavalry"),
+        (try_end),
+        (copy_position, pos1, pos2),
+        (call_script, ":script", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":fformation"),    
+      (try_end),
+      (store_add, ":slot", slot_team_d0_move_order, ":division"),
+      (team_set_slot, "$fplayer_team_no", ":slot", mordr_hold),   
+    (try_end), #Battle Group Loop #2
+    (agent_set_position, "$fplayer_agent_no", pos49),
+    (assign, "$gk_order_hold_over_there", 0)
+  ]),
+
+  (1, 0, 0, [ #attempt to avoid simultaneous formations function calls
+    #(neg|key_is_down, key_for_ranks),
+    #(neg|key_is_down, key_for_shield),
+    #(neg|key_is_down, key_for_wedge),
+    #(neg|key_is_down, key_for_square),
+    #(neg|key_is_down, key_for_undo),
+    (neg|key_is_down, key_f7), #ADDED
+    (neg|key_is_down, key_f8), #ADDED
+    (neg|game_key_is_down, gk_order_1),
+    (neg|game_key_is_down, gk_order_2),
+    (neg|game_key_is_down, gk_order_3),
+    (neg|game_key_is_down, gk_order_4),
+    (neg|game_key_is_down, gk_order_5),
+    (neg|game_key_is_down, gk_order_6)
+    ], [
+    (set_fixed_point_multiplier, 100),
+    (store_mod, ":fifth_second", "$fclock", 5),
+    (store_mod, ":tenth_second", "$fclock", 10),
+    
+    (try_begin),  #set up revertible types for type check
+      (eq, ":tenth_second", 0),
+      (try_for_range, ":team", 0, 4),
+        (try_for_range, ":division", 0, 9),
+          (store_add, ":slot", slot_team_d0_type, ":division"),
+          (this_or_next|team_slot_eq, ":team", ":slot", sdt_skirmisher),
+          (team_slot_eq, ":team", ":slot", sdt_harcher),
+          (team_set_slot, ":team", ":slot", sdt_unknown),
+        (try_end),
+      (try_end),
+    (try_end),
+    
+    (call_script, "script_store_battlegroup_data"),
+    (call_script, "script_team_get_position_of_enemies", pos60, "$fplayer_team_no", grc_everyone),
+    (try_begin),
+      (eq, reg0, 0),  #no more enemies?
+      (try_for_range, ":division", 0, 9),
+        (call_script, "script_formation_end", "$fplayer_team_no", ":division"),
+      (try_end),
+    (else_try),
+      (assign, "$autorotate_at_player", 0),
+      (call_script, "script_division_reset_places"),
+      (try_for_range, ":division", 0, 9),
+          (store_add, ":slot", slot_team_d0_size, ":division"),
+        (team_get_slot, ":troop_count", "$fplayer_team_no", ":slot"),
+        (gt, ":troop_count", 0),
+        (try_begin),
+            (store_add, ":slot", slot_team_d0_move_order, ":division"),
+            (team_slot_eq, "$fplayer_team_no", ":slot", mordr_follow),
+          (call_script, "script_battlegroup_place_around_leader", "$fplayer_team_no", ":division"),
+            (team_set_slot, "$fplayer_team_no", ":slot", mordr_follow), #override script_battlegroup_place_around_leader
+          
+        (else_try),    #periodically reform
+          (eq, ":fifth_second", 0),
+          (store_add, ":slot", slot_team_d0_formation, ":division"),
+          (team_get_slot, ":fformation", "$fplayer_team_no", ":slot"),
+          (neq, ":fformation", formation_none),
+          (team_get_movement_order, reg0, "$fplayer_team_no", ":division"),
+          (neq, reg0, mordr_stand_ground),
+          
+          (call_script, "script_get_formation_position", pos1, "$fplayer_team_no", ":division"),
+          (store_add, ":slot", slot_team_d0_formation_space, ":division"),
+          (team_get_slot, ":div_spacing", "$fplayer_team_no", ":slot"),
+          (store_add, ":slot", slot_team_d0_type, ":division"),
+          (team_get_slot, ":sd_type", "$fplayer_team_no", ":slot"),
+          (try_begin),
+            (neq, ":sd_type", sdt_cavalry),
+            (neq, ":sd_type", sdt_harcher),
+              (position_move_y, pos1, -2000),
+          (try_end),
+          (call_script, "script_point_y_toward_position", pos1, pos60),
+          (try_begin),
+            (neq, ":sd_type", sdt_cavalry),
+            (neq, ":sd_type", sdt_harcher),
+              (position_move_y, pos1, 2000),
+          (try_end),
+          (call_script, "script_set_formation_position", "$fplayer_team_no", ":division", pos1),  
+                    (try_begin),  
+                        (neq, ":sd_type", sdt_cavalry),
+            (neq, ":sd_type", sdt_harcher),         
+              (call_script, "script_get_centering_amount", ":fformation", ":troop_count", ":div_spacing"),
+            (try_begin),
+                (eq, ":sd_type", sdt_archer),
+                (val_mul, reg0, -1),
+            (try_end),
+              (position_move_x, pos1, reg0),  
+                    (try_end),
+          (try_begin),
+              (eq, ":sd_type", sdt_archer),
+              (call_script, "script_form_archers", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":fformation"),    
+          (else_try),
+              (this_or_next|eq, ":sd_type", sdt_cavalry),
+            (eq, ":sd_type", sdt_harcher),  
+            (call_script, "script_form_cavalry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing"),
+          (else_try),       
+              (call_script, "script_form_infantry", "$fplayer_team_no", ":division", "$fplayer_agent_no", ":div_spacing", ":fformation"), 
+          (try_end),
+          (try_end),  #Periodic Reform
+      (try_end),  #Division Loop
+      (assign, "$autorotate_at_player", formation_autorotate_at_player),
+    (try_end),
+    (val_add, "$fclock", 1),
+  ]),
+]
+
+#AI triggers v3 for WB by motomataru
+AI_triggers = [  
+  (ti_before_mission_start, 0, 0, [], [
+    (assign, "$cur_casualties", 0),
+    (assign, "$prev_casualties", 0),
+    (assign, "$ranged_clock", 1),
+    (assign, "$battle_phase", BP_Setup),
+    (assign, "$clock_reset", 0),
+    (try_for_range, ":team_no", 0, 4),
+        (team_set_slot, ":team_no", slot_team_default_formation, formation_default),
+      #(team_set_slot, ":team_no", slot_team_reinforcement_stage, 0), #Not needed, team slots begin missions reset
+    (try_end),
+    (init_position, Team0_Cavalry_Destination),
+    (init_position, Team1_Cavalry_Destination),
+    (init_position, Team2_Cavalry_Destination),
+    (init_position, Team3_Cavalry_Destination),
+  ]),
+
+  (0, AI_Delay_For_Spawn, ti_once, [], [
+    (try_for_agents, ":cur_agent"),
+      (agent_set_slot, ":cur_agent",  slot_agent_is_running_away, 0),
+    (try_end),
+    (set_fixed_point_multiplier, 100),
+    (call_script, "script_battlegroup_get_position", Team0_Starting_Point, 0, grc_everyone),
+    (call_script, "script_battlegroup_get_position", Team1_Starting_Point, 1, grc_everyone),
+    (call_script, "script_battlegroup_get_position", Team2_Starting_Point, 2, grc_everyone),
+    (call_script, "script_battlegroup_get_position", Team3_Starting_Point, 3, grc_everyone),
+    (call_script, "script_field_tactics", 1)
+  ]),
+
+  (1, .5, 0, [], [  #delay to offset half a second from formations trigger
+    (try_begin),
+      (call_script, "script_cf_count_casualties"),
+      (assign, "$cur_casualties", reg0),
+      (assign, "$battle_phase", BP_Fight),
+    (try_end),
+    
+    (set_fixed_point_multiplier, 100),
+    (call_script, "script_store_battlegroup_data"),
+    (try_begin),  #reassess ranged position when fighting starts
+      (ge, "$battle_phase", BP_Fight),
+      (eq, "$clock_reset", 0),
+      (call_script, "script_field_tactics", 1),
+      (assign, "$ranged_clock", 0),
+      (assign, "$clock_reset", 1),
+    (else_try), #reassess ranged position every five seconds after setup
+      (ge, "$battle_phase", BP_Jockey),
+      (store_mod, reg0, "$ranged_clock", 5),    
+      (eq, reg0, 0),
+      (call_script, "script_field_tactics", 1),
+      (team_set_slot, 0, slot_team_reinforcement_stage, "$defender_reinforcement_stage"),
+      (team_set_slot, 1, slot_team_reinforcement_stage, "$attacker_reinforcement_stage"),
+    (else_try),
+      (call_script, "script_field_tactics", 0),
+    (try_end),
+
+    (try_begin),
+      (eq, "$battle_phase", BP_Setup),
+      (assign, ":not_in_setup_position", 0),
+      (try_for_range, ":bgteam", 0, 4),
+        (neq, ":bgteam", "$fplayer_team_no"),
+        (team_slot_ge, ":bgteam", slot_team_size, 1),
+        (call_script, "script_battlegroup_get_position", pos1, ":bgteam", grc_archers),
+        (team_get_order_position, pos0, ":bgteam", grc_archers),
+        (get_distance_between_positions, reg0, pos0, pos1),
+        (gt, reg0, 500),
+        (assign, ":not_in_setup_position", 1),
+        #tom
+        (try_begin),
+          (store_random_in_range, ":random", 0, 100),
+            (lt, ":random", 15),
+          (play_sound_at_position, "snd_horn", pos1),
+          (try_end),
+        #tom end
+      (try_end),
+      (eq, ":not_in_setup_position", 0),  #all AI reached setup position?
+      (assign, "$battle_phase", BP_Jockey),
+    (try_end),
+    
+    (val_add, "$ranged_clock", 1),
+  ]),
+]
+
+# end AI triggers
+################################################################
+## death cam
+################################################################
 
 unarmed_agent_damage = (
   ti_on_agent_hit, 0, 0,
@@ -272,7 +930,7 @@ dplmc_random_mixed_gender = (ti_on_agent_spawn, 0, 0, [
   (agent_is_human, ":agent_no"),
   (agent_get_troop_id, ":troop_no", ":agent_no"),
   (neg|troop_is_hero, ":troop_no"),
-  (is_between, ":troop_no", soldiers_begin, "trp_follower_woman", "trp_caravan_master"), #skip refugee line, town walkers
+  (neg|is_between, ":troop_no", "trp_follower_woman", "trp_caravan_master"), #always female
   #SB : check non-native troop genders
 
   #get individual faction chances
@@ -912,10 +1570,6 @@ dplmc_battle_mode_triggers = [
     horses_spook,
   ]
 ##diplomacy end
-
-bodyguard_triggers = [
-	bodyguard_trigger_a, bodyguard_trigger_b, bodyguard_trigger_c,
-	]
 
 multiplayer_server_check_belfry_movement = (
   0, 0, 0, [],
@@ -1718,7 +2372,10 @@ common_siege_ai_trigger_init_2 = (
           (item_get_type, ":itp", ":item_no"),
           (is_between, ":itp", itp_type_bow, itp_type_thrown),
           (assign, ":weapon_slot", 0),
+          (str_store_item_name, s2, ":item_no"),
         (try_end),
+        (str_store_agent_name, s1, ":agent_no"),
+        (display_message, "@{s1} wielding {s2}"),
         (try_begin),
           (eq, ":weapon_slot", 0),
           (agent_set_division, ":agent_no", grc_archers),
@@ -2637,8 +3294,8 @@ mission_templates = [
         (val_max, "$g_attacker_drawn_weapon", ":wielded_item"),
 
         (call_script, "script_neutral_behavior_in_fight"),
-      ]),     
-	] + bodyguard_triggers,
+      ]),
+    ]+ bodyguard_triggers,
   ),
 
 # This template is used in party encounters and such.
@@ -2814,22 +3471,6 @@ mission_templates = [
          (play_sound, "snd_town_ambiance", sf_looping),
        (try_end),
      ]),
-     
-     (0, 0, ti_once, [],### replace static horse
-      [(neg|is_edit_mode_enabled),
-	    (try_for_range, ":horse", all_items_begin, all_items_end),#itp_type_horse
-			(item_get_type, ":type", ":horse"),
-			(eq, ":type", itp_type_horse),
-			(scene_item_get_num_instances, ":num_instances", ":horse"),
-			(try_for_range, ":number", 0, ":num_instances"),
-				(scene_item_get_instance, ":scene_item", ":horse", ":number"),
-				(prop_instance_get_position, pos53, ":scene_item"),
-				(prop_instance_set_scale, ":scene_item", 0, 0, 0),
-				(set_spawn_position, pos53),
-				(spawn_horse, ":horse", 0),
-			(try_end),
-		(try_end),
-     ]),
 
 	(3, 0, 0,
 	[
@@ -2966,8 +3607,8 @@ mission_templates = [
        (troop_set_slot, ":dead_agent_troop_no", slot_troop_mission_participation, mp_prison_break_caught),
      (try_end),
    ]),
-   ] + bodyguard_triggers,
-   ),
+  ]+ bodyguard_triggers,
+  ),
 
   (
     "village_center",0,-1,
@@ -3098,8 +3739,7 @@ mission_templates = [
       (call_script, "script_change_player_relation_with_center", "$current_town", -1),
     (try_end),
    ]),
-    ] + bodyguard_triggers,
-    
+    ]+ bodyguard_triggers,
   ),
 
   (
@@ -3767,7 +4407,7 @@ mission_templates = [
 
     ]
     ##diplomacy begin
-    + dplmc_battle_mode_triggers + dplmc_horse_cull,  #SB : horse cull
+    + dplmc_battle_mode_triggers + dplmc_horse_cull + order_volley_triggers + formations_triggers + AI_triggers,  #SB : horse cull
     ##diplomacy end
   ),
 
@@ -4843,7 +5483,7 @@ mission_templates = [
         (mission_enable_talk),
         (finish_mission, 0),
       ]),
-    ],
+    ]+ bodyguard_triggers,
   ),
 
 
@@ -5626,10 +6266,11 @@ mission_templates = [
 #used for tournament master scene
 
       (56, mtef_visitor_source|mtef_team_0, af_override_all, aif_start_alarmed, 1, [itm_practice_sword, itm_practice_shield, itm_padded_cloth, itm_segmented_helmet]),
-      (57, mtef_visitor_source|mtef_team_0, af_override_all, aif_start_alarmed, 1, [itm_practice_sword, itm_practice_shield, itm_padded_cloth, itm_segmented_helmet]),      
+      (57, mtef_visitor_source|mtef_team_0, af_override_all, aif_start_alarmed, 1, [itm_practice_sword, itm_practice_shield, itm_padded_cloth, itm_segmented_helmet]),
     ],
     tournament_triggers
-  ), 
+  ),
+
   (
     "arena_challenge_fight",mtf_arena_fight|mtf_commit_casualties,-1,
     "You enter a melee fight in the arena.",

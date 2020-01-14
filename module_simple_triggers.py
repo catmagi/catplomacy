@@ -407,13 +407,7 @@ simple_triggers = [
         (assign,"$g_player_raid_complete",1),
       (else_try),
         (party_slot_eq, "$g_player_raiding_village", slot_village_state, svs_being_raided),
-        (try_begin), #SB : turbo
-          (this_or_next|key_is_down, key_left_shift),
-          (key_is_down, key_right_shift),
-          (rest_for_hours, 3, 15, 1),
-        (else_try),
-          (rest_for_hours, 3, 5, 1),
-        (try_end),
+        (rest_for_hours, 3, 5, 1), #rest while attackable
       (else_try),
         (rest_for_hours, 0, 0, 0), #stop resting - abort
         (assign,"$g_player_raiding_village",0),
@@ -2496,18 +2490,13 @@ simple_triggers = [
   # Check escape chances of hero prisoners.
   (48,
    [
-       (assign, ":chance", hero_escape_from_player_chance), #50
-       (try_begin),  #SB : use consts and apply skill
-         (store_skill_level, ":skill", "skl_prisoner_management", "trp_player"),
-         (val_sub, ":chance", ":skill"), #50 to 35
-       (try_end), #also chance is /1000 not /100
-       (call_script, "script_randomly_make_prisoner_heroes_escape_from_party", "p_main_party", ":chance"),
+       (call_script, "script_randomly_make_prisoner_heroes_escape_from_party", "p_main_party", 50),
        (try_for_range, ":center_no", walled_centers_begin, walled_centers_end),
 ##         (party_slot_eq, ":center_no", slot_town_lord, "trp_player"),
-         (assign, ":chance", hero_escape_from_center_chance),
+         (assign, ":chance", 30),
          (try_begin),
            (party_slot_eq, ":center_no", slot_center_has_prisoner_tower, 1),
-           (assign, ":chance", hero_escape_from_tower_chance),
+           (assign, ":chance", 5),
          (try_end),
          (call_script, "script_randomly_make_prisoner_heroes_escape_from_party", ":center_no", ":chance"),
        (try_end),
@@ -3456,6 +3445,7 @@ simple_triggers = [
         # (else_try),
           # (eq, ":cur_improvement", slot_center_has_messenger_post),
         (try_end),
+      
       (try_end),
     (try_end),
     
@@ -3486,12 +3476,12 @@ simple_triggers = [
           (str_store_party_name_link, s2, ":center_no"),
           #SB : log message, change color, add money
           (display_log_message, "@{s1} has won the tournament at {s2}.", message_alert),
-          (call_script, "script_change_troop_renown", ":winner_troop", dplmc_tournament_renown),
+          (call_script, "script_change_troop_renown", ":winner_troop", 20),
           (try_begin),
             (ge, "$g_dplmc_gold_changes", DPLMC_GOLD_CHANGES_MEDIUM),
             (store_faction_of_party, ":center_faction", ":center_no"),
             (call_script, "script_dplmc_get_troop_standing_in_faction", ":winner_troop", ":center_faction"),
-            (store_mul, ":reward", reg0, dplmc_tournament_renown), #1200 for leader, 600 for lord etc
+            (store_mul, ":reward", reg0, 20), #1200 for leader, 600 for lord etc
             (val_add, ":reward", 150),
             (call_script, "script_dplmc_distribute_gold_to_lord_and_holdings", ":reward", ":winner_troop"), #add some wealth
           (else_try),
@@ -6092,8 +6082,7 @@ simple_triggers = [
           (try_begin), #SB : drop off prisoners
             (le, ":distance_to_target", 3),
             (is_between, ":target_party", walled_centers_begin, walled_centers_end),
-            (call_script, "script_party_prisoners_add_party_prisoners", ":target_party", ":party_no"), #DA 3.10.2019: fix to put prisoners in the dungeon and not in the garrison
-            # (call_script, "script_party_add_party_prisoners", ":target_party", ":party_no"),
+            (call_script, "script_party_add_party_prisoners", ":target_party", ":party_no"),
             (call_script, "script_party_remove_all_prisoners", ":party_no"),
           (try_end),
           (try_begin),
@@ -6423,12 +6412,11 @@ simple_triggers = [
 		(assign, ":num_exiles", 0),
 		#iterate over lords from a random start point, wrapping back to zero
 		(store_random_in_range, ":rand_no", lords_begin, lords_end),
-        (val_sub, ":rand_no", lords_begin), #overflow fix
 		(try_for_range, ":index", lords_begin, lords_end),
 		  (store_add, ":troop_no", ":rand_no", ":index"),
 		  (try_begin),
 			 #wrap back around when you go off the end
-			(ge, ":troop_no", lords_end),
+			  (ge, ":troop_no", lords_end),
 			(val_sub, ":troop_no", lords_end),
 			(val_add, ":troop_no", lords_begin),
 		  (try_end),
@@ -6459,7 +6447,7 @@ simple_triggers = [
 		     (eq, ":chosen_lord", -1),
 			 (assign, ":chosen_lord", ":troop_no"),
 		  (try_end),
-		(try_end),
+      (try_end),
 		#search is done
 		(try_begin),
 		 #no lord found
@@ -6754,7 +6742,18 @@ simple_triggers = [
     ]),
 
   ##diplomacy end
-  #-## TBS - Beer drinking
+
+# Merc Camp Begin 
+# Replenish camps every 3 days
+   (24 * 3,
+   [
+      (try_for_range, ":camp_no", mercenary_camp_begin, mercenary_camp_end),
+		(call_script, "script_refresh_mercenary_camp_troops", ":camp_no"),
+      (try_end),
+    ]),
+# Merc Camp End 
+
+#-## TBS - Beer drinking
    (1, [
 	(troop_get_slot, ":last_beers_time", "trp_player", slot_last_beers_time),
 	(store_current_hours, ":cur_hrs"),
