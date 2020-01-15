@@ -82,10 +82,10 @@ bodyguard_triggers = [
     #Get number of bodyguards
     (store_skill_level, ":leadership", skl_leadership, "trp_player"),
     (troop_get_slot, ":renown", "trp_player", slot_troop_renown),
-    (val_div, ":leadership", 3),
+    (val_div, ":leadership", 1),
     (val_div, ":renown", 400),
     (store_add, ":max_guards", ":renown", ":leadership"),
-    (val_min, ":max_guards", 4),
+    (val_min, ":max_guards", 5),
    
     (ge, ":max_guards", 1),
 
@@ -149,7 +149,23 @@ bodyguard_triggers = [
     (set_show_messages, 0),   
     (team_give_order, ":playerteam", 8, mordr_follow), #Division 8 to avoid potential conflicts
     (set_show_messages, 1),   
-   ]),   
+   ]),  
+   
+  (0, 0, ti_once, [],### replace static horse
+      [(neg|is_edit_mode_enabled),
+	    (try_for_range, ":horse", all_items_begin, all_items_end),#itp_type_horse
+			(item_get_type, ":type", ":horse"),
+			(eq, ":type", itp_type_horse),
+			(scene_item_get_num_instances, ":num_instances", ":horse"),
+			(try_for_range, ":number", 0, ":num_instances"),
+				(scene_item_get_instance, ":scene_item", ":horse", ":number"),
+				(prop_instance_get_position, pos53, ":scene_item"),
+				(prop_instance_set_scale, ":scene_item", 0, 0, 0),
+				(set_spawn_position, pos53),
+				(spawn_horse, ":horse", 0),
+			(try_end),
+		(try_end),
+     ]),
 
  (ti_on_agent_spawn, 0, 0, [],
    [
@@ -3607,7 +3623,7 @@ mission_templates = [
        (troop_set_slot, ":dead_agent_troop_no", slot_troop_mission_participation, mp_prison_break_caught),
      (try_end),
    ]),
-  ]+ bodyguard_triggers,
+   ]+ bodyguard_triggers,
   ),
 
   (
@@ -3636,6 +3652,21 @@ mission_templates = [
           (call_script, "script_init_town_walker_agents"),
           (call_script, "script_music_set_situation_with_culture", mtf_sit_travel),
         ]),
+       (0, 0, ti_once, [],### replace static horse
+        [(neg|is_edit_mode_enabled),
+	    (try_for_range, ":horse", all_items_begin, all_items_end),#itp_type_horse
+			(item_get_type, ":type", ":horse"),
+			(eq, ":type", itp_type_horse),
+			(scene_item_get_num_instances, ":num_instances", ":horse"),
+			(try_for_range, ":number", 0, ":num_instances"),
+				(scene_item_get_instance, ":scene_item", ":horse", ":number"),
+				(prop_instance_get_position, pos53, ":scene_item"),
+				(prop_instance_set_scale, ":scene_item", 0, 0, 0),
+				(set_spawn_position, pos53),
+				(spawn_horse, ":horse", 0),
+			(try_end),
+		(try_end),
+      ]),
       (ti_before_mission_start, 0, 0, [], [(call_script, "script_change_banners_and_chest")]),
       (ti_inventory_key_pressed, 0, 0, [
       #SB : same conditions, no weapon switching mid-fight

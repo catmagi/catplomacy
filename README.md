@@ -30,3 +30,5 @@ AndyYa for his script that makes the sarranids more hallah - https://forums.tale
 Alive Horses - https://forums.taleworlds.com/index.php/topic,366769.0.html
 
 A few OSPs linked in this thread - https://forums.taleworlds.com/index.php?topic=78411.0
+
+Mercenary Camps Of Calradia - https://forums.taleworlds.com/index.php/topic,374505.0.html
