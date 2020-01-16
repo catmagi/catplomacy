@@ -4230,7 +4230,9 @@ mission_templates = [
          (store_trigger_param_1, ":agent_no"),
          (call_script, "script_agent_reassign_team", ":agent_no"),
 
-         (assign, ":initial_courage_score", 5000),
+##++START-VEXED++##
+         (assign, ":initial_courage_score", 6000),
+##++END-VEXED++##
 
          (agent_get_troop_id, ":troop_id", ":agent_no"),
          (store_character_level, ":troop_level", ":troop_id"),
@@ -6277,7 +6279,19 @@ mission_templates = [
       (37,mtef_visitor_source|mtef_team_2,af_override_all,aif_start_alarmed,1,[itm_practice_sword, itm_practice_shield]),
       (38,mtef_visitor_source|mtef_team_3,af_override_all,aif_start_alarmed,1,[itm_heavy_practice_sword]),
       (39,mtef_visitor_source|mtef_team_4,af_override_all,aif_start_alarmed,1,[itm_practice_staff]),
-#40-49 not used yet
+#40-49 VEXED
+      (40,mtef_visitor_source|mtef_team_1,af_override_all,aif_start_alarmed,1,[itm_arena_lance,itm_practice_shield]),
+      (41,mtef_visitor_source|mtef_team_1,af_override_all,aif_start_alarmed,1,[itm_practice_crossbow,itm_practice_bolts]),
+      (42,mtef_visitor_source|mtef_team_1,af_override_all,aif_start_alarmed,1,[itm_practice_javelin,itm_practice_javelin_melee]),
+	  (43,mtef_visitor_source|mtef_team_1,af_override_all,aif_start_alarmed,1,[itm_sledgehammer]),
+	  (44,mtef_visitor_source|mtef_team_1,af_override_all,aif_start_alarmed,1,[itm_two_handed_cleaver]),
+	  (45,mtef_visitor_source|mtef_team_1,af_override_all,aif_start_alarmed,1,[itm_stones,itm_practice_dagger,itm_practice_shield]),
+	  (46,mtef_visitor_source|mtef_team_1,af_override_all,aif_start_alarmed,1,[itm_wooden_stick,itm_practice_shield]),
+	  (47,mtef_visitor_source|mtef_team_1,af_override_all,aif_start_alarmed,1,[itm_heavy_throwing_axes,itm_practice_dagger,itm_practice_shield]),
+	  (48,mtef_visitor_source|mtef_team_1,af_override_all,aif_start_alarmed,1,[itm_shortened_military_scythe]),
+	  (49,mtef_visitor_source|mtef_team_1,af_override_all,aif_start_alarmed,1,[itm_club_with_spike_head,itm_practice_shield]),
+	  ##
+	  
       (24,mtef_visitor_source|mtef_team_3,af_override_all,aif_start_alarmed,1,[itm_practice_bow,itm_practice_arrows,itm_practice_horse,itm_arena_tunic_yellow, itm_gold_tourney_helmet]),
       (24,mtef_visitor_source|mtef_team_3,af_override_all,aif_start_alarmed,1,[itm_heavy_practice_sword,itm_arena_tunic_yellow, itm_gold_tourney_helmet]),
       (24,mtef_visitor_source|mtef_team_3,af_override_all,aif_start_alarmed,1,[itm_heavy_practice_sword,itm_practice_horse,itm_arena_tunic_yellow, itm_gold_tourney_helmet]),

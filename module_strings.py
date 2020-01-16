@@ -1,5 +1,5 @@
 # -*- coding: cp1254 -*-
-from module_skills import * 
+from module_skills import *
 from compiler import *
 #SB : skill strings from CC, see bottom
 strings = [
@@ -2506,7 +2506,7 @@ We apologize sincerely if you contributed your suggestions and feedback but were
   ("multi_scene_23", "Canyon"),
   ("multi_scene_24", "Desert Town"),
   #INVASION MODE START
-  # ("multi_scene_25", "Cold Coast"),  
+  # ("multi_scene_25", "Cold Coast"),
   #INVASION MODE END
   ("multi_scene_12", "Random Plains (Medium)"),
   ("multi_scene_13", "Random Plains (Large)"),
@@ -4000,14 +4000,14 @@ We apologize sincerely if you contributed your suggestions and feedback but were
   ("quick_battle_scene_4", "Haima Castle"),
   ("quick_battle_scene_5", "Ulbas Castle"),
 
-  ("quick_battle_troop_1", "There is a reason no one goes about the cities without armed guards once the sun sets, and that reason is Rodrigo de Braganca. Once a bright eyed merchant who arrived at Tihr with a small fortune in rubies and a dream to corner the velvet market, he was soon reduced to a pauper, having lost everything to cutthroat competition with the colluding Rhodok merchant guilds. But he soon turned measuring scales into swords, and applied his considerable business smarts into building up the deadliest criminal enterprise in Veluca, with hideouts and operations in every major town. He has attained his goal, for the price on his head is greater than the riches he once pursued. Now he takes great pleasure in relieving his former competitors of their worldly goods -— and worries."),
+  ("quick_battle_troop_1", "There is a reason no one goes about the cities without armed guards once the sun sets, and that reason is Rodrigo de Braganca. Once a bright eyed merchant who arrived at Tihr with a small fortune in rubies and a dream to corner the velvet market, he was soon reduced to a pauper, having lost everything to cutthroat competition with the colluding Rhodok merchant guilds. But he soon turned measuring scales into swords, and applied his considerable business smarts into building up the deadliest criminal enterprise in Veluca, with hideouts and operations in every major town. He has attained his goal, for the price on his head is greater than the riches he once pursued. Now he takes great pleasure in relieving his former competitors of their worldly goods -ï¿½ and worries."),
   ("quick_battle_troop_2", "Usiatra usurped leadership of the group of bandits that occupied Siri, a rural village in the southern deserts outside the realm of Calradia, in a curt and bloody fashion when she was seventeen years old. Under her direction, the band of ruffians quickly expanded their operations across the southlands. Her shrewd, decisive manner, combined with her merciless ambition which she acts upon with inhuman composure and cruelty, garners fanatic admiration from those that follow her. As such, amongst her own she lives a decadent, spoilt lifestyle -- built upon the violent plundering she exacts in her travels. Her military strength and natural strategic wit allowed her outfit to remain undealt with in her homeland, and now she turns her eye towards the rich lands of Calradia to sustain her war band."),
   ("quick_battle_troop_3", "The second son of a minor noble living near Uxkhal, Hegen was educated in the art of war and single combat. After being knighted he served as a paid knight in the army of the lord of Uxkhal and fought against the Vaegirs before leading a group of outriders that defeated a Khergit raid near Amere. The ensuing counter raid and the following two campaigns earned him glory and fame as a warrior. Unfortunately, he lost any chance of further prestige when peace was declared and he was discharged. With no hope of inheriting and his skills at war languishing in peace, he assembled other young warriors and set out as a mercenary captain. He now hopes to take advantage of the fact that Calradia never lacks warring states in need of mercenaries."),
   ("quick_battle_troop_4", "Konrad is a professional mercenary from the distant land of Balion, far beyond the vast western ocean. Having spent most of his years on campaign and seen countless battles, Konrad has grown to love his life as a soldier of fortune. Though he once had his nose flattened by a mace blow and has received many wounds, he has nevertheless survived this harsh existence through the strength of his arm, innate cunning and pure luck. Hearing of the lucrative career opportunities awaiting a man of his talents in Calradia, Konrad chartered a vessel and crossed the sea with his men in search of new wars to fight in. A sellsword with no ties to any of the Calradian states, he is more than happy to offer his services to any lord with a fat enough coin-purse."),
   ("quick_battle_troop_5", "Sverre is one of the so-called sea raiders -- freebooters and lawless men from the icy realm of Jumne beyond the North Sea, also said to be the ancestral home of the Nords. Already as a young man he has been along on many raids against both his distant cousins in the Wercheg region and the Vaegirs. However, Sverre was always a sharp lad, and it didn't take him long to see that Calradia was a far more prosperous land than his own, and that he could have a better life here than among his own people. During a raid on Jayek, Sverre stole away while his comrades were busy looting the village and taking captives. Passing himself off as a yokel from the Chalbek mountains, Sverre quickly built up a reputation for himself as a fierce fighter, and he now seeks his fortune at the head of a mercenary band."),
   ("quick_battle_troop_6", "Hailing from Charnye, in the far reaches of the Vaegir tundra, Borislav is a hunter. For all of his life he has tracked the beasts of the wild for their meat and fur, living off the land just as his forefathers had done in happier days, before the endless wars. Now, the game is quick to take fright from the constant sounds of battle, and the wanton slaughter of animals by soldiers has left empty those forests that have not been burnt down. Facing starvation, Borislav chose to turn his great skill with bow and spear, learned from hunting stag, wolf, and bear, to the practice of hunting men, and his steady hand and keen eye have claimed many lives. Borislav does not care much for the disputes of kingdoms, and is only really interested in keeping himself and his men fed."),
   ("quick_battle_troop_7", "Stavros was born in the independent city-state of Zendar, and spent much of his adult life serving in the town watch under the famous constable Hareck. Stavros' leadership and prowess were instrumental in ridding the area of the dreaded river pirates, but even he was powerless against the calamity that befell the city. When Zendar was razed to the ground by a great horde of sea raiders, Stavros fled the burning city in a crowd of refugees. After a brief period of wandering and odd jobs, he found a place in a mercenary company, eventually rising to become its leader due to his dedication and tactical aptitude. He now devotes most of his efforts to working with manhunters and local authorities against the sea raiders and other outlaws, trying to keep the land safe for travelers."),
-  ("quick_battle_troop_8", "Growing up with one of the nomadic tribes deep in the desert beyond Sarranid lands, Gamara learned early on how to hunt with sling and spear. However, the simple life and pitiless conditions in the desert did not satisfy her, and she burned with a desire to see the great world beyond that she had heard so many wondrous tales about. Life is not easy for an adventuring young woman, and Gamara had to learn the ways of Calradia quickly. Taking the weapons and armor of a soldier who had attacked her after a dispute, Gamara now hides her beauty under thick Sarranid garb, and many never even suspect she is a woman –- certainly as a force on the battlefield she is as dangerous as any man. She has gathered about her a group of followers, and together they wander the war-torn land in search of glory."),
+  ("quick_battle_troop_8", "Growing up with one of the nomadic tribes deep in the desert beyond Sarranid lands, Gamara learned early on how to hunt with sling and spear. However, the simple life and pitiless conditions in the desert did not satisfy her, and she burned with a desire to see the great world beyond that she had heard so many wondrous tales about. Life is not easy for an adventuring young woman, and Gamara had to learn the ways of Calradia quickly. Taking the weapons and armor of a soldier who had attacked her after a dispute, Gamara now hides her beauty under thick Sarranid garb, and many never even suspect she is a woman ï¿½- certainly as a force on the battlefield she is as dangerous as any man. She has gathered about her a group of followers, and together they wander the war-torn land in search of glory."),
   ("quick_battle_troop_9", "Aethrod is not a noble person. He's changed his name twice, and is blamed for most of the crimes on Vaegir territory. True or not, he claims to never have taken an innocent man's life, and considers himself a patriotic citizen, several times bringing his band or renegades to the assistance of his faction, when it is threatened. In times of peace, however, most lords must be careful when he is in the vicinity due to his daring personality and willingness to challenge a lord. Born and rasied in the slums of Reyvadin, he learned how to use a bow at an early age and ran away from home a fourteen. Now at thirty two, his archery skills are near perfect and though he can't ride a horse well, he can hit one at the furthest of distances. Tough as nails and sharp as a hawk, he is a true local legend."),
   ("quick_battle_troop_10", "Being the daughter of one of the most infamous bandit leaders in the Sarranid realm isn't always easy, but Zaira seems to have managed quite well. Unlike most women she grew up learning the ways of the desert warrior and is deadly with the sword as well as the bow. While the other girls her age learned how to manage the household, Zaira learned how to best gut a merchant before taking his money. At the age of sixteen Zaira had killed more men than the average veteran in the Sultan's army. Just before her twentieth brithday her father was killed in brawl with another bandit leader. As the only child, Zaira now took control of her father's band. After avenging her father, she quickly picked up where he had left. Now she's on a good way of establishing her own reputation has a bandit leader."),
   ("quick_battle_troop_11", "Argo Sendnar had quite a diversified life. When he arrived at Calradia, working as a trader, he hoped for more income than in Lokti. Little did he know, that the wartorn Calradia was a wasps' nest for bandits and cutthroats that made trading a lot more complicated than in Lokti. Being bought out by another competeting trader, after losing all his goods and money due to caravan raids, he was forced to serve as a caravan guard to make a living. Despite his pathetic fighting skills, he soon found an employment on one of the more dangerous routes through Calradia. Due to sheer luck he managed to stay alive long enough to aquire enough combat experience and money to start his own buisness as a caravan master, offering his services to traders in need of defense for their goods."),
@@ -4144,7 +4144,7 @@ We apologize sincerely if you contributed your suggestions and feedback but were
   ("good_you_have_enough_men", "Good, good. You did well. You have enough men. Now, go and knock some of those robbers over the head, and make them tell you how to find their hideout."),
   ("do_not_waste_time_go_and_learn_where_my_brother_is", "Look, {sir/my lady}. Time is at a bit of premium, here. Now, if you could go find out where they are hiding my brother, that would be appreciated."),
 
-  ("start_up_quest_message_1", "{s9} wants you to collect at least five men from nearby villages. After you collect these men, find and speak with him. He is in the tavern at {s1}"),
+  ("start_up_quest_message_1", "{s9} wants you to collect at least fifteen men from nearby villages. After you collect these men, find and speak with him. He is in the tavern at {s1}"),
   ("start_up_quest_message_2", "Find and defeat a group of bandits lurking near {s9}, and learn where your employer's brother has been taken."),
   ("start_up_quest_message_3", "Rescue the merchant's brother from the robber's hideout located near {s9}."),
   ("start_up_first_quest", "You have taken your first quest. You may view your quest log by pressing 'Q' anytime in the game."),
@@ -4508,25 +4508,25 @@ We apologize sincerely if you contributed your suggestions and feedback but were
  ("dplmc_s0_and_s1",     "{s0} and {s1}"),
  ("dplmc_s0_newline_s1", "{!}{s0}^{s1}"),
  ##diplomacy end+
- 
+
  #morality objections
  ("hire_deserters", "take those scoundrels under our banner"),
  ("rotten_food", "consume those foul foodstuff and find insects with every bite we take"),
  ("repress_farmers", "repress those peasants and propagate the violence inherent in the system"),
  ("stop_cheating", "waste time playing around with 'consoles' when you can just change the damn thing under camp options"),
- 
+
  #auxiliary item types
  ("dplmc_hero_wpn_slot_morningstar","Two-handed/One-handed"), #21
  ("dplmc_hero_wpn_slot_lance","Lances"), #22
  ("dplmc_hero_wpn_slot_pikes","Pikes"), #23
  ("dplmc_hero_wpn_slot_halberd","Bladed Polearms"), #23
  ("dplmc_hero_wpn_slot_no_metatype","No Preference"), #23
- 
+
   ("camera_keyboard", "To watch the fight you can use direction keys to move horizontally, numpad +- to move vertically, and numpad keys to rotate."),
   ("camera_mouse", "Use the mouse or numpad to rotate the camera, direction keys to move (holding Zoom will move faster). Tilt to adjust sensitivity, numpad to rotate and move vertically."),
   ("camera_follow", "Use tilt keys or mouse wheel to follow friendly agents. Hold Ctrl while using numpad to change view angle."),
 
-  #ai behaviour strings (probably correct)  
+  #ai behaviour strings (probably correct)
   ("ai_bhvr_hold", "Holding"),
   ("ai_bhvr_travel_to_party", "Travelling to Party"),
   ("ai_bhvr_patrol_location", "Patrolling Point"),
@@ -4541,12 +4541,12 @@ We apologize sincerely if you contributed your suggestions and feedback but were
   ("ai_bhvr_escort_party", "Accompanying Party"),
   ("ai_bhvr_driven_by_party", "Being Driven"),
 
-  #party template names 
+  #party template names
   ("s5_transfer", "Transfer to {s5}"),
   ("s5_reinf", "Reinforcements from {s5}"),
   ("s5_scout", "{s5} Scout"),
   ("s5_patrol", "{s5} Patrol"),
-  
+
   #companion mission strings
   ("preparing_prison_break", "Preparing a prison break in {s9}"),
   ("on_loan", "On loan"),
@@ -4555,9 +4555,9 @@ We apologize sincerely if you contributed your suggestions and feedback but were
   # ("damage_cut", "cut"),
   # ("damage_pierce", "pierce"),
   # ("damage_blunt", "blunt"),
- 
+
  #utility for keys array
- 
+
   ("key_0", "0"),
   ("key_1", "1"),
   ("key_2", "2"),
@@ -4686,7 +4686,7 @@ We apologize sincerely if you contributed your suggestions and feedback but were
  You were only one of many other foundlings and orphans, but you nonetheless received a lot of attention\
  as well as many years of study in the church library and before the altar. They taught you many things.\
  Gradually, faith became such a part of your life that it was no different from the blood coursing through your veins."),
-  
+
   ##   As a {reg11?girl:boy} growing out of childhood,\
   ("story_childhood_page","you were sent to live in the court of one of the nobles of the land.\
  There, your first lessons were in humility, as you waited upon the lords and ladies of the household.\
@@ -4789,7 +4789,7 @@ We apologize sincerely if you contributed your suggestions and feedback but were
  You want to be the one whom others hurry to obey.\
  You want people to know your name, and tremble whenever it is spoken.\
  You want everything, and you won't let anyone stop you from having it..."),
-  
+
   ("story_all", "{s10}^^You started to learn about the world almost as soon as you could walk and talk. As a {reg11?girl:boy} growing out of childhood, {s11}^^\
 Though the distinction felt sudden to you, somewhere along the way you had become a {reg11?woman:man}, and the whole world seemed to change around you. {s12}^^\
 Only you know exactly what caused you to give up your old life and become an adventurer. {s13}"),
@@ -4828,50 +4828,50 @@ Only you know exactly what caused you to give up your old life and become an adv
   ("ctm_ranged", "Stay behind the line on the ground and shoot the targets. Try not to waste any shots."),
   ("ctm_mounted", "Try to destroy as many targets as you can. You have two and a half minutes to clear the track."),
 #utility from CC for item modifiers
-  ("imod_plain", "{!}"), 
+  ("imod_plain", "{!}"),
   ("imod_cracked", "Cracked "),
-  ("imod_rusty", "Rusty "), 
-  ("imod_bent", "Bent "), 
-  ("imod_chipped", "Chipped "), 
-  ("imod_battered", "Battered "), 
-  ("imod_poor", "Poor "), 
-  ("imod_crude", "Crude "), 
-  ("imod_old", "Old "), 
-  ("imod_cheap", "Cheap "), 
-  ("imod_fine", "Fine "), 
-  ("imod_well_made", "Well Made "), 
-  ("imod_sharp", "Sharp "), 
-  ("imod_balanced", "Balanced "), 
-  ("imod_tempered", "Tempered "), 
-  ("imod_deadly", "Deadly "), 
-  ("imod_exquisite", "Exquisite "), 
-  ("imod_masterwork", "Masterwork "), 
-  ("imod_heavy", "Heavy "), 
-  ("imod_strong", "Strong "), 
-  ("imod_powerful", "Powerful "), 
-  ("imod_tattered", "Tattered "), 
-  ("imod_ragged", "Ragged "), 
-  ("imod_rough", "Rough "), 
-  ("imod_sturdy", "Sturdy "), 
-  ("imod_thick", "Thick "), 
-  ("imod_hardened", "Hardened "), 
-  ("imod_reinforced", "Reinforced "), 
-  ("imod_superb", "Superb "), 
-  ("imod_lordly", "Lordly "), 
-  ("imod_lame", "Lame "), 
-  ("imod_swaybacked", "Swaybacked "), 
-  ("imod_stubborn", "Stubborn "), 
-  ("imod_timid", "Timid "), 
-  ("imod_meek", "Meek "), 
-  ("imod_spirited", "Spirited "), 
-  ("imod_champion", "Champion "), 
-  ("imod_fresh", "Fresh "), 
-  ("imod_day_old", "Day Old "), 
-  ("imod_two_day_old", "Two Day Old "), 
-  ("imod_smelling", "Smelling "), 
-  ("imod_rotten", "Rotten "), 
-  ("imod_large_bag", "Large Bag "), 
-  
+  ("imod_rusty", "Rusty "),
+  ("imod_bent", "Bent "),
+  ("imod_chipped", "Chipped "),
+  ("imod_battered", "Battered "),
+  ("imod_poor", "Poor "),
+  ("imod_crude", "Crude "),
+  ("imod_old", "Old "),
+  ("imod_cheap", "Cheap "),
+  ("imod_fine", "Fine "),
+  ("imod_well_made", "Well Made "),
+  ("imod_sharp", "Sharp "),
+  ("imod_balanced", "Balanced "),
+  ("imod_tempered", "Tempered "),
+  ("imod_deadly", "Deadly "),
+  ("imod_exquisite", "Exquisite "),
+  ("imod_masterwork", "Masterwork "),
+  ("imod_heavy", "Heavy "),
+  ("imod_strong", "Strong "),
+  ("imod_powerful", "Powerful "),
+  ("imod_tattered", "Tattered "),
+  ("imod_ragged", "Ragged "),
+  ("imod_rough", "Rough "),
+  ("imod_sturdy", "Sturdy "),
+  ("imod_thick", "Thick "),
+  ("imod_hardened", "Hardened "),
+  ("imod_reinforced", "Reinforced "),
+  ("imod_superb", "Superb "),
+  ("imod_lordly", "Lordly "),
+  ("imod_lame", "Lame "),
+  ("imod_swaybacked", "Swaybacked "),
+  ("imod_stubborn", "Stubborn "),
+  ("imod_timid", "Timid "),
+  ("imod_meek", "Meek "),
+  ("imod_spirited", "Spirited "),
+  ("imod_champion", "Champion "),
+  ("imod_fresh", "Fresh "),
+  ("imod_day_old", "Day Old "),
+  ("imod_two_day_old", "Two Day Old "),
+  ("imod_smelling", "Smelling "),
+  ("imod_rotten", "Rotten "),
+  ("imod_large_bag", "Large Bag "),
+
   #lowercase descriptions for disguises
   ("pilgrim_disguise", "pilgrim"),
   ("farmer_disguise", "farmer"),
@@ -4879,7 +4879,7 @@ Only you know exactly what caused you to give up your old life and become an adv
   ("guard_disguise", "guard"),
   ("merchant_disguise", "merchant"),
   ("bard_disguise", "bard"),
-  
+
   #recolor presentation strings
   ("html", "HTML Code: {s0}"),
   ("html_color", "{!}#{s11}{s12}{s13}{s14}{s15}{s16}"),
@@ -4887,25 +4887,25 @@ Only you know exactly what caused you to give up your old life and become an adv
   # ("color_kingdom", "your realm"),
   ("color_banner", "the back of your banner"),
   ("color_group", "the {s0} group on the minimap"),
-  
+
   #update settings
   ("setting_of", "Current Setting: {s1}"),
-  
+
   #SB : new strings from Invasion, moved down here to keep slot compatibility
   ("multi_scene_25", "Cold Coast"),
   # ("multi_game_type_9", "Invasion"),
-  
-  ("s1_team", "{s1} squad"), 
+
+  ("s1_team", "{s1} squad"),
   # ("warning_max_players_count_caption", "{!}NOT USED"),
   # ("warning_max_players_count_text", "{!}The recommended number of players for this mode is 16 players"),
   # ("warning_max_players_count_text2", "The recommended number of players for this mode is 16 players"),
   # ("command_info_text", "{!}Squad size: {reg1}, cost: {reg2}"),
-  
+
   # ("morale_reason_faction_conflict", "{!}NOT USED"),
   # ("morale_reason_faction_common", "{!}NOT USED"),
-  # ("multi_disable_granades", "Disable grenades"), 
+  # ("multi_disable_granades", "Disable grenades"),
   # ("squad_size_s0", "Squad size: {s0}"),
-  
+
   ("mp_add_troop", "Companions"),
   # ("mp_squad", "Squad"),
   # ("mp_squad_req_size_reg0", "Requested: {reg0}"),
@@ -4920,8 +4920,8 @@ Only you know exactly what caused you to give up your old life and become an adv
   ("time_left_reg2_mins_reg1_secs", "Time Left: {reg2} minutes and {reg1} seconds"),
   ("time_left_reg1_secs", "Time Left: {reg1} seconds"),
   ("enemies_reg1_total_reg2_arriving", "Enemies: {reg1} Alive, {reg2} Arriving"),
-  ("ccoop_enemy_info", "   {reg4} {s0} ({reg3} arriving)"),  
-  
+  ("ccoop_enemy_info", "   {reg4} {s0} ({reg3} arriving)"),
+
   #Suvorov add 01/06/2011
   # ("oim_black_hetman_failed", "You no longer control the capital, there is no chance of victory. All is lost!"),
 
@@ -4949,9 +4949,9 @@ Only you know exactly what caused you to give up your old life and become an adv
   # ("s1_s2", "{!}{s1} {s2}"),
   # ("your_troops_are_dying_because_of_illness", "Your troops are dying because of a disease!"),
   # ("has_died_because_of_illness", "has died of {s4}."),
-  # ("have_died_because_of_illness", "have died of {s4}."),  
-  
-  
+  # ("have_died_because_of_illness", "have died of {s4}."),
+
+
   ("ccoop_wave_reg1_is_coming_in_reg0_seconds", "Wave {reg1} is coming in {reg0} seconds"),
   ("ccoop_veteran_wave_reg1_is_coming_in_reg0_seconds", "Veteran wave {reg1} is coming in {reg0} seconds"),
   ("ccoop_elite_wave_reg1_is_coming_in_reg0_seconds", "Elite wave {reg1} (Tier {reg2}) is coming in {reg0} seconds"),
@@ -4965,9 +4965,9 @@ Only you know exactly what caused you to give up your old life and become an adv
   ("elite_wave_hint", "Beware: Elites have increased health and deliver more damage!"),
   ("ask_for_help_to_respawn_hint", "You'll respawn once your comrades destroy the prisoner cart or pass the current round."),
   ("wait_for_next_turn_to_respawn_hint", "You will respawn in the next round."),
-  
+
   # ("mp_cbf_squad_auto_ratio", "Auto-balance captain squad ratio"),
-  
+
   #Frank new coop strings
   ("default", "Default"),
   ("coop_open_chest", "Open Chest"),
@@ -4990,10 +4990,10 @@ Only you know exactly what caused you to give up your old life and become an adv
   ("ccoop_lvl_reg0", "Lv. {reg0}"),
   ("ccoop_dropping_item_on_ground", "You didn't have enough free weapon slots, so it fell to the ground."),
   #("ccoop_all_stars", "All Stars"),
-  
+
   ("ccoop_king_name", "King {s0}"),
   ("ccoop_queen_name", "Queen {s0}"),
-  
+
   #Coop Special Item Descriptions
   ("javelin_bow", "A bow that fires javelins"),
   ("knockdown_mace", "Knocks down everyone it hits"),
@@ -5011,7 +5011,7 @@ Only you know exactly what caused you to give up your old life and become an adv
   ("invulnerable_helmet", "Keeps your head safer"),
   ("kicking_boots", "Deliver a nasty kick"),
   ("restore_health_armour", "Restores health gradually"),
-  
+
   #Coop Companion Descriptions
   ("npc1_1","-Good with throwing and 1h^-Poor with 2h and crossbows"),
   ("npc2_1","-Good with 1h^-Poor with throwing"),
@@ -5031,7 +5031,7 @@ Only you know exactly what caused you to give up your old life and become an adv
   ("npc16_1","-Good with throwing and 1h^-Poor with 2h and crossbows"),
   #INVASION MODE END
 
-  #dckplmc 
+  #dckplmc
 
   ("faction_leader_title_male_player", "King {s0}"),
   ("faction_leader_title_male_1", "King {s0}"),
@@ -5048,7 +5048,7 @@ Only you know exactly what caused you to give up your old life and become an adv
   ("faction_leader_title_female_4", "Queen {s0}"),
   ("faction_leader_title_female_5", "Queen {s0}"),
   ("faction_leader_title_female_6", "Sultana {s0}"),
-  
+
   #settings
   ("dplmc_setting_2", "High"),
   ("dplmc_setting_1", "Medium"),
@@ -5073,7 +5073,7 @@ Only you know exactly what caused you to give up your old life and become an adv
 
   #yet to be determined <-known to be {s4} -> here
   #we're not sure which could <- the town of {s4} is believed to -> we think ourselves to
-  
+
   ("mayor_wealth_compare", "Here in {s3}, we {s4} than {reg4} towns{reg6?, and {s5} than {reg5}:}."),
   ("mayor_wealth_no_data", "All things considered, we are on par with all others towns in Calradia."),
   ("mayor_wealth_rank_1", "yet to be reckoned"),
@@ -5092,7 +5092,7 @@ Only you know exactly what caused you to give up your old life and become an adv
   ("mayor_wealth_compare_more_3", "have villagers producing more"),
   ("mayor_wealth_compare_more_4", "are more visited"),
   ("mayor_wealth_compare_more_5", "are more afflicted by raiders"),
-  
+
   ("mayor_wealth_comparison_1", "Overall, the wealthiest town in Calradia is {s2}. {s1}"),
   ("mayor_wealth_comparison_2", "In terms of local industry, the most productive town in Calradia is {s2}. {s1}\
  Production is of course affected by the supply of raw materials, as well as by the overall prosperity of the town."),
@@ -5100,7 +5100,7 @@ Only you know exactly what caused you to give up your old life and become an adv
  The wealth of a town's hinterland, of course, is heavily dependent on the tides of war. Looting and pillage, and shifts in territory, can make a major impact."),
   ("mayor_wealth_comparison_4", "In terms of trade, {s2} have received the most visits from caravans over the past few months. {s1}"),
   ("mayor_wealth_comparison_5", "In terms of attacks on travellers, {s2} be the most dangerous. {s1}"),
-  
+
   ("npc_mission_delegate_quest", "Questing on your behalf"), #generic description "on an errand"
   #these are 3rd-person descriptions of objectives {x} for {y} since string registers are not always known
   ("dplmc_npc_qst_deliver_message", "Deliver a peaceful message"),

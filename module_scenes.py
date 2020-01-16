@@ -738,7 +738,7 @@ scenes = [
     [],[],"outer_terrain_desert"),
   ("town_22_alley",sf_generate,"none", "none", (0,0),(100,100),-100,"0x000000025a00723200046d1b00003e0200001476000052ae",
     [],[],"outer_terrain_desert"),
-    
+
 #0x30054d228004050000005a768000688400002e3b
 #0x30054da28004050000005a76800022aa00002e3b
 #Castles:
@@ -1324,6 +1324,8 @@ scenes = [
 	
 	("village_110",sf_generate,"none", "none", (0,0),(100,100),-100,"0x00000001500410320005a96800006b5300004edc00000d11",
     [],[],"outer_terrain_desert"),
+	
+	
 
 
 	

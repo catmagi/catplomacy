@@ -42,7 +42,7 @@ from compiler import *
 game_menus = [
   ("start_game_0",menu_text_color(0xFF000000)|mnf_disable_all_keys,
   ##diplomacy begin
-    "Welcome, adventurer, to Diplomacy for Mount & Blade: Warband. Before beginning the game you must create your character. Remember that in the traditional medieval society depicted in the game, war and politics are usually dominated by male members of the nobility. That does not however mean that you should not choose to play a female character, or one who is not of noble birth. Male nobles may have a somewhat easier start, but women and commoners can attain all of the same goals -- and in fact may have a much more interesting if more challenging early game.",
+    "Welcome, adventurer, to Catplomacy for Mount & Blade: Warband. Before beginning the game you must create your character. Remember that in the traditional medieval society depicted in the game, war and politics are usually dominated by male members of the nobility. That does not however mean that you should not choose to play a female character, or one who is not of noble birth. Male nobles may have a somewhat easier start, but women and commoners can attain all of the same goals -- and in fact may have a much more interesting if more challenging early game.",
   ##diplomacy end
   "none",
     [],
@@ -4076,7 +4076,7 @@ TOTAL:  {reg5}"),
       ("camp_recruit_prisoners",
        [(troops_can_join, 1),
         (store_current_hours, ":cur_time"),
-        (val_sub, ":cur_time", 24),
+        (val_sub, ":cur_time", 12),
         (gt, ":cur_time", "$g_prisoner_recruit_last_time"),
         (try_begin),
           (gt, "$g_prisoner_recruit_last_time", 0),
@@ -10493,7 +10493,9 @@ TOTAL:  {reg5}"),
       ("village_bandits_defeated_cont",[],  "Refuse, stating that they need these {reg10?items:livestock} more than you do.",
       [ 
         (call_script, "script_change_player_relation_with_center", "$g_encountered_party", 3),
-        (call_script, "script_change_player_honor", 1),
+##++START-VEXED++##
+        (call_script, "script_change_player_honor", 4),
+##++END-VEXED++##
         (jump_to_menu, "mnu_village")]),
     ],
   ),
@@ -12798,7 +12800,9 @@ TOTAL:  {reg5}"),
           (store_faction_of_party, ":current_town_faction", "$current_town"),
           (neq, ":current_town_faction", "fac_player_supporters_faction"),
           (party_get_num_companions, ":num_men", "p_main_party"),
-          (store_div, reg1, ":num_men", 4),
+##++START-VEXED++##
+          (store_div, reg1, ":num_men", 10),
+##++END-VEXED++##
           (val_add, reg1, 1),
           (str_store_string, s1, "@ ({reg1} denars per night)"),
           (store_troop_gold, ":gold", "trp_player"),
@@ -13585,44 +13589,46 @@ TOTAL:  {reg5}"),
       (assign, reg6, ":min_dif_divisor"),
       ],
     [
+##++START-VEXED++##
       ("bet_100_denars", [(store_troop_gold, ":gold", "trp_player"),
-                          (ge, ":gold", 100)
+                          (ge, ":gold", 500)
                           ],
-       "100 denars.",
+       "500 denars.",
        [
-         (assign, "$temp", 100),
+         (assign, "$temp", 500),
          (jump_to_menu, "mnu_tournament_bet_confirm"),
         ]),
       ("bet_50_denars", [(store_troop_gold, ":gold", "trp_player"),
-                         (ge, ":gold", 50)
+                         (ge, ":gold", 400)
                          ],
-       "50 denars.",
+       "400 denars.",
        [
-         (assign, "$temp", 50),
+         (assign, "$temp", 400),
          (jump_to_menu, "mnu_tournament_bet_confirm"),
         ]),
       ("bet_20_denars", [(store_troop_gold, ":gold", "trp_player"),
-                         (ge, ":gold", 20)
+                         (ge, ":gold", 300)
                          ],
-       "20 denars.",
+       "300 denars.",
        [
-         (assign, "$temp", 20),
+         (assign, "$temp", 300),
          (jump_to_menu, "mnu_tournament_bet_confirm"),
         ]),
       ("bet_10_denars", [(store_troop_gold, ":gold", "trp_player"),
-                         (ge, ":gold", 10)
+                         (ge, ":gold", 200)
                          ],
-       "10 denars.",
+       "200 denars.",
        [
-         (assign, "$temp", 10),
+         (assign, "$temp", 200),
          (jump_to_menu, "mnu_tournament_bet_confirm"),
         ]),
       ("bet_5_denars", [(store_troop_gold, ":gold", "trp_player"),
-                        (ge, ":gold", 5)
+                        (ge, ":gold", 100)
                         ],
-       "5 denars.",
+       "100 denars.",
        [
-         (assign, "$temp", 5),
+         (assign, "$temp", 100),
+##++END-VEXED++##
          (jump_to_menu, "mnu_tournament_bet_confirm"),
         ]),
       ("go_back_dot", [], "Go back.",
@@ -13640,7 +13646,9 @@ TOTAL:  {reg5}"),
       (call_script, "script_get_win_amount_for_tournament_bet"),
       (assign, ":win_amount", reg0),
       (val_mul, ":win_amount", "$temp"),
-      (val_div, ":win_amount", 100),
+##++START-VEXED++##
+      (val_div, ":win_amount", 500),
+##++END-VEXED++##
       (assign, reg1, "$temp"),
       (assign, reg2, ":win_amount"),
       ],
@@ -14143,7 +14151,9 @@ TOTAL:  {reg5}"),
                                                                        ]),
       ("village_bandits_defeated_cont",[],  "Refuse, stating that they need these items more than you do.",[
       (call_script, "script_change_player_relation_with_center", "$g_encountered_party", 3),
-      (call_script, "script_change_player_honor", 1),
+##++START-VEXED++##
+      (call_script, "script_change_player_honor", 4),
+##++END-VEXED++##
       (change_screen_map)]),
     ],
   ),
@@ -18361,6 +18371,10 @@ goods, and books will never be sold. ^^You can change some settings here freely.
         (assign, "$g_starting_town", -1), #this disables the startup merchant from taverns
         #let triggers load first
         (rest_for_hours, 3, 5, 0),
+##++START-VEXED++##
+##Mmmmmm monies!
+	(troop_add_gold, "trp_player", 1000),
+##++END-VEXED++##
         (assign, "$auto_enter_town", "$current_town"),
         # (start_encounter, "$current_town"),
         (change_screen_return),

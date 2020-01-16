@@ -1391,7 +1391,7 @@ If you would like to practice your horsemanship, you can take my horse here. The
   (agent_get_troop_id, ":type", "$g_main_attacker_agent"),
   (eq, ":type", "trp_hired_assassin"),
   (str_store_string, s9, "str_strange_that_one_didnt_seem_like_your_ordenary_troublemaker_he_didnt_drink_all_that_much__he_just_stood_there_quietly_and_watched_the_door_you_may_wish_to_consider_whether_you_have_any_enemies_who_know_you_are_in_town_a_pity_that_blood_had_to_be_spilled_in_my_establishment"),
-  
+
   (try_begin), #random "good" imod
     (store_random_in_range, ":imod", imod_old, imod_exquisite),
     (gt, "$g_attacker_drawn_weapon", 0),
@@ -1406,7 +1406,7 @@ If you would like to practice your horsemanship, you can take my horse here. The
   (try_begin),
     (try_for_range, ":item_slot", ek_item_0, ek_head),
       (agent_get_item_slot, ":item_no", "$g_main_attacker_agent", ":item_slot"),
-      (troop_add_item, "trp_player", ":item_no", 0), # SB: add attacker sword  
+      (troop_add_item, "trp_player", ":item_no", 0), # SB: add attacker sword
     (try_end),
   (try_end),
   #SB : this is useless, change with town instead
@@ -2315,7 +2315,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
 
 [anyone,"member_chat",
 [
-(store_conversation_troop,"$g_talk_troop"), 
+(store_conversation_troop,"$g_talk_troop"),
 (troop_is_hero,"$g_talk_troop"),
 (troop_get_slot, ":honorific", "$g_talk_troop", slot_troop_honorific),
 ##diplomacy start+
@@ -2387,7 +2387,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
    (is_between, ":cur_center", walled_centers_begin, walled_centers_end),
    (str_store_party_name, s5, ":cur_center"),
    ], "This is unsafe for you. You should get back to our {reg5?court:household} in {s5}.", "spouse_leave",[
-   
+
 ]],
 
 #TODO: add relocate household in friendly $current_town
@@ -2526,7 +2526,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
     ##diplomacy end+
 ], "Do you have any connections that we could use to our advantage?", "member_intelgathering_1",[]],
 
-# #TODO: steal some disguises from companions 
+# #TODO: steal some disguises from companions
 # [anyone|plyr,"member_question_2", [
     # (is_between, "$g_talk_troop", companions_begin, companions_end),
     # (call_script, "script_dplmc_store_troop_is_female_reg", "$g_talk_troop", 4),
@@ -2681,7 +2681,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
  (else_try), #own city, unassigned, etc instead of defaulting to ruler
    (assign, reg18, 0),
  (try_end),
- 
+
  #use cached instability value
  (faction_get_slot, ":instability", ":contact_town_faction", slot_faction_instability), #0 to 100
  (val_min, ":instability", 60), #no descriptor past that point
@@ -2694,7 +2694,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
  #SB : initialize global
  (assign, "$lord_selected", -1),
  ]],
- 
+
 [anyone,"member_intelgathering_1", [
  (troop_get_slot, ":town_with_contacts", "$g_talk_troop", slot_troop_town_with_contacts),
  (str_store_party_name, s17, ":town_with_contacts"),
@@ -2728,7 +2728,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
  ], "Excellent. While you're there, do check on our chained friend {s10} and make sure {reg4?she:he} is still in one piece.", "member_intelgathering_rescue",[
    (quest_get_slot, "$lord_selected", "qst_rescue_prisoner", slot_quest_target_troop),
  ]],
- 
+
 #SB : enable this while not questing
 [anyone|plyr,"member_intelgathering_3", [
   (troop_get_slot, ":center_no", "$g_talk_troop", slot_troop_town_with_contacts),
@@ -2755,9 +2755,9 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
     (assign, ":stack_no", -1), #loop break
     (call_script, "script_faction_get_adjective_to_s10", ":faction_no"),
   (try_end),
-  
+
   (eq, ":stack_no", -1), #valid target
- 
+
  ], "I heard rumours of a {s10} aristocrat jailed there.", "member_intelgathering_rescue",[]],
 [anyone|plyr,"member_intelgathering_3", [
  ], "Actually, hold off for now.", "do_member_trade",[]],
@@ -2777,7 +2777,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
  ], "Yes, we can use this opportunity to ingratiate ourselves with {s20}. I will do my best to put together a rescue plan, {s21}. It will be about a week before you'll hear back from me.", "close_window",
  [
  #evaluate chance of success, three outcomes : successful rescue, failed rescue, failed and captured
- 
+
  (store_skill_level, ":management", "skl_prisoner_management", "$g_talk_troop"),
  (store_skill_level, ":persuasion", "skl_persuasion", "$g_talk_troop"),
  (store_skill_level, ":athletics", "skl_athletics", "$g_talk_troop"),
@@ -2786,12 +2786,12 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
  (store_attribute_level, ":agi", "$g_talk_troop", ca_agility),
  (store_attribute_level, ":int", "$g_talk_troop", ca_intelligence),
  (store_attribute_level, ":cha", "$g_talk_troop", ca_charisma),
- 
+
  (store_add, ":base_score", ":management", ":persuasion"), #usually not levelled skills, oh well
  (val_mul, ":base_score", 3), #from 0 to 60 max
  (val_add, ":base_score", ":int"), #10 to 90ish
  (val_add, ":base_score", ":cha"), #20 to 100ish
- 
+
  (troop_get_slot, ":center_no", "$g_talk_troop", slot_troop_town_with_contacts),
  #chance is calculated against player's relation with center inherited by companions
  (party_get_slot, ":center_relation", ":center_no", slot_center_player_relation),
@@ -2814,10 +2814,10 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
    (lt, ":random", ":base_score"),
    (troop_set_slot, "$g_talk_troop", dplmc_slot_troop_mission_diplomacy, -1), #fail & not caught
  (try_end),
- 
+
  #results should really take into account lord's health in a week + slot_town_last_nearby_fire_time
  ]],
- 
+
 [anyone,"member_intelgathering_4", [
  (troop_set_slot, "$g_talk_troop", slot_troop_days_on_mission, 5),
  (troop_set_slot, "$g_talk_troop", slot_troop_current_mission, npc_mission_gather_intel),
@@ -2828,7 +2828,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
  (str_store_string, s21, ":string"),
 
  ], "Good. I should be ready to report in about five days. Farewell then, {s21}, for a little while.", "close_window",[]],
- 
+
 #SB : quest delegation fail by health
 [anyone,"member_delegate_quest", [
   (troop_is_wounded, "$g_talk_troop"),
@@ -2883,7 +2883,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
  ], "Look, {s5} - if you want me out of your hair for a bit, just say the word and I'll gladly depart. But don't expect me to be doing you any favours while I'm gone.", "close_window",[]],
 
 [anyone,"member_delegate_quest", [
-  
+
 ], "Very well {s5}, what will you have me do?", "member_delegate_quest_list",[
   (store_conversation_agent, "$g_talk_agent"),
   (try_begin),
@@ -3004,7 +3004,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
     (gt, ":target", 0),
     (str_store_faction_name, s20, ":target"),
   (try_end),
-  
+
   #numerics (probably)
   (quest_get_slot, reg10, "$random_merchant_quest_no", 10),
   (quest_get_slot, reg11, "$random_merchant_quest_no", 11),
@@ -3024,7 +3024,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
   (quest_get_slot, reg27, "$random_merchant_quest_no", 27),
   (quest_get_slot, reg28, "$random_merchant_quest_no", 28),
 
- ], 
+ ],
 "target center: {s10}\
  target troop: {s11}\
  target faction: {s12}^\
@@ -3061,7 +3061,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
   (assign, "$diplomacy_var2", 0),
 ]],
 
-[anyone|plyr, "member_delegate_quest_select", [], 
+[anyone|plyr, "member_delegate_quest_select", [],
 "On second though, I better do this one myself.", "member_delegate_quest", []],
 
 #calculate destination - usually target party takes x days
@@ -3077,7 +3077,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
   (try_end),
   (party_is_active, ":target"),
   (str_store_party_name, s10, ":target"),
-  
+
   (store_skill_level, ":speed", "$g_talk_troop", "skl_pathfinding"),
   (val_add, ":speed", 45), #45 to 60
   (store_distance_to_party_from_party, ":distance", "p_main_party", ":target"),
@@ -3086,13 +3086,13 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
   (store_div, reg10, ":distance", ":speed"),
   (val_max, reg10, 2), #base time to "complete"
   # (assign, reg11, ":distance"), #base time to "complete"
-], 
+],
 "Very well. I will set forth for {s10}. I should be back in approximately {reg10} days but may need a few extra days to complete the mission satisfactorily.", "member_delegate_quest_inventory", [
   (troop_clear_inventory, "trp_temp_troop"),
   (party_clear, "p_temp_party"),
 ]],
 #fallback
-[anyone, "member_delegate_quest_destination", [], 
+[anyone, "member_delegate_quest_destination", [],
 "I am actually lost on where I need to go for this. Do you happen to have a map of the area per chance?", "redo_member_quest", []],
 
 #check for quest items: qst_deliver_wine, qst_deliver_grain
@@ -3135,13 +3135,13 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
 ],
 [anyone|auto_proceed, "member_delegate_quest_inventory", [], "{!}.", "member_delegate_quest_soldiers", []],
 
-[anyone|plyr, "member_delegate_quest_ask_for_items", [ 
+[anyone|plyr, "member_delegate_quest_ask_for_items", [
   (gt, "$diplomacy_var", 0),
   (store_item_kind_count, ":item_count", "$diplomacy_var"),
   (item_get_max_ammo, ":item_size", "$diplomacy_var"),
   ],
 "Of course, take care with these.", "member_delegate_quest_assess_for_items", [
-  
+
 ]],
 [anyone|plyr, "member_delegate_quest_ask_for_items", [ (gt, "$diplomacy_var", 0),],
 "You'll have to pick up some more along the way. I can't be bothered to gather more at the moment.", "member_delegate_quest_confirm", [
@@ -3166,7 +3166,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
   ],
   "Alright, let me gather the soldiers and I'll be on my way. I believe we need {reg10} {s10} for the quota.", "member_delegate_quest_ask_for_troops",
   [
-    
+
 
   ]
 ],
@@ -3180,7 +3180,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
 
 [anyone|plyr, "member_delegate_quest_confirm", [],
 "Good luck out there.", "do_member_quest", [
-  
+
 ]],
 [anyone|plyr, "member_delegate_quest_confirm", [],
 "No, I've reconsidered.", "redo_member_quest", []],
@@ -3192,7 +3192,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
 
 #this reviews all the quest slots
 [anyone, "do_member_quest", [
-  
+
 ], "I'll be on my way then.", "close_window", [
   (str_store_troop_name, s1, "$g_talk_troop"),
   (add_quest_note_from_sreg, "$random_merchant_quest_no", 6, "@You have assigned this task to {s1}", 1),
@@ -3205,7 +3205,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
   (try_for_range, ":slot_no", slot_troop_days_on_mission, slot_troop_mission_object + 1),
     (troop_set_slot, "$g_talk_troop", ":slot_no", 0),
   (try_end),
-  (troop_set_slot, "$g_talk_troop", dplmc_slot_troop_mission_diplomacy, 0), 
+  (troop_set_slot, "$g_talk_troop", dplmc_slot_troop_mission_diplomacy, 0),
   (troop_set_slot, "$g_talk_troop", dplmc_slot_troop_mission_diplomacy2, 0),
   (troop_set_slot, "$g_talk_troop", slot_troop_mission_object, 0), #quest
   (troop_set_slot, "$g_talk_troop", slot_troop_days_on_mission, 0), #distance
@@ -3213,7 +3213,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
   (assign, "$random_merchant_quest_no", -1),
   (assign, "$diplomacy_var", -1),
   (assign, "$diplomacy_var2", -1),
-  
+
 ], "How else may I be of service?", "do_member_trade", []],
 [anyone|auto_proceed, "start",
 [
@@ -3455,7 +3455,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
 (check_quest_active, "qst_collect_men"),
 (neg|check_quest_succeeded, "qst_collect_men"),
 
-(lt, ":total_party_size", 5),
+(lt, ":total_party_size", 15),
 
 (try_begin),
   (le, ":total_party_size", 1),
@@ -3489,7 +3489,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
 (check_quest_active, "qst_collect_men"),
 (neg|check_quest_succeeded, "qst_duel_for_lady"),
 (call_script, "script_party_count_members_with_full_health", "p_main_party"),
-(ge, reg0, 5), #player not included, minus 1 from requirement
+(ge, reg0, 15), #player not included, minus 1 from requirement
 
 (str_store_party_name, s9, "$current_town"),
 ],
@@ -3526,7 +3526,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
 "Well... My brother is home safe. I'm not sure what to do with him -- maybe pack him off to a university outside Calradia. That way, if he gets knocked on the head in a street brawl, no one can say it's my fault. But that's not your problem. Here's the rest of your reward. It was well-earned.", "merchant_quest_3b",
 [
 (call_script, "script_finish_quest", "qst_save_relative_of_merchant", 100),
-(troop_add_gold, "trp_player", 200),
+(troop_add_gold, "trp_player", 2000),
 ]],
 
 [anyone|plyr, "merchant_quest_3b", #was startup
@@ -4035,7 +4035,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
     (neg|troop_slot_ge, "$g_talk_troop", slot_troop_banner_scene_prop, banner_scene_props_begin),
     (store_sub, ":banner_offset", banners_end_offset, 1),
     (assign, ":end_loop", 150), #151 tries to not match the player/companions banner...not all will be used
-    (try_for_range, ":unused", 0, ":end_loop"), 
+    (try_for_range, ":unused", 0, ":end_loop"),
         (store_random_in_range, ":banner_id", 0, ":banner_offset"),
         (val_add, ":banner_id", banner_scene_props_begin),
         (assign, ":duplicate", 0),
@@ -4048,7 +4048,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
         (try_end),
         (neq, ":duplicate", 1), #No duplicate
         (assign, ":end_loop", 0), #Then break the loop, else try again
-        (troop_set_slot, "$g_talk_troop", slot_troop_banner_scene_prop, ":banner_id"), 
+        (troop_set_slot, "$g_talk_troop", slot_troop_banner_scene_prop, ":banner_id"),
     (try_end),
 (try_end),
 (troop_set_slot, "$g_talk_troop", slot_troop_occupation, slto_kingdom_hero),
@@ -4833,7 +4833,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
     (jump_to_menu, "mnu_rename_court"),
     (finish_mission),
     ]],
-    
+
    [anyone|plyr, "minister_rename_confirm",
     [
     (faction_slot_eq, "fac_player_supporters_faction", slot_faction_ai_state, sfai_feast),
@@ -4842,7 +4842,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
     #add the condition that at least one lord attends - we talk from the court so assume script_get_heroes_attached_to_center has been called
     (party_get_num_companion_stacks, ":num_stacks","p_temp_party"),
     (gt, ":num_stacks", 0),
-    
+
     ],
     "Very well -- let all the attendant lords and townsfolk know of our decision.", "minister_pretalk",
     [
@@ -4868,7 +4868,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
     ],
     "We had best start preparations for the feast.", "spouse_organize_feast",
     []],
-    
+
    [anyone|plyr, "minister_rename_confirm",
     [
     (neg|player_has_item, "itm_linen"),
@@ -5056,7 +5056,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
 [anyone, "dplmc_recruiter_enough_talk", [
       (party_get_num_companion_stacks, ":amount", "$g_encountered_party"),
       (le, ":amount", 1),   #the recruiter himself
-], "Well, it looks like my job here is done. Give the constable my regards.", "close_window", 
+], "Well, it looks like my job here is done. Give the constable my regards.", "close_window",
 [
   (remove_party, "$g_encountered_party"), #not sure how safe this is
   (assign, "$g_leave_encounter", 1),
@@ -7439,7 +7439,7 @@ Still I am sorry that I'll leave you soon. You must promise me, you'll come visi
 [anyone, "dplmc_constable_status_info", [
     (party_get_num_companion_stacks, ":num_stacks", "$diplomacy_var"),
     (eq, ":num_stacks", 0),
-  ], "We don't have any soldiers garrisoned there. Luckily the sight of our banner should scare any bandits away.", "dplmc_constable_status", 
+  ], "We don't have any soldiers garrisoned there. Luckily the sight of our banner should scare any bandits away.", "dplmc_constable_status",
   []],
 
 [anyone, "dplmc_constable_status_info",
@@ -7913,7 +7913,7 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
 [
   (ge, "$g_disable_condescending_comments", 4),
   (call_script, "script_dplmc_get_troop_standing_in_faction", "trp_player", "$players_kingdom"),
-  (ge, reg0, DPLMC_FACTION_STANDING_LEADER),  
+  (ge, reg0, DPLMC_FACTION_STANDING_LEADER),
 ],
 "I want to focus on the gender balance of our troops.", "dplmc_constable_gender_ratio",
 []],
@@ -8852,7 +8852,7 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
   (call_script, "script_game_get_money_text", ":debt"),
   (str_store_string, s6, s1),
 (else_try),
-  
+
   (str_store_string, s6, "@no outstanding amount"),
 (try_end),
 ], #SB : use money string
@@ -11413,7 +11413,7 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
   (else_try),
     (assign, reg10, 0),
   (try_end),
-  
+
   (try_begin),
     (lt, "$diplomacy_var", 2),
     (assign, reg12, 1),
@@ -13418,7 +13418,7 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
 []],
 
 [anyone|plyr, "minister_brief_employee_choose", [],
-  "Nevermind, I prioritize all my advisors equally.", "minister_brief_employee_chosen", 
+  "Nevermind, I prioritize all my advisors equally.", "minister_brief_employee_chosen",
   [(troop_set_slot, dplmc_employees_end, dplmc_slot_troop_affiliated, 0),]],
 [anyone|plyr, "minister_brief_employee_choose", [(gt, "$g_player_chamberlain", 0)],
   "I'll be meeting with the Chamberlain to organize internal affairs.", "minister_brief_employee_chosen",
@@ -15269,7 +15269,9 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
                ],
 "Well, {s21}, at last I've found you. I've been out spreading the word about your claim, and am now ready to rejoin the company.", "companion_rejoin_response", [
               (assign, "$npc_to_rejoin_party", 0),
-         (call_script, "script_change_player_right_to_rule", 3),
+##++START-VEXED++##
+         (call_script, "script_change_player_right_to_rule", 7),
+##++END-VEXED++##
          (troop_set_slot, "$g_talk_troop", slot_troop_kingsupport_state, 1),
 
          (try_begin),
@@ -15345,7 +15347,7 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
  # (call_script, "script_dplmc_store_troop_is_female_reg", ":prisoner", 4),
 
  # ],
-# "Well, {s21}, it seems somebody got to {s11} before I did, still, I enjoyed the time I had in {s12} even if I didn't manage to make contact with the {reg4?lady:lord}.", "companion_rejoin_response", 
+# "Well, {s21}, it seems somebody got to {s11} before I did, still, I enjoyed the time I had in {s12} even if I didn't manage to make contact with the {reg4?lady:lord}.", "companion_rejoin_response",
 # []],
 
 ##SB : dplmc_npc_mission_rescue_prisoner failed
@@ -15366,7 +15368,7 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
  (call_script, "script_dplmc_store_troop_is_female_reg", ":prisoner", 4),
 
  ],
-"Well, {s21}, I tried my best to rescue {s11} from {s12}, but they took {reg4?her:him} down with a stray shot and my men and I couldn't go back with the wardens on our trail. I don't think we'll be welcome there for a while, what with all the fires we started and all...", "companion_rejoin_response", 
+"Well, {s21}, I tried my best to rescue {s11} from {s12}, but they took {reg4?her:him} down with a stray shot and my men and I couldn't go back with the wardens on our trail. I don't think we'll be welcome there for a while, what with all the fires we started and all...", "companion_rejoin_response",
 [
   #faction stuff
   (troop_get_slot, ":town_with_contacts", "$map_talk_troop", slot_troop_town_with_contacts),
@@ -15376,13 +15378,13 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
   (val_add, ":player_alarm", 25),
   (val_min, ":player_alarm", 100),
   (faction_set_slot, ":cur_faction", slot_faction_player_alarm, ":player_alarm"),
-  
+
   #individual stuff
   (call_script, "script_change_troop_renown", "$map_talk_troop", -3),
   (troop_get_slot, ":prisoner", "$map_talk_troop", slot_troop_mission_object),
   (call_script, "script_troop_change_relation_with_troop", "$map_talk_troop", ":prisoner", -1),
   (troop_set_health, ":prisoner", 0),
-  
+
 ]],
 ##SB : dplmc_npc_mission_rescue_prisoner success
 [anyone, "event_triggered", [
@@ -15401,7 +15403,7 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
  (str_store_party_name, s12, ":town_with_contacts"),
 
  ],
-"Well, {s21}, it wasn't easy but I've managed to keep {s11} intact the whole way back. The guards at {s12} will be telling stories of our daring escape, but suffice it to say they had no idea what hit them.", "companion_rejoin_response", 
+"Well, {s21}, it wasn't easy but I've managed to keep {s11} intact the whole way back. The guards at {s12} will be telling stories of our daring escape, but suffice it to say they had no idea what hit them.", "companion_rejoin_response",
 [
 
   #reward
@@ -15424,7 +15426,7 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
   (call_script, "script_remove_troop_from_prison", ":prisoner"),
   (assign, "$do_not_cancel_quest", 0),
   (troop_set_slot, "$map_talk_troop", slot_troop_mission_object, 0),
-  
+
 ]],
 
 ##companion caught after rescue request
@@ -15454,7 +15456,7 @@ What kind of recruits do you want?", "dplmc_constable_recruit_select",
   (troop_set_slot, "$g_talk_troop", slot_troop_occupation, 0),
   (troop_set_slot, "$map_talk_troop", slot_troop_mission_object, 0),
   (assign, "$npc_to_rejoin_party", 0),
-  
+
   (call_script, "script_change_player_honor", -1),
   (call_script, "script_change_troop_renown", "trp_player", -5),
   (call_script, "script_change_troop_renown", "$g_talk_troop", -5),
@@ -16042,7 +16044,7 @@ Here, take this purse of {reg3} denars, as I promised. I hope we can travel toge
 # "Hello yourself.", "export_import", [
 # (set_player_troop, "$g_player_troop"),
 # (change_screen_view_character)]],
- 
+
 # [anyone|auto_proceed, "export_import", [(eq, "$g_talk_troop", "$g_player_troop")],
 # "Hello yourself.", "close_window", [
  # ]],
@@ -17307,7 +17309,7 @@ Such oaths to a usurper are of course invalid, and we can expect some of the {s0
 
       (party_force_add_members, "p_main_party", "$supported_pretender", 1),
       (troop_set_slot, "$supported_pretender", slot_troop_cur_center, 0),
-      
+
       (str_store_troop_name_link, s6, "$supported_pretender"),
       (display_message, "@{s6} has joined your party."),
 
@@ -18083,8 +18085,10 @@ Please accept my sincere thanks.", "lord_pretalk",[
 ##diplomacy start+ actually give gold to lord
 (call_script, "script_dplmc_distribute_gold_to_lord_and_holdings", reg4, "$g_talk_troop"),
 ##diplomacy end+
-(call_script, "script_change_player_relation_with_troop","$g_talk_troop", 2),
+##++START-VEXED++##
+(call_script, "script_change_player_relation_with_troop","$g_talk_troop", 10),
 (add_xp_as_reward, 100),
+##++END-VEXED++##
 (call_script, "script_end_quest", "qst_collect_debt")
 ]],
 
@@ -18291,7 +18295,9 @@ this purse as a token of my appreciation.", "lord_follow_spy_completed",
 ##diplomacy end+
 [(party_remove_prisoners, "p_main_party", "trp_spy", 1),
 (party_remove_prisoners, "p_main_party", "trp_spy_partner", 1),
-(call_script, "script_change_player_relation_with_troop","$g_talk_troop",4),
+##++START-VEXED++##
+(call_script, "script_change_player_relation_with_troop","$g_talk_troop",10),
+##++END-VEXED++##
 (call_script, "script_troop_add_gold", "trp_player", 2000),
 (add_xp_as_reward, 4000),
 (call_script, "script_end_quest", "qst_follow_spy")]],
@@ -18373,12 +18379,14 @@ Forget any reward I offered you. You've done nothing to earn it.", "lord_follow_
                    (check_quest_succeeded, "qst_bring_back_runaway_serfs")],
 "Splendid work, {playername}. All the serfs are back, properly cowed, and they're busy preparing for the harvest.\
 You certainly earned your reward. Here, take it, with my compliments.", "lord_generic_mission_completed",
-[(call_script, "script_change_player_relation_with_troop","$g_talk_troop", 2),
+##++START-VEXED++##
+[(call_script, "script_change_player_relation_with_troop","$g_talk_troop", 10),
 (call_script, "script_troop_add_gold", "trp_player", 300),
 (add_xp_as_reward, 300),
 (call_script, "script_end_quest", "qst_bring_back_runaway_serfs"),
 (call_script, "script_objectionable_action", tmt_humanitarian, "str_round_up_serfs"),
 ]],
+##++END-VEXED++##
 
 [anyone,"lord_start", [(store_partner_quest,":lords_quest"),
                    (eq,":lords_quest","qst_bring_back_runaway_serfs"),
@@ -18396,7 +18404,10 @@ You certainly earned your reward. Here, take it, with my compliments.", "lord_ge
 (call_script, "script_end_quest", "qst_bring_back_runaway_serfs")]],
 [anyone,"lord_bring_back_runaway_serfs_failed_1b", [],
 "Hah, now you reveal your true colours, traitor! Your words match your actions all too well. I should never have trusted you.", "close_window",
-[(call_script, "script_change_player_relation_with_troop","$g_talk_troop",-10),
+[
+##++START-VEXED++##
+(call_script, "script_change_player_relation_with_troop","$g_talk_troop",-5),
+##++END-VEXED++##
 (quest_get_slot, ":home_village", "qst_bring_back_runaway_serfs", slot_quest_object_center),
 (call_script, "script_change_player_relation_with_center",":home_village",6),
 (call_script, "script_end_quest", "qst_bring_back_runaway_serfs"),
@@ -18477,7 +18488,9 @@ Everyone said that you were a capable warrior, but appearently, they were wrong.
                    ],
 "Ah, {playername}. My quartermaster has informed me of your delivery, {reg13} heads of cattle, as I requested. I'm impressed.", "lord_deliver_cattle_to_army_thank",
 [
-(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 2),
+##++START-VEXED++##
+(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 10),
+##++END-VEXED++##
 (quest_get_slot, ":quest_target_amount", "qst_deliver_cattle_to_army", slot_quest_target_amount),
 #TODO: Change reward
 (store_mul, ":reward", ":quest_target_amount", 100),
@@ -18510,7 +18523,7 @@ Everyone said that you were a capable warrior, but appearently, they were wrong.
 "You make a good scout, {playername}. My runner just brought me your reports of the mission to {s13}, {s14} and {s15}. Well done.", "lord_scout_waypoints_thank",
 [
 #TODO: Change reward
-(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 1),
+(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 5),
 #     (call_script, "script_troop_add_gold", "trp_player", 100),
 (add_xp_as_reward, 100),
 (call_script, "script_end_quest", "qst_scout_waypoints"),
@@ -18711,7 +18724,7 @@ I want you to go to {s13}, {s14} and {s15} and report back whatever you find.", 
                      (gt, reg0, 0),
                      (assign, ":cur_debt", -1),
                    (try_end),
-                   
+
                    (gt, ":cur_debt", 0),
                    (assign, reg1, ":cur_debt")],
 "I think you owe me {reg1} denars, {playername}. Do you intend to pay your debt anytime soon?", "lord_pay_debt_2",[]],
@@ -23105,7 +23118,9 @@ I'll send some men to take him to our prison with due haste.", "lord_pretalk", [
 "Certainly, {playername}. {reg3?She:He} is a bright {reg3?girl:fellow}, you're a lucky {man/woman} to have such worthy companions.", "lord_pretalk",
 [(quest_get_slot, ":quest_target_troop", "qst_lend_companion", slot_quest_target_troop),
 (party_add_members, "p_main_party", ":quest_target_troop", 1),
-(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 3),
+##++START-VEXED++##
+(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 10),
+##++END-VEXED++##
 (add_xp_as_reward, 100),
 (call_script, "script_end_quest", "qst_lend_companion"),
 (str_store_troop_name,s14,":quest_target_troop"),
@@ -23355,8 +23370,10 @@ Well, well, well! It was good of you to bring me this, {playername}. Take my sea
 (call_script, "script_end_quest", "qst_deliver_message"),
 (quest_get_slot, ":quest_giver", "qst_deliver_message", slot_quest_giver_troop),
 (str_store_troop_name,s9,":quest_giver"),
-(call_script, "script_change_player_relation_with_troop", ":quest_giver", 1),
-(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 1),
+##++START-VEXED++##
+(call_script, "script_change_player_relation_with_troop", ":quest_giver", 10),
+(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 10),
+##++END-VEXED++##
 ]],
 
 [anyone|plyr,"lord_talk",[(check_quest_active,"qst_deliver_message_to_enemy_lord"),
@@ -23373,8 +23390,10 @@ Hmmm. It was good of you to bring me this, {playername}. Take my seal as proof t
 with my thanks.", "close_window",[
 (call_script, "script_end_quest", "qst_deliver_message_to_enemy_lord"),
 (quest_get_slot, ":quest_giver", "qst_deliver_message_to_enemy_lord", slot_quest_giver_troop),
-(call_script, "script_change_player_relation_with_troop", ":quest_giver", 1),
-(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 1),
+##++START-VEXED++##
+(call_script, "script_change_player_relation_with_troop", ":quest_giver", 10),
+(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 10),
+##++END-VEXED++##
 (assign, "$g_leave_encounter", 1),
 ]],
 
@@ -23638,7 +23657,10 @@ and perhaps I shall be able to repay the debt I owe you.", "lord_rescue_by_repla
 
 (call_script, "script_player_join_faction", "$g_talk_troop_faction"),
 (assign, "$player_has_homage", 1),
-(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 3),
+##++START-VEXED++##
+(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 10),
+##++END-VEXED++##
+
 ]],
 
 
@@ -23647,7 +23669,9 @@ and perhaps I shall be able to repay the debt I owe you.", "lord_rescue_by_repla
 [
 (assign, "$g_leave_encounter", 1),
 #TODO: Add relation drop. $players_oath_renounced_begin_time can also be reset to current time for worse conditions in the next conversation.
-(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", -5),
+##++START-VEXED++##
+(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", -3),
+##++END-VEXED++##
 ]],
 
 #SB : qst_rescue_prisoner request, directly through town lord
@@ -23664,7 +23688,7 @@ and perhaps I shall be able to repay the debt I owe you.", "lord_rescue_by_repla
   (str_store_party_name, s12, ":center"),
 ],
 "I wish to offer ransom for {s11} held captive in {s12}","lord_ask_about_ransom",
-[ 
+[
   (assign, "$g_convince_quest", "qst_rescue_prisoner"),
 ]],
 
@@ -23677,7 +23701,7 @@ and perhaps I shall be able to repay the debt I owe you.", "lord_rescue_by_repla
   (str_store_troop_name, s12, ":giver_troop"),
   (call_script, "script_troop_get_family_relation_to_troop", ":giver_troop", ":prisoner"),
   (call_script, "script_dplmc_store_troop_is_female_reg", ":prisoner", 3),
-  
+
 ]],
 
 [anyone|plyr,"lord_ask_to_ransom_prisoner", [],  "Perhaps I can talk you into it...", "convince_begin",[]],
@@ -23702,12 +23726,12 @@ and perhaps I shall be able to repay the debt I owe you.", "lord_rescue_by_repla
   (quest_get_slot, ":target_amount", "qst_rescue_prisoner", slot_quest_target_amount),
   (call_script, "script_game_get_money_text", ":target_amount"),
   (assign, "$temp", ":target_amount"), #cache
-  
-  
+
+
 ]],
 
 #player has gold and pays in full
-[anyone|plyr,"lord_ask_to_ransom_prisoner_convinced", [(store_troop_gold, ":cur_gold", "trp_player"), (ge, ":cur_gold", "$temp")], 
+[anyone|plyr,"lord_ask_to_ransom_prisoner_convinced", [(store_troop_gold, ":cur_gold", "trp_player"), (ge, ":cur_gold", "$temp")],
     "Of course, here you are.", "lord_ask_to_ransom_prisoner_released",[
 
 ]],
@@ -23740,13 +23764,13 @@ and perhaps I shall be able to repay the debt I owe you.", "lord_rescue_by_repla
         # (store_troop_gold, ":cur_gold", "trp_player"),
         (quest_get_slot, ":cur_amount", "qst_rescue_prisoner", slot_quest_target_state),
         (lt, ":cur_amount", "$temp"),
-], 
+],
     "Why, I had no idea {s10} had such poor friends! With that paltry amount you'll be able to ransom a few fingers, just enough for a pauper's burial for {s12} to cry over.", "lord_ask_to_ransom_prisoner_portion_payment",
   []
 ],
 
 
-[anyone|plyr,"lord_ask_to_ransom_prisoner_portion_payment", [(store_troop_gold, ":cur_gold", "trp_player"), (ge, ":cur_gold", "$temp")], 
+[anyone|plyr,"lord_ask_to_ransom_prisoner_portion_payment", [(store_troop_gold, ":cur_gold", "trp_player"), (ge, ":cur_gold", "$temp")],
     "I will pay the remainder from my own coffers...", "lord_ask_to_ransom_prisoner_released",
   [
   ]
@@ -23757,27 +23781,27 @@ and perhaps I shall be able to repay the debt I owe you.", "lord_rescue_by_repla
     (val_div, ":cur_wealth", 2), #don't take all wealth
     (quest_get_slot, ":cur_amount", "qst_rescue_prisoner", slot_quest_target_state),
     (val_add, ":cur_amount", ":cur_wealth"),
-    (ge, ":cur_amount", "$temp")], 
+    (ge, ":cur_amount", "$temp")],
     "Surely {s10} can offer some of {reg4?her:his} own wealth?", "lord_ask_to_ransom_prisoner_portion_lord",
   [
     (quest_get_slot, ":prisoner", "qst_rescue_prisoner", slot_quest_target_troop),
     (call_script, "script_change_player_relation_with_troop", ":prisoner", -1),
   ]
 ],
-[anyone|plyr,"lord_ask_to_ransom_prisoner_portion_payment", [], 
+[anyone|plyr,"lord_ask_to_ransom_prisoner_portion_payment", [],
     "Nevermind, I must think this over...", "lord_ask_to_ransom_prisoner_not_paid",
   [
   ]
 ],
 
-# [anyone,"lord_ask_to_ransom_prisoner_portion_player", [], 
+# [anyone,"lord_ask_to_ransom_prisoner_portion_player", [],
     # "Good, good... ", "lord_ask_to_ransom_prisoner_released",
   # [
-  
+
   # ]
 # ],
 
-[anyone,"lord_ask_to_ransom_prisoner_portion_lord", [], 
+[anyone,"lord_ask_to_ransom_prisoner_portion_lord", [],
     "Well, I didn't expect to squeeze much money from {s10} anyway. {reg4?Her:His} arms and horse barely fetched any money at the auction, but it will have to do -- I expect that {s10} will be your problem now.", "lord_ask_to_ransom_prisoner_released",
   [
     #subtract the troop's own wealth
@@ -23791,7 +23815,7 @@ and perhaps I shall be able to repay the debt I owe you.", "lord_rescue_by_repla
 ],
 
 #actual release
-[anyone,"lord_ask_to_ransom_prisoner_released", [], 
+[anyone,"lord_ask_to_ransom_prisoner_released", [],
     "Excellent choice, {playername}. I will have {s10} released soon enough.", "close_window",
   [
     (quest_get_slot, ":prisoner", "qst_rescue_prisoner", slot_quest_target_troop),
@@ -23813,7 +23837,7 @@ and perhaps I shall be able to repay the debt I owe you.", "lord_rescue_by_repla
       (call_script, "script_change_player_honor", 1), #this is to compensate for missing freed_lord_answer rewards
       (assign, "$g_leave_encounter", 1),
     (try_end),
-    
+
     # (assign, "$g_leave_encounter", 1),
   ]
 ],
@@ -25153,7 +25177,7 @@ I will use this to make amends to those you have wronged, and I will let it be k
   (val_add, ":cur_count", 1), #off by one for ge
   (quest_slot_ge, "qst_capture_prisoners", slot_quest_target_amount, ":cur_count"),
   # (quest_get_slot, ":cur_amount", "qst_capture_prisoners", slot_quest_target_amount),
-  
+
   (store_troop_count_prisoners, ":prisoner_count", ":prisoner", "$g_encountered_party"),
   (try_begin),
     (is_between, "$g_encountered_party", walled_centers_begin, walled_centers_end),
@@ -25164,7 +25188,7 @@ I will use this to make amends to those you have wronged, and I will let it be k
   (str_store_troop_name_plural, s1, ":prisoner"),
  ],
  "I need some {s1} as prisoner.", "lord_talk_ask_about_capture_prisoners", []],
- 
+
 [anyone, "lord_talk_ask_about_capture_prisoners",
  [
   (quest_get_slot, ":prisoner", "qst_capture_prisoners", slot_quest_target_troop),
@@ -25192,7 +25216,7 @@ I will use this to make amends to those you have wronged, and I will let it be k
     (str_store_troop_name_by_count, s11, "$g_prisoner_recruit_troop_id", reg11),
   ],
  ],
- 
+
 [anyone|plyr, "lord_talk_ask_about_capture_prisoners_count", [], "Never mind.", "lord_talk_ask_something_again", [
   #clear globals
   (assign, "$g_prisoner_recruit_troop_id", 0),
@@ -25268,7 +25292,7 @@ I will use this to make amends to those you have wronged, and I will let it be k
  #store these things for later
  (quest_get_slot, "$lord_selected", "qst_rescue_prisoner", slot_quest_target_troop),
  (call_script, "script_troop_get_family_relation_to_troop", "$lord_selected", "$g_talk_troop"),
- 
+
  (assign, "$diplomacy_var", reg0),
  (assign, "$diplomacy_var2", reg1),
 
@@ -25281,11 +25305,11 @@ I will use this to make amends to those you have wronged, and I will let it be k
   ],
  "While I am concerned about {s1}'s wellbeing, I do not consider you worthy of the task {s2} set forth as you have yet to clear the personal debt you have accrued to me.", "lord_talk_ask_something_again", [
    (str_store_troop_name, s1, "$lord_selected"),
-   (quest_get_slot, ":quest_giver", "qst_rescue_prisoner", slot_quest_giver_troop), 
+   (quest_get_slot, ":quest_giver", "qst_rescue_prisoner", slot_quest_giver_troop),
    (str_store_troop_name, s2, ":quest_giver"),
   ],
  ],
- 
+
 #denied due to bad credit score
 [anyone, "lord_talk_ask_about_ransom",
  [(troop_get_slot, ":cur_debt", "$g_talk_troop", slot_troop_player_debt),
@@ -25325,7 +25349,7 @@ I will use this to make amends to those you have wronged, and I will let it be k
     (str_store_faction_name, s2, ":faction_no"),
    ],
  ],
- 
+
 #really hate eachother
 [anyone, "lord_talk_ask_about_ransom",
  [
@@ -25358,7 +25382,7 @@ I will use this to make amends to those you have wronged, and I will let it be k
     (call_script, "script_change_troop_intrigue_impatience", "$g_talk_troop", 50),
    ],
  ],
- 
+
 #already raised sufficient funds
 #dislike one another
 [anyone, "lord_talk_ask_about_ransom",
@@ -25369,7 +25393,7 @@ I will use this to make amends to those you have wronged, and I will let it be k
  "I believe that, between {s12} and yourself, enough funds have been secured for ransoming {s11}. I can give you nothing more except my blessings.", "lord_pretalk", [
    ],
  ],
- 
+
 #otherwise we calculate money
 [anyone, "lord_talk_ask_about_ransom",
  [],
@@ -25385,21 +25409,21 @@ I will use this to make amends to those you have wronged, and I will let it be k
     # (assign, ":amount", reg0),
    ],
  ],
- 
+
 #if for some reason this lord is stingy or bankrupt
 [anyone, "lord_calculated_ransom",
  [(neg|troop_slot_ge, "$g_talk_troop", slot_troop_player_debt, 0)],
- "However, my coffers are severely depleted at the moment -- {s1} will have to wait a while longer.", "lord_pretalk", 
+ "However, my coffers are severely depleted at the moment -- {s1} will have to wait a while longer.", "lord_pretalk",
  [(call_script, "script_change_troop_intrigue_impatience", "$g_talk_troop", 15),]],
 #wait for at least 1x24 hour for this to go down or wealth to be refreshed
 
 [anyone, "lord_calculated_ransom",
  [],
- "Will {s1} suffice?", "lord_ask_calculated_ransom", 
+ "Will {s1} suffice?", "lord_ask_calculated_ransom",
  [(troop_get_slot, ":ransom", "$g_talk_troop", slot_troop_player_debt),
   (call_script, "script_game_get_money_text", ":ransom"),
  ]],
- 
+
 #get the money
 [anyone|plyr, "lord_ask_calculated_ransom",
 [], "For sure.","lord_lend_ransom_accept",[
@@ -27423,7 +27447,7 @@ I will use this to make amends to those you have wronged, and I will let it be k
                             (ge, "$g_encountered_party_relation", 0),], "I offer you one chance to surrender or die.", "lord_ultimatum_surrender",[
                             #SB : add animation
                             (call_script, "script_encounter_agent_draw_weapon"),
-                            
+
                             ]],
 
 #Neutral attack on lord
@@ -28523,7 +28547,9 @@ You are free, {playername}.", "lord_ask_leave_service_end",
   (assign, reg5, ":reward"),
   (call_script, "script_troop_add_gold", "trp_player", ":reward"),
   (add_xp_as_reward, 2500),
-  (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 4),
+##++START-VEXED++##
+  (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 10),
+##++END-VEXED++##
   (call_script, "script_end_quest", "qst_capture_enemy_hero"),
 ]],
 
@@ -28576,7 +28602,7 @@ You are free, {playername}.", "lord_ask_leave_service_end",
                                                                                          (else_try),
                                                                                            (assign, reg13, tf_male),
                                                                                          (try_end),
-                                                                                         
+
                                                                                          ]],
 
   [anyone,"lord_raise_troops_thank", [], #SB : gender string
@@ -28663,7 +28689,7 @@ You are free, {playername}.", "lord_ask_leave_service_end",
     (call_script, "script_dplmc_distribute_gold_to_lord_and_holdings", reg20, "$g_talk_troop"),
     ##diplomacy end+
     (quest_set_slot, "qst_collect_taxes", slot_quest_gold_reward, 0),
-    (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 2),
+    (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 7),
     (call_script, "script_end_quest", "qst_collect_taxes"),
     ]],
 
@@ -28712,18 +28738,18 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
                                          ],
    "I found {s4} hiding at {s3}...", "lord_hunt_down_fugitive_prompt",
    []],
-   
+
   [anyone,"lord_hunt_down_fugitive_prompt", [],
    "Good. I trust you followed my instructions to the letter?", "lord_hunt_down_fugitive_status",
    []],
-   
+
     #SB : branching conditions on slot_quest_current_state: succeed by riding him down, succeed by capturing, succeed by persuading/burning village (should already trigger from the encounter)
     #fail by losing, fail by capturing but losing prisoner, conclude by somebody else raiding the village (bandits don't count)
   [anyone|plyr,"lord_hunt_down_fugitive_status", [(check_quest_succeeded, "qst_hunt_down_fugitive"),
   (quest_slot_eq, "qst_hunt_down_fugitive", slot_quest_current_state, 1),],
    "Of course. I gave him his punishment.", "lord_hunt_down_fugitive_success",
    []],
-   
+
   [anyone|plyr,"lord_hunt_down_fugitive_status", [
                                          (check_quest_succeeded, "qst_hunt_down_fugitive"),
                                          (quest_slot_eq, "qst_hunt_down_fugitive", slot_quest_current_state, 2),
@@ -28731,15 +28757,15 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
                                          (gt, ":count", 0)],
    "I apprehended {s4} and brought him here to see justice done.", "lord_hunt_down_fugitive_brought_back",
    [
-    (party_remove_prisoners, "p_main_party", "trp_fugitive", 1), 
+    (party_remove_prisoners, "p_main_party", "trp_fugitive", 1),
    ]],
-   
+
   [anyone|plyr,"lord_hunt_down_fugitive_status", [
                                          (check_quest_succeeded, "qst_hunt_down_fugitive"),
                                          (quest_slot_eq, "qst_hunt_down_fugitive", slot_quest_current_state, 2),],
    "I caught {s4} but he slipped his bonds along the way...", "lord_hunt_down_fugitive_not_brought_back",
    [
-    # (party_remove_prisoners, "p_main_party", "trp_fugitive", 1), 
+    # (party_remove_prisoners, "p_main_party", "trp_fugitive", 1),
    ]],
    #SB : succeed when you bring the whole house down
   [anyone|plyr,"lord_hunt_down_fugitive_status", [
@@ -28751,7 +28777,7 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
                                         ],
    "I found the fugitive at {s3} and burnt down that nest of corruption.", "lord_hunt_down_fugitive_burnt_village",
    []],
-   
+
    #SB : concluded when other parties attacked the village, or when the player feels like being dishonest
   [anyone|plyr,"lord_hunt_down_fugitive_status", [(quest_slot_eq, "qst_hunt_down_fugitive", slot_quest_current_state, 3),],
    "I'm afraid somebody else torched down {s3}. I was unable to trace his family.", "lord_hunt_down_fugitive_concluded",
@@ -28792,7 +28818,7 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
    [
      (add_xp_as_reward, 450), #excess reward
     ]],
-    
+
   [anyone,"lord_hunt_down_fugitive_burnt_village", [
     (quest_get_slot, ":quest_target_center", "qst_hunt_down_fugitive", slot_quest_target_center),
     (party_get_slot, ":town_lord", ":quest_target_center", slot_town_lord),
@@ -28827,13 +28853,13 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
     ]],
   #player might burn down own village, idk
 
-    
+
   [anyone,"lord_hunt_down_fugitive_burnt_village", [],
    "But why?! I suppose you did your job, although your methods are questionable at best...", "lord_hunt_down_fugitive_success_2",
    [
      (add_xp_as_reward, 150), #half reward
     ]],
-    
+
   [anyone,"lord_hunt_down_fugitive_not_brought_back", [
     (assign, reg10, 0),
     (assign, reg11, 0),
@@ -28852,7 +28878,7 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
     # (call_script, "script_change_player_honor", -1),
     (call_script, "script_end_quest", "qst_hunt_down_fugitive"),
     ]],
-    
+
   [anyone,"lord_hunt_down_fugitive_brought_back", [
     (troop_get_slot, ":lrep", "$g_talk_troop", slot_lord_reputation_type),
     (this_or_next|eq, ":lrep", lrep_upstanding),
@@ -28862,7 +28888,7 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
    [
      (add_xp_as_reward, 600),
     ]],
-    
+
   [anyone,"lord_hunt_down_fugitive_brought_back", [
     (troop_get_slot, ":lrep", "$g_talk_troop", slot_lord_reputation_type),
     (this_or_next|eq, ":lrep", lrep_debauched),
@@ -28879,9 +28905,9 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
    [
      (add_xp_as_reward, 450), #150% reward
     ]],
-    
 
-    
+
+
   [anyone,"lord_hunt_down_fugitive_success", [],
    "And we'll all be a lot better off without him! Thank you, {playername},\
  for removing this long-festering thorn from my side. 'Tis good to know you can be trusted to handle things\
@@ -28902,7 +28928,9 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
 		# (call_script, "script_lord_comment_to_s43", "$g_talk_troop", "str_lord_insult_default"),
 
 		(call_script, "script_troop_add_gold", "trp_player", 300),
-		(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 1),
+##++START-VEXED++##
+		(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 8),
+##++END-VEXED++##
 		(call_script, "script_end_quest", "qst_hunt_down_fugitive"),
 		]],
 
@@ -28913,7 +28941,9 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
  		# (call_script, "script_lord_comment_to_s43", "$g_talk_troop", "str_lord_insult_default"),
 
 
-       (call_script, "script_change_player_honor", 3),
+##++START-VEXED++##
+       (call_script, "script_change_player_honor", 6),
+##++END-VEXED++##
        (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 1),
        (call_script, "script_end_quest", "qst_hunt_down_fugitive"),
        ]],
@@ -28927,7 +28957,7 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
     (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", -1),
     (call_script, "script_end_quest", "qst_hunt_down_fugitive"),
     ]],
-    
+
   [anyone,"lord_hunt_down_fugitive_concluded", [],
    "Well, I suppose the fates intervened to take that revenge from me. Although I would have liked to see that {s43}'s corpse myself, I'll have to take your word for it.", "lord_pretalk",
    [
@@ -29807,7 +29837,7 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
   "Of course. If my missives to {s14} were not persuasive enough, there is always the merit of amassing more gold. If that fails, I'm sure you could convince the dungeon-keeper or petition a ransom-broker on our behalf. I'm sure other members of our family would be willing to contribute to {s13}'s ransom fund in that case.", "lord_mission_rescue_other_ideas",[
     (quest_get_slot, ":prisoner", "qst_rescue_prisoner", slot_quest_target_troop),
     (str_store_troop_name, s13, ":prisoner"),
-    
+
     (quest_get_slot, ":center_no", "qst_rescue_prisoner", slot_quest_target_center),
     (party_get_slot, ":town_ruler", ":center_no", slot_town_lord),
     (try_begin),
@@ -29818,7 +29848,7 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
     (try_end),
     (call_script, "script_lend_money_for_ransom", "$g_talk_troop", 2000), #add initial funds
   ]],
-  
+
   #SB : describe attributes to increase chances
   [anyone,"lord_mission_rescue_prisoner_method_connection", [],
   "Well said, {playername}. If you or your companions know the layout of {s24}, then a distraction can certainly be arranged and during the ensuing chaos the locks can be cut with the proper tools. However, whomever we send to rescue {s13} must be fleet of foot and have an agile mind to cajole or hire locals to effect the rescue.", "lord_mission_rescue_other_ideas",[]],
@@ -29832,7 +29862,7 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
   [anyone,"lord_mission_rescue_prisoner_method_siege", [],
   "Well, that is certainly the most direct approach.", "lord_mission_rescue_other_ideas",[]],
 
-  
+
   [anyone,"lord_tell_mission", [(eq,"$random_quest_no","qst_deliver_message"),
   ##diplomacy start+ fix pronoun
   (quest_get_slot, ":quest_target_troop", "$random_quest_no", slot_quest_target_troop),
@@ -30188,7 +30218,9 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
     (store_mul, ":amount", reg0, ":num_recruits"),
     (call_script, "script_troop_add_gold", "trp_player", ":amount"),
     (party_add_members, "p_main_party", ":recruit_troop", ":num_recruits"),
-    (call_script, "script_change_player_relation_with_troop","$g_talk_troop",1),
+##++START-VEXED++##
+    (call_script, "script_change_player_relation_with_troop","$g_talk_troop",7),
+##++END-VEXED++##
     (assign, "$g_leave_encounter",1),
    ]],
 
@@ -30270,7 +30302,7 @@ Hand over my {reg19} denars, if you please, and end our business together.", "lo
  Well, good hunting to you.", "close_window",
    [(call_script, "script_start_quest", "$random_quest_no", "$g_talk_troop"),
     (call_script, "script_change_player_relation_with_troop","$g_talk_troop",1),
-    
+
     # #SB : add the troop to the village itself
     # (quest_get_slot, ":quest_target_center", "$random_quest_no", slot_quest_target_center),
     # (party_add_members, ":quest_target_center", "trp_fugitive", 1),
@@ -30788,7 +30820,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
  Your messenger must be someone trustworthy. If you sent the letter with a simple peasant, someone expendable,\
  {s13} might suspect a plot. {reg3?She:He} may have the wits of a snail, but even a snail can see the obvious.\
  Give the letter to someone of rank. One of your {s9}, perhaps.", "lord_tell_mission_incriminate_commander_8",[
- 
+
     #SB : gender of sacrificed messenger
     (call_script, "script_dplmc_store_troop_is_female_reg", "$incriminate_quest_sacrificed_troop", 4),
  ]],#changed "He" to "{reg3?She:He}"
@@ -30813,7 +30845,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
        (quest_get_slot, ":quest_object_troop", "qst_incriminate_loyal_commander", slot_quest_object_troop),
        (quest_get_slot, ":quest_target_center", "qst_incriminate_loyal_commander", slot_quest_target_center),
        (call_script, "script_troop_add_gold", "trp_player", 300),
-       (call_script, "script_change_player_relation_with_troop","$g_talk_troop",2),
+##++START-VEXED++##
+       (call_script, "script_change_player_relation_with_troop","$g_talk_troop", 7),
+##++END-VEXED++##
        (str_store_troop_name_link, s11,"$g_talk_troop"),
        (str_store_troop_name_link, s13,":quest_target_troop"),
        (str_store_party_name_link, s14,":quest_target_center"),
@@ -31082,7 +31116,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (this_or_next|is_between, "$g_talk_troop", heroes_begin, heroes_end),
     ##diplomacy end+
     (troop_slot_eq, "trp_player", slot_troop_spouse, "$g_talk_troop"),
-    
+
     (assign, ":spouse_party_exists", 0),
     (try_for_parties, ":spouse_party"), #SB : additional checks
       (eq, ":spouse_party_exists", 0),
@@ -31097,7 +31131,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     ],
     ##diplomacy start+ use relation string
    "What is it, {s0}? I still need to finish my job.", "close_window",[
-   
+
     (assign, "$g_leave_encounter", 1),
  ]],
 
@@ -31131,7 +31165,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone|plyr,"spouse_talk", [
   (check_quest_active, "qst_offer_gift"),
     (quest_slot_eq, "qst_offer_gift", slot_quest_giver_troop, "$g_talk_troop"),
-  
+
     (quest_get_slot, ":target_troop", "qst_offer_gift", slot_quest_target_troop),
   (str_store_troop_name, s4, ":target_troop"),
   (player_has_item, "itm_furs"),
@@ -31292,24 +31326,24 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 
   [
     anyone,
-    
+
     "spouse_join",
-    
+
     [
       (call_script, "script_dplmc_print_player_spouse_says_my_husband_wife_to_s0", "$g_talk_troop", 0),
-      
+
       (troop_get_slot, ":reputation", "$g_talk_troop", slot_lord_reputation_type),
       (this_or_next|eq, ":reputation", lrep_adventurous),
       (neg|is_between, ":reputation", lrep_conventional, lrep_moralist + 1), #SB : if slot not set or promoted companion
     ],
-    
-    "Really?  You'd ask me to ride with your band like the old stories? To be with you in the field and watch your back in the wars?  I've dreamed about this since I was a little girl!  To see those dreams realized in this modern world would be so amazing! I shall make ready at once!  Thank you so much, {s0}!", 
 
-    "close_window", 
-    
+    "Really?  You'd ask me to ride with your band like the old stories? To be with you in the field and watch your back in the wars?  I've dreamed about this since I was a little girl!  To see those dreams realized in this modern world would be so amazing! I shall make ready at once!  Thank you so much, {s0}!",
+
+    "close_window",
+
     [
       (call_script, "script_recruit_troop_as_companion", "$g_talk_troop"),
-      
+
       (assign, "$g_leave_encounter", 1),
       (try_begin),
         (troop_get_slot, ":encountered_town", "$g_talk_troop", slot_troop_first_encountered),
@@ -31322,13 +31356,13 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
         # (troop_add_item, "$g_talk_troop","itm_female_hood", imod_lordly),
         (troop_add_item, "$g_talk_troop","itm_hunting_bow", imod_masterwork),
         (troop_add_item, "$g_talk_troop","itm_arrows", imod_large_bag),
-        
+
         # ..and some proficiencies
         (troop_raise_attribute, "$g_talk_troop", ca_strength, 2),
         (troop_raise_attribute, "$g_talk_troop", ca_agility, 6),
         (troop_raise_attribute, "$g_talk_troop", ca_intelligence, 4),
         (troop_raise_attribute, "$g_talk_troop", ca_charisma, 3),
-        
+
         (troop_raise_skill, "$g_talk_troop", skl_power_draw, 2),
         (troop_raise_skill, "$g_talk_troop", skl_weapon_master, 1),
         (troop_raise_skill, "$g_talk_troop", skl_athletics, 3),
@@ -31338,10 +31372,10 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
         (troop_raise_skill, "$g_talk_troop", skl_first_aid, 2),
         (troop_raise_skill, "$g_talk_troop", skl_wound_treatment, 2),
         (troop_raise_skill, "$g_talk_troop", skl_leadership, 2),
-        
+
         (troop_raise_proficiency, "$g_talk_troop", wpt_archery, 20),
         # (troop_add_proficiency_points, "$g_talk_troop", 30),
-        
+
         (add_xp_to_troop, 500, "$g_talk_troop"),
         (troop_equip_items, "$g_talk_troop"),
       (try_end),
@@ -31356,19 +31390,19 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 
   [
     anyone,
-    
+
     "spouse_join",
-    
+
     [
       (call_script, "script_dplmc_print_player_spouse_says_my_husband_wife_to_s0", "$g_talk_troop", 0),
-      
+
       (troop_slot_eq, "$g_talk_troop", slot_lord_reputation_type, lrep_otherworldly),
     ],
-    
+
     "You want me to ride with you into the wars?  I've read such things in books and heard the minstrel's tales of women fighting alongside the men. And I know there are some common women swept up into the wars who fight as Sword Sisters or serve as camp followers. But I never thought such an opportunity could come to me. I've never seen a battle up close -- except in the arena of course -- and the thought of having a man rush me with a raised ax terrifies me.^^Still -- to sleep under the stars with {s0}, to see the world, to ride to victory on a gallant steed... these are opportunities rarely offered to women. I would be doing my sex a disservice not to seize upon it. I will come with you.",
-    
+
     "close_window",
-    
+
     [
       (call_script, "script_recruit_troop_as_companion", "$g_talk_troop"),
       (assign, "$g_leave_encounter", 1),
@@ -31380,13 +31414,13 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
         (troop_add_item, "$g_talk_troop","itm_lady_dress_ruby", imod_lordly),
         (troop_add_item, "$g_talk_troop","itm_light_leather_boots", imod_lordly),
         (troop_add_item, "$g_talk_troop","itm_female_hood", imod_lordly),
-        
+
         # ..and some proficiencies
         (troop_raise_attribute, "$g_talk_troop", ca_strength, 2),
         (troop_raise_attribute, "$g_talk_troop", ca_agility, 2),
         (troop_raise_attribute, "$g_talk_troop", ca_intelligence, 5),
         (troop_raise_attribute, "$g_talk_troop", ca_charisma, 6),
-        
+
         (troop_raise_skill, "$g_talk_troop", skl_athletics, 2),
         (troop_raise_skill, "$g_talk_troop", skl_riding, 1),
         (troop_raise_skill, "$g_talk_troop", skl_trade, 3),
@@ -31395,19 +31429,19 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
         (troop_raise_skill, "$g_talk_troop", skl_surgery, 2),
         (troop_raise_skill, "$g_talk_troop", skl_wound_treatment, 2),
         (troop_raise_skill, "$g_talk_troop", skl_leadership, 3),
-        
+
         (add_xp_to_troop, 200, "$g_talk_troop"),
         # (troop_add_proficiency_points, "$g_talk_troop", 20),
         (troop_equip_items, "$g_talk_troop"),
       (try_end),
-      
+
       (try_begin),
         (le, "$g_talk_troop_relation", 50),
         (call_script, "script_troop_change_relation_with_troop", "$g_talk_troop", "trp_player", 5),
       (try_end),
     ]
   ],
-  
+
 
   #SB : re-enable this default behaviour for high-relationship with spouse (50+) before rejecting it
   [anyone, "spouse_join",
@@ -31424,7 +31458,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (troop_get_slot, ":encountered_town", "$g_talk_troop", slot_troop_first_encountered),
       (neg|is_between, ":encountered_town", centers_begin, centers_end), #if we did not distribute equipment already
       (troop_add_item, "$g_talk_troop","itm_courser", imod_old), #add at least 1 horse
-        
+
        # ..and some proficiencies
       (troop_raise_attribute, "$g_talk_troop", ca_strength, 2),
       (troop_raise_attribute, "$g_talk_troop", ca_agility, 2),
@@ -31432,18 +31466,18 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (troop_raise_attribute, "$g_talk_troop", ca_charisma, 2),
       (store_random_in_range, ":attr", ca_strength, ca_charisma + 1),
       (troop_raise_attribute, "$g_talk_troop", ":attr", 2),
-        
+
       (try_for_range, ":skill", "skl_persuasion", "skl_reserved_5"),
         (store_random_in_range, ":increase", -3, 3), #chance of 3x0, 1 or 2
         (val_max, ":increase", 0), #validate param
         (troop_raise_skill, "$g_talk_troop", ":skill", 1),
       (try_end),
-        
+
       #assume no combat skill but raise riding, add a leadership skill
       (troop_raise_skill, "$g_talk_troop", skl_riding, 1),
       (store_random_in_range, ":skill", "skl_trade", "skl_reserved_1"),
       (troop_raise_skill, "$g_talk_troop", ":skill", 2),
-        
+
       (add_xp_to_troop, 100, "$g_talk_troop"),
       # (troop_add_proficiency_points, "$g_talk_troop", 10),
       (troop_equip_items, "$g_talk_troop"),
@@ -31453,42 +31487,42 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   ]],
   [
     anyone,
-    
+
     "spouse_join",
-    
+
     [
       (call_script, "script_dplmc_print_player_spouse_says_my_husband_wife_to_s0", "$g_talk_troop", 0),
       (troop_slot_eq, "$g_talk_troop", slot_lord_reputation_type, lrep_moralist),
     ],
-    
-    "Ride out with you to the wars? I must confess to being tempted, if only to see to it that you and your men refrain from the vices to which your sex is susceptible, such as drinking and wenching and plundering and slaughtering prisoners. But I am a woman, a lady of noble lineage, and for a Calradian woman, riding out to war is just not to be done.^^It is not my place. My place is here, maintaining your household and protecting your interests in your absence, and ensuring your hearth is warmed when you return.^^That is my role as a woman, and I am content.", 
-    
+
+    "Ride out with you to the wars? I must confess to being tempted, if only to see to it that you and your men refrain from the vices to which your sex is susceptible, such as drinking and wenching and plundering and slaughtering prisoners. But I am a woman, a lady of noble lineage, and for a Calradian woman, riding out to war is just not to be done.^^It is not my place. My place is here, maintaining your household and protecting your interests in your absence, and ensuring your hearth is warmed when you return.^^That is my role as a woman, and I am content.",
+
     "spouse_pretalk",
 
     [
       # (assign, "$g_leave_encounter", 1),
-     
+
       # no relationship modification
     ]
   ],
-  
+
   [
     anyone,
-    
+
     "spouse_join",
-    
+
     [
       (call_script, "script_dplmc_print_player_spouse_says_my_husband_wife_to_s0", "$g_talk_troop", 0),
       (troop_slot_eq, "$g_talk_troop", slot_lord_reputation_type, lrep_ambitious),
     ],
-    
-    "What? Ride to the wars like a common camp follower? Spend my days in slaughter like some harlot of a Sword Sister? You presume a great deal, {s0}. I am not some common tavern drek or tomboy mercenary. I am a Lady of Calradia, brought up from birth to assist my husband in the ruling of the household and lands. I seek my glory in the deeds of my husband. Not in my own.^^For me to play a man's part would cheapen me and subject me to the scorn and contempt of every highborn Calradian. I do not take this suggestion kindly and I do not wish to be asked again.", 
-    
+
+    "What? Ride to the wars like a common camp follower? Spend my days in slaughter like some harlot of a Sword Sister? You presume a great deal, {s0}. I am not some common tavern drek or tomboy mercenary. I am a Lady of Calradia, brought up from birth to assist my husband in the ruling of the household and lands. I seek my glory in the deeds of my husband. Not in my own.^^For me to play a man's part would cheapen me and subject me to the scorn and contempt of every highborn Calradian. I do not take this suggestion kindly and I do not wish to be asked again.",
+
     "spouse_pretalk",
-    
+
     [
       # (assign, "$g_leave_encounter", 1),
-      
+
       (try_begin),
         (is_between, "$g_talk_troop_relation", -50, 20),
         (gt, "$g_time_since_last_talk", 24),
@@ -31500,18 +31534,18 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 
   [
     anyone,
-    
+
     "spouse_join",
-    
+
     [
       (call_script, "script_dplmc_print_player_spouse_says_my_husband_wife_to_s0", "$g_talk_troop", 0),
       (troop_slot_eq, "$g_talk_troop", slot_lord_reputation_type, lrep_conventional),
     ],
 
-    "Oh, {s0}, why do you ask me this? I couldn't ride into battle with you! I've never held a sword in my life! I'd be worse than hopeless! Few Calradians of noble lineage teach their daughters to fight and I'm not sure I would have learned to fight even I'd been given the opportunity. The weakest recruit in your army has more virtue in a fight than I, who have never wielded any weapon deadlier than an embroidery needle. I would get your men killed trying to protect me.^^You are my {s0} and I respect you, but if you wanted a wife who was going to be able to stand with you shoulder to shoulder, shield to shield -- you should have married someone else.", 
-    
+    "Oh, {s0}, why do you ask me this? I couldn't ride into battle with you! I've never held a sword in my life! I'd be worse than hopeless! Few Calradians of noble lineage teach their daughters to fight and I'm not sure I would have learned to fight even I'd been given the opportunity. The weakest recruit in your army has more virtue in a fight than I, who have never wielded any weapon deadlier than an embroidery needle. I would get your men killed trying to protect me.^^You are my {s0} and I respect you, but if you wanted a wife who was going to be able to stand with you shoulder to shoulder, shield to shield -- you should have married someone else.",
+
     "spouse_pretalk",
-    
+
     [
       # (assign, "$g_leave_encounter", 1),
 
@@ -31523,7 +31557,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (try_end),
     ]
   ],
-  
+
 
 ##diplomacy end+
 
@@ -31945,7 +31979,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
      (add_xp_as_reward, 300),
      (call_script, "script_troop_add_gold", "trp_player", 250),
      (call_script, "script_end_quest", "qst_escort_lady"),
-     (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 2),
+##++START-VEXED++##
+     (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 4),
+##++END-VEXED++##
      (troop_set_slot, "$g_talk_troop", slot_troop_cur_center, ":cur_center"),
      (remove_member_from_party,"$g_talk_troop"),
      ]],
@@ -32345,17 +32381,23 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   (str_store_string,s10,"@Forgive me, {playername}, but I must insist you accept it.\
  The money means little to me, and I owe you so much.\
  Here, take it, and let us speak no more of this."),
-    (call_script, "script_change_player_honor", 1),
+##++START-VEXED++##
+    (call_script, "script_change_player_honor", 6),
+##++END-VEXED++##
   ]],
 
   [anyone|plyr,"lady_qst_duel_for_lady_succeeded_1", [], "Please, {s65}, no reward is necessary.", "lady_qst_duel_for_lady_succeeded_2",[
   (str_store_string,s10,"@{playername}, what a dear {man/woman} you are,\
  but I will not allow you to refuse this. I owe you far more than I can say,\
  and I am sure you can put this money to far better use than I."),
-    (call_script, "script_change_player_honor", 2),
+##++START-VEXED++##
+    (call_script, "script_change_player_honor", 10),
+##++END-VEXED++##
   ]],
   [anyone,"lady_qst_duel_for_lady_succeeded_2", [], "{s10}", "lady_pretalk",
-   [(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 10),
+##++START-VEXED++##
+   [(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 20),
+##++END-VEXED++##
     (add_xp_as_reward, 1000),
     (call_script, "script_troop_add_gold", "trp_player", 2000),
     (call_script, "script_end_quest", "qst_duel_for_lady"),
@@ -32377,7 +32419,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone,"lady_qst_duel_for_lady_failed_2", [], "It matters not, dear {playername}. You tried.\
  The truth cannot be proven at the point of a sword, but you willingly put your life at stake for my honour.\
  That alone will convince many of my innocence.", "lady_pretalk",
-   [(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 6),
+##++START-VEXED++##
+   [(call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 12),
+##++END-VEXED++##
     (add_xp_as_reward, 400),
     (call_script, "script_end_quest", "qst_duel_for_lady"),
     ]],
@@ -32434,7 +32478,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
  Please, take this as some small repayment for your noble deed.", "lady_generic_mission_succeeded",
     ##diplomacy end+
    [
-     (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 8),
+##++START-VEXED++##
+     (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 16),
+##++END-VEXED++##
      (add_xp_as_reward, 2000),
      (call_script, "script_troop_add_gold", "trp_player", 1500),
      (call_script, "script_end_quest", "qst_rescue_lord_by_replace"),
@@ -34090,7 +34136,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
      (quest_get_slot, ":quest_target_troop", "$random_quest_no", slot_quest_target_troop),
      (call_script, "script_start_quest", "$random_quest_no", "$g_talk_troop"),
      (call_script, "script_report_quest_troop_positions", "$random_quest_no", ":quest_target_troop", 3),
-     (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 3),
+##++START-VEXED++##
+     (call_script, "script_change_player_relation_with_troop", "$g_talk_troop", 6),
+##++END-VEXED++##
      ]],
 
   [anyone|plyr,"lady_quest_duel_for_lady_3", [##diplomacy start+ Use proper pronoun
@@ -34611,7 +34659,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (call_script, "script_troop_add_gold", "trp_player", ":reward"),
     (try_begin), #apply extra reward for quest caravans, if it gets here instead of original map dialog
       (party_get_template_id, ":template", "$g_encountered_party"),
-      (eq, ":template", "pt_merchant_caravan"), 
+      (eq, ":template", "pt_merchant_caravan"),
       (quest_get_slot, ":destination", "qst_escort_merchant_caravan", slot_quest_target_center),
       (party_set_ai_behavior, "$g_encountered_party", ai_bhvr_travel_to_party),
       (party_set_ai_object, "$g_encountered_party", ":destination"),
@@ -34626,7 +34674,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (add_xp_as_reward, ":xp_reward"),
       (call_script, "script_change_troop_renown", "trp_player", 2),
     (else_try), #no xp bonus
-      (eq, ":template", "pt_kingdom_caravan_party"), 
+      (eq, ":template", "pt_kingdom_caravan_party"),
       (add_xp_as_reward, ":reward"),
       (party_set_flags, "$g_encountered_party", pf_default_behavior, 1),
     (try_end),
@@ -34801,40 +34849,40 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone,"caravan_offer_disguise", [(neg|troop_slot_ge,"trp_player",slot_troop_renown, 75),], "Sorry, friend, we do not admit strangers so easily and neither will the guards, I think.", "merchant_talk_offer_else",[]],
   [anyone,"caravan_offer_disguise", [(lt,"$g_encountered_party_relation",0),], "I am sorry, I cannot abet your entrance to {s12} in good conscience.", "merchant_talk_offer_else",[]],
   [anyone,"caravan_offer_disguise", [(troop_get_slot, ":disguise", "trp_player", slot_troop_player_disguise_sets),
-    (store_and, ":guard", ":disguise", disguise_guard), 
+    (store_and, ":guard", ":disguise", disguise_guard),
     (store_and, ":merchant", ":disguise", disguise_merchant),
     (store_add, ":disguise", ":guard", ":merchant"),
     (eq, ":disguise", 0),
-    ], 
+    ],
   "I cannot help you. It would endanger our business in {s12} to take you in, {playername}, when your intent is so conspicuous. You'll have to make do without our aid.", "merchant_pretalk",[]],
 
   [anyone,"caravan_offer_disguise", [
-    ], 
+    ],
   "For the right price, we can make room for you in our caravan. If you have a good head for numbers, you'll fit right in with the other merchants. If you're more of the martial sort, you're more than welcome to help out among the caravan guards.", "caravan_choose_disguise",[]],
   [anyone|plyr,"caravan_choose_disguise", [
     (troop_get_slot, ":disguise", "trp_player", slot_troop_player_disguise_sets),
     (val_and, ":disguise", disguise_guard),
     (eq, ":disguise", disguise_guard),
-    ], 
+    ],
   "I will ready my weapons and stay alert.", "caravan_offer_disguise_continue",[]],
 
   [anyone|plyr,"caravan_choose_disguise", [
     (troop_get_slot, ":disguise", "trp_player", slot_troop_player_disguise_sets),
     (val_and, ":disguise", disguise_merchant),
     (eq, ":disguise", disguise_merchant),
-    ], 
+    ],
   "Yes, I clearly have important business to do.", "caravan_offer_disguise_continue",[]],
 
   #disable for now, nobody uses it anyways
   [anyone,"caravan_offer_disguise_continue", [
-    ], 
+    ],
   "Very well. We'll be moving on to {s12}. Enjoy the ride, {s0}, but keep your eye out for brigands...", "close_window",[
     (assign, "$g_leave_encounter", 1),
     (party_set_bandit_attraction, "$g_encountered_party", 0), #prevent awkward attacks
     (set_camera_follow_party, "$g_encountered_party"),
     # (party_attach_to_party, "p_main_party", "$g_encountered_party"),
     # (party_set_icon, "p_main_party", icon_camp),
-  
+
   ]],
 
 ##  [anyone|plyr,"merchant_talk_offer_2", [(troop_slot_eq, "$g_talk_troop", slot_troop_is_prisoner, 0),
@@ -35311,11 +35359,11 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   ], "Get lost before I lose my temper!", "close_window",[
     (agent_play_sound, "$g_talk_agent", "snd_encounter_nobleman"),
   ]],
-  
+
   [anyone,"castle_guard_sneaked_intro_ask", [
     (eq, "$sneaked_into_town",disguise_pilgrim),
   ], "Get out of my sight, beggar! You stink!", "castle_guard_sneaked_intro_1",[]],
-  
+
   #other commoner disguises
   [anyone,"castle_guard_sneaked_intro_ask", [
   ], "Where do you think you're going?", "castle_guard_sneaked_intro_1",[]],
@@ -36488,7 +36536,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
  I want to see that purse full next time I see you.", "close_window",[(assign, "$g_leave_encounter",1)]],
   [anyone|plyr,"deserter_paid_talk", [], "No. It's your turn to pay me this time.", "deserter_paid_talk_2b",[]],
   [anyone,"deserter_paid_talk_2b", [], "What nonsense are you talking about? You want trouble? You got it.", "close_window",[
-    
+
        #SB : start attack
        (call_script, "script_encounter_agent_draw_weapon"),
        (assign, "$cant_leave_encounter", 1),
@@ -36568,7 +36616,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (party_get_num_prisoners, ":num_prisoners", "$g_encountered_party"),
       (val_mul, ":num_prisoners", 50), #deserters can't count or use game_get_prisoner_price
       (val_add, ":recruit_cost", ":num_prisoners"),
-      
+
       # (store_skill_level, ":persuasion_level", "skl_persuasion", "trp_player"),
       (party_get_skill_level, ":persuasion", "p_main_party", "skl_persuasion"),
       (faction_get_slot, ":serfdom", "$g_talk_troop_faction", dplmc_slot_faction_serfdom),
@@ -36672,7 +36720,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (val_add, ":protected_until", 72),
     (party_set_slot,"$g_encountered_party",slot_party_ignore_player_until,":protected_until"),
     (party_ignore_player, "$g_encountered_party", 72),
-    
+
     #SB : objectionable action
     (call_script, "script_objectionable_action", tmt_aristocratic, "str_pay_bandits"),
 
@@ -36796,7 +36844,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 
     (quest_get_slot, ":giver_town", "qst_deliver_wine", slot_quest_giver_center),
     (call_script, "script_change_player_relation_with_center", ":giver_town", 2),
-    (call_script, "script_change_player_relation_with_center", "$current_town", 1),
+##++START-VEXED++##
+    (call_script, "script_change_player_relation_with_center", "$current_town", 2),
+##++END-VEXED++##
     (call_script, "script_end_quest", "qst_deliver_wine"),
     ]],
 
@@ -36858,7 +36908,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     #SB : refetch this slot value since we've decremented
     (quest_get_slot, ":quest_total_amount", "qst_deliver_wine", slot_quest_target_amount),
     # (quest_get_slot, ":quest_temp_amount", "qst_deliver_wine", slot_quest_temp_slot),
- 
+
     (val_mul, ":quest_gold_reward", ":item_count"),
     (val_div, ":quest_gold_reward", ":quest_total_amount"),
     (call_script, "script_troop_add_gold", "trp_player", ":quest_gold_reward"),
@@ -36977,7 +37027,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 	  (store_party_size, reg1, "p_main_party"),
 	  (store_mul, reg2, reg1, 7), # 7 denars per beer - making it more expensive to counter the big amount of morale possible to gain
       ], "I want {reg1} beers for my company. ({reg2} denars.)", "tavernkeeper_drink_beer",[]],
-	 
+
   [anyone,"tavernkeeper_drink_beer",
    [
 	(store_troop_gold, ":player_cash", "trp_player"),
@@ -37012,8 +37062,8 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
         (this_or_next|lt, "$player_honor", -20), #lowest game checks for (marriage), shouldn't reach this point
         (neg|party_slot_ge, "$current_town", slot_center_player_relation, -40), #this is the "angry" threshold
    ], "Why {playername}, I do believe that would be a waste of our time. The local boys would dump their perfectly good drinks as soon as they heard it came from you. I think it best if you could find other places to spend your blood money...", "close_window", []],
-   
-   
+
+
   [anyone,"tavernkeeper_buy_drinks",
    [
         (party_get_slot, ":lord", "$current_town", slot_town_lord),
@@ -37030,7 +37080,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
         # (this_or_next|lt, "$player_honor", -20), #lowest game checks for (marriage), shouldn't reach this point
         # (neg|party_slot_ge, "$current_town", slot_center_player_relation, -40), #this is the "angry" threshold
    # ], "Why {playername}, I do believe that would be a waste of our time. The local boys would dump their perfectly good drinks as soon as they heard it came from you. I think it best if you could find other places to spend your blood money...", "close_window", []],
-   
+
   #SB : TODO adjust cost of buying drinks (prosperity based?)
   # [anyone,"tavernkeeper_buy_drinks",
    # [
@@ -37075,7 +37125,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    ##diplomacy end+
    [
        (troop_remove_gold, "trp_player", "$temp"),
-       (call_script, "script_change_player_relation_with_center", "$current_town", 1),
+##++START-VEXED++##
+       (call_script, "script_change_player_relation_with_center", "$current_town", 2),
+##++END-VEXED++##
        (store_current_hours,":cur_hours"),
        #SB : TODO store_add longer delay once relation is high enough
        (assign, "$buy_drinks_last_time", ":cur_hours"),
@@ -37354,7 +37406,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone,"ransom_kingdom_hero",[
     (party_get_slot, ":town_lord", "$current_town", slot_town_lord),
     (try_begin),
-      (is_between, ":town_lord", heroes_begin, heroes_end),      
+      (is_between, ":town_lord", heroes_begin, heroes_end),
       (str_store_troop_name, s1, ":town_lord"),
       (call_script, "script_troop_get_player_relation", ":town_lord"),
       (assign, ":relation", reg0),
@@ -37364,7 +37416,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (try_end),
     (lt, ":relation", -5), #arbitrary value
     (call_script, "script_dplmc_print_commoner_at_arg1_says_sir_madame_to_s0", "$current_town"),
-  ], "Sorry {s0}, even with my influences I fear that {s1} will not welcome your gold.", "ransom_broker_pretalk",[]],  
+  ], "Sorry {s0}, even with my influences I fear that {s1} will not welcome your gold.", "ransom_broker_pretalk",[]],
   [anyone,"ransom_kingdom_hero",[], "Whom do you wish to ransom?", "ransom_kingdom_hero_choose",[
     (try_begin), #refresh this value here, in case we cancel selection
       (check_quest_active, "qst_rescue_prisoner"),
@@ -37402,7 +37454,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (assign, ":kingdom_no", ":kingdom"),
   (try_end),
   (neq, ":kingdom_no", -1),
-  
+
   #set up strings
   (party_get_slot, ":town_lord", "$current_town", slot_town_lord),
   (try_begin), #we already filtered out the player
@@ -37416,7 +37468,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   (call_script, "script_dplmc_print_commoner_at_arg1_says_sir_madame_to_s0", "$current_town"),
   ], "I am sorry {s0}, as {s1} is inimical to {s2}, I do not believe I am capable of negotiating for the release of a {s3}.", "ransom_kingdom_hero",[]],
 
-  
+
   [anyone,"ransom_kingdom_hero_chosen",[
   (call_script, "script_calculate_ransom_amount_for_troop", "$lord_selected"),
   (assign, ":ransom", reg0),
@@ -37428,7 +37480,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   (assign, "$temp", ":ransom"),
   (str_store_troop_name, s11, "$lord_selected"),
   ], "I believe {s11}'s liberty is currently valued at {s1}?", "ransom_kingdom_hero_pay",[]],
-  
+
   [anyone|plyr,"ransom_kingdom_hero_pay",[
     (store_troop_gold, ":gold", "trp_player"),
     (gt, ":gold", "$temp"),
@@ -37462,7 +37514,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 
   [anyone|plyr,"ransom_kingdom_hero_pay",[
   ], "I don't think I can pay that just yet.", "ransom_kingdom_hero_choose",[]],
-  
+
 
   [anyone|plyr,"ransom_broker_talk",[
   ], "I wish to ransom one of my companions.", "ransom_broker_ransom_companion",[]],
@@ -37606,7 +37658,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone|plyr, "tavern_traveler_tell_kingdoms_2", [], "Tell me more about these opportunities.", "tavern_traveler_tell_kingdoms_3", []],
   [anyone|plyr, "tavern_traveler_tell_kingdoms_2", [], "Thank you. That was all I needed to know", "close_window", []],
 
-  
+
   #SB: alternative traveller dialog
   #if we already have a claimant
   [anyone, "tavern_traveler_tell_kingdoms_3", [
@@ -37640,7 +37692,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone, "tavern_traveler_tell_kingdoms_4b", [], "There are many pretenders in Calradia -- those who are born to the right family, who go around and rally support for their claim over the current king's false cause.\
  With the right sort of support from yourself and a few nudges here and there, they could easily start civil wars and perhaps even replace the king one day. Of course, your claim is equally as good as theirs, and a co-rulership of Calradia isn't unheard of.",
    "tavern_traveler_tell_kingdoms_5", []],
-   
+
   [anyone, "tavern_traveler_tell_kingdoms_4", [], "It might be easier for an adventurer like yourself to pledge support to an existing king's rival.\
   There are many such pretenders in Calradia -- those who are born to the right family, who go around and stir up trouble saying they have a better claim to the throne than the current king.\
  If those claim holders could find supporters, they could easily start civil wars and perhaps even replace the king one day.",
@@ -37737,7 +37789,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 
   [anyone|plyr, "tavern_traveler_minstrel_location_ask_money", [], "Never mind.", "tavern_traveler_pretalk", []],
 
-    
+
   #SB : change the following to use new utility scripts
   [anyone|plyr, "tavern_traveler_talk", [], "I am looking for book merchants...", "tavern_traveler_bookseller_location", []],
 
@@ -38007,7 +38059,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   (store_character_level, "$temp_2", "$temp"),
   (val_mul, "$temp_2", 5),
   (assign, reg1, "$temp_2"),
-  
+
   ]],
 
   [anyone|plyr, "tavern_traveler_companion_location_ask_money",
@@ -38211,7 +38263,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (call_script, "script_acquire_disguise", disguise_bard),
   ]],
   [anyone|plyr, "minstrel_disguise_teach", [], "Never mind.", "minstrel_pretalk", []],
-   
+
   [anyone, "minstrel_courtship_poem", [],
    "I believe you already know the poems I am best equipped to teach.",
    "minstrel_pretalk", []],
@@ -39209,7 +39261,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
                      (neg|troop_is_hero, "$g_talk_troop"),
                      (party_slot_eq, "$current_town", slot_center_mercenary_troop_type, "$g_talk_troop"),
                      (party_slot_ge, "$current_town", slot_center_mercenary_troop_amount, 1),
-                     
+
                      #disguise stuff
                      (eq, "$g_dplmc_player_disguise", 1), #skip dialog if disguise system disabled
                      (this_or_next|eq, "$sneaked_into_town", disguise_hunter),
@@ -39564,7 +39616,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (troop_slot_eq, "$g_talk_troop", slot_troop_trainer_training_fight_won, 1),
       (finish_mission),
     (try_end),
-    
+
     (try_begin), #add flag
       (troop_get_slot, ":flag", "trp_player", slot_troop_banner_scene_prop),
       (gt, ":flag", banner_scene_props_begin),
@@ -39615,7 +39667,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
      # (shuffle_range, 0, 4),
      (store_random_in_range, ":entry_no", 0, 4),
      (set_visitor, ":entry_no", "trp_player"),
-     
+
      #SB : make sure opponent has randomized equipment
      # (set_visitor, reg1, "$novicemaster_opponent_troop"),
      (store_random_in_range, ":random_no", 0, 4),
@@ -39624,7 +39676,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
        (store_sub, ":random_no", 3, ":entry_no"), #opponent
      (try_end),
      (set_visitor, ":random_no", ":opponent"),
-     
+
      (set_visitor, 4, "$g_talk_troop"), #trainer
      (set_jump_mission, "mt_training_ground_trainer_training"),
      (jump_to_scene, "$g_training_ground_melee_training_scene"),
@@ -39894,7 +39946,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   ], "As you wish, my {lord/lady}. I will have them delivered to you soon after the tailors have your measure.", "master_craftsman_pretalk",
   [(call_script, "script_acquire_disguise", disguise_merchant)]],
 
-  
+
   [anyone|plyr,"master_craftsman_talk", [
   ], "Could you explain my options related to production?", "master_craftsman_production_options",[]],
 
@@ -40043,7 +40095,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
  Me and the people of our town will not forget your help.", "close_window",
    [(quest_get_slot, ":quest_reward", "qst_persuade_lords_to_make_peace", slot_quest_gold_reward),
     (call_script, "script_troop_add_gold", "trp_player", ":quest_reward"),
-    (call_script, "script_change_player_relation_with_center", "$current_town", 5),
+##++START-VEXED++##
+    (call_script, "script_change_player_relation_with_center", "$current_town", 10),
+##++END-VEXED++##
     (call_script, "script_end_quest", "qst_persuade_lords_to_make_peace"),
     (quest_get_slot, ":quest_reward", "qst_persuade_lords_to_make_peace", slot_quest_gold_reward),
     (assign, reg12, ":quest_reward")
@@ -40055,8 +40109,10 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
  You not only did what was impossible and put an end to this terrible war, but you won't even accept a reward for it.\
  Very well, I will not insist on the matter, but please know that you will have our eternal respect and gratitude.", "close_window",
    [
-    (call_script, "script_change_player_honor", 3),
-    (call_script, "script_change_player_relation_with_center", "$current_town", 8),
+##++START-VEXED++##
+    (call_script, "script_change_player_honor", 15),
+    (call_script, "script_change_player_relation_with_center", "$current_town", 16),
+##++END-VEXED++##
     (call_script, "script_end_quest", "qst_persuade_lords_to_make_peace"),
     ]],
 
@@ -40069,7 +40125,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    [
      (add_xp_as_reward,200),
      (call_script, "script_troop_add_gold", "trp_player", 150),
-     (call_script, "script_change_player_relation_with_center", "$current_town", 1),
+##++START-VEXED++##
+     (call_script, "script_change_player_relation_with_center", "$current_town", 2),
+##++END-VEXED++##
      (call_script, "script_end_quest", "qst_deal_with_night_bandits"),
     ]],
 
@@ -40124,7 +40182,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (add_xp_as_reward, ":xp_reward"),
       (call_script, "script_troop_add_gold", "trp_player", ":gold_reward"),
       (call_script, "script_change_troop_renown", "trp_player", 1),
-      (call_script, "script_change_player_relation_with_center", "$current_town", 5),
+##++START-VEXED++##
+      (call_script, "script_change_player_relation_with_center", "$current_town", 10),
+##++END-VEXED++##
       (call_script, "script_end_quest", "qst_deal_with_looters"),
       (try_for_parties, ":cur_party_no"),
         (party_get_template_id, ":cur_party_template", ":cur_party_no"),
@@ -40221,7 +40281,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (store_div, ":xp_reward", ":quest_gold_reward", 3),
     (add_xp_as_reward, ":xp_reward"),
     (call_script, "script_change_troop_renown", "trp_player", 1),
-    (call_script, "script_change_player_relation_with_center", "$current_town", 3),
+##++START-VEXED++##
+    (call_script, "script_change_player_relation_with_center", "$current_town", 6),
+##++END-VEXED++##
     (call_script, "script_end_quest", "qst_move_cattle_herd"),
     (assign, reg8, ":quest_gold_reward"),
     ]],
@@ -40262,7 +40324,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (val_add, ":xp_reward", 100),
     (add_xp_as_reward, ":xp_reward"),
     (call_script, "script_change_troop_renown", "trp_player", 3),
-    (call_script, "script_change_player_relation_with_center", "$current_town", 2),
+##++START-VEXED++##
+    (call_script, "script_change_player_relation_with_center", "$current_town", 4),
+##++END-VEXED++##
     (call_script, "script_end_quest", "qst_kidnapped_girl"),
     ]],
 
@@ -40278,7 +40342,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
                               (assign, ":xp_reward", ":quest_gold_reward"),
                               (val_mul, ":xp_reward", 2),
                               (add_xp_as_reward, ":xp_reward"),
-                              (call_script, "script_change_player_relation_with_center", "$current_town", 2),
+##++START-VEXED++##
+                              (call_script, "script_change_player_relation_with_center", "$current_town", 4),
+##++END-VEXED++##
                               (call_script, "script_change_troop_renown", "trp_player", 3),
                               (call_script, "script_end_quest", "qst_track_down_bandits"),
                               (assign, reg5, ":quest_gold_reward"),
@@ -40297,7 +40363,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
                               (assign, ":xp_reward", ":quest_gold_reward"),
                               (val_mul, ":xp_reward", 2),
                               (add_xp_as_reward, ":xp_reward"),
-                              (call_script, "script_change_player_relation_with_center", "$current_town", 2),
+##++START-VEXED++##
+                              (call_script, "script_change_player_relation_with_center", "$current_town", 4),
+##++END-VEXED++##
                               (call_script, "script_change_troop_renown", "trp_player", 3),
                               (call_script, "script_end_quest", "qst_troublesome_bandits"),
                               (assign, reg5, ":quest_gold_reward"),
@@ -40623,7 +40691,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 
 ## SB : add conditional lordship/rulership and flavour text for guildmaster
   [anyone|plyr,"mayor_talk", [], "Goodbye.", "close_window",[]],
-  
+
   [anyone, "mayor_info_begin", [
   (call_script, "script_dplmc_get_troop_standing_in_faction", "$g_encountered_party_faction", "trp_player"),
   (this_or_next|party_slot_eq,"$current_town",slot_town_lord, "trp_player"),
@@ -40651,27 +40719,27 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
  {reg5?Though you may not have heard of me, I have heard of your {reg4?dastardly:good} deeds, {playername}:I can help you find a job if you are looking for some honest work}.", "mayor_info_talk",[(assign, "$mayor_info_lord_told",0)]],
 
   [anyone|plyr,"mayor_info_talk",[(eq, "$mayor_info_lord_told",0)], "Who rules this town?", "mayor_info_lord",[]],
-  
+
 ##diplomacy start+ make gender correct
   [anyone, "mayor_info_lord", #moto fix
     [
     (party_get_slot, ":town_lord","$current_town",slot_town_lord),
     (assign, reg5, ":town_lord"),
     (assign, reg10, 0),
-    (try_begin), 
-        (eq, ":town_lord", "trp_player"), 
-        (str_store_string, s10, "str_your_excellency"), 
+    (try_begin),
+        (eq, ":town_lord", "trp_player"),
+        (str_store_string, s10, "str_your_excellency"),
     (else_try),
         (le, ":town_lord", stl_unassigned),
         (str_store_string, s10, "@yet to be announced"),
         (assign, reg10, 1),
-    (else_try), 
-        (is_between, ":town_lord", active_npcs_begin, active_npcs_end), 
+    (else_try),
+        (is_between, ":town_lord", active_npcs_begin, active_npcs_end),
         (str_store_troop_name, s10, ":town_lord"),
-    (else_try), 
-        (faction_get_slot, ":town_lord", "$g_encountered_party_faction", slot_faction_leader), 
-        (str_store_troop_name, s10, ":town_lord"), 
-    (try_end), 
+    (else_try),
+        (faction_get_slot, ":town_lord", "$g_encountered_party_faction", slot_faction_leader),
+        (str_store_troop_name, s10, ":town_lord"),
+    (try_end),
     (try_begin), #SB fix
       (neq, ":town_lord", stl_unassigned),
       (call_script, "script_dplmc_store_troop_is_female", ":town_lord"),
@@ -40726,7 +40794,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 								(val_max, "$g_mayor_given_political_dialog", 1),
 
   ], "Well, to answer your question generally, each monarch claims to be the rightful heir to the old Calradic emperors. Some of these claims are based on forgotten dynastic marriages and others are based on obscure promises, while {s22} Rhodoks invoke the empire's unwritten constitution. So in theory, any one realm has the right to declare war on any other realm at any time.", "mayor_war_description_2",[]],
-  
+
   ##SB : cut off dialogue here if high ranking
   [anyone,"mayor_war_description_2",[
   #(faction_slot_eq, "$g_encountered_party_faction", slot_faction_leader, "trp_player"),
@@ -40784,7 +40852,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (assign, ":continue", 1), #at least 1 faction is active
     (try_end),
     (eq, ":continue", 0),
-    
+
     (try_begin),
       (faction_slot_eq, "$g_encountered_party_faction", slot_faction_leader, "trp_player"),
       (assign, reg10, 1),
@@ -40837,7 +40905,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone,"mayor_internal_politics_5",[
   (call_script, "script_dplmc_get_troop_standing_in_faction", "trp_player", "$g_encountered_party_faction"),
   (ge, reg0, DPLMC_FACTION_STANDING_LEADER_SPOUSE),
-  ], 
+  ],
     "Now, men do not trust a vassal who turns coat easily. But I'm sure your grace know the heart and mind of the realm, keeping better council than myself.", "mayor_prepolitics", []],
   [anyone,"mayor_internal_politics_5",[], "Now, men do not trust a vassal who turns coat easily, nor do they trust a king who lightly throws around charges of treason. Those two factors can keep a realm together. But if relations between a vassal and a liege deteriorate far enough, things can become very tense indeed... In other lands, of course. These things could never happen here in the {s4}.", "mayor_prepolitics", []],
 
@@ -40847,7 +40915,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (str_clear, s20),
     (call_script, "script_display_policy_string_to_reg", "$g_encountered_party_faction", 1, 1),
   ]],
-  
+
   [anyone|plyr, "mayor_political_questions", [], "That is all. Thank you.", "mayor_pretalk", []],
 
 
@@ -41238,7 +41306,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
         (troop_set_inventory_slot, ":troop_no", ":i_slot", -1),
       (try_end),
     (try_end),
-    
+
     ]],
 
   [anyone|plyr,"merchant_quest_brief_deliver_wine", [], "I am afraid I can't carry all that cargo now.", "merchant_quest_stall",[]],
@@ -41832,8 +41900,10 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    [(add_xp_as_reward, 400),
 #    (quest_get_slot, ":num_cattle", "qst_deliver_cattle", slot_quest_target_amount),
 #    (party_set_slot, "$current_town", slot_village_number_of_cattle, ":num_cattle"),
-    (call_script, "script_change_center_prosperity", "$current_town", 4),
-    (call_script, "script_change_player_relation_with_center", "$current_town", 5),
+##++START-VEXED++##
+    (call_script, "script_change_center_prosperity", "$current_town", 6),
+    (call_script, "script_change_player_relation_with_center", "$current_town", 10),
+##++END-VEXED++##
     (call_script, "script_end_quest", "qst_deliver_cattle"),
 #Troop commentaries begin
     (call_script, "script_add_log_entry", logent_helped_peasants, "trp_player",  "$current_town", -1, -1),
@@ -41926,7 +41996,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   ],
    "Good day, {s0}.", "village_elder_talk",[]],#replaced {sir/madam} with {s0}
   ##diplomacy end+
-  
+
   [anyone ,"village_elder_pretalk", [],
    "Is there anything else I can do for you?", "village_elder_talk",[]],
 
@@ -41952,7 +42022,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
      # (assign, "$g_talk_agent", "$g_player_chamberlain")
     ]],
   #after selecting dialogs however it will go back to the village elder
-  
+
   [anyone|plyr,"village_elder_talk", [(check_quest_active, "qst_hunt_down_fugitive"),
                                       (neg|check_quest_concluded, "qst_hunt_down_fugitive"),
                                       (quest_slot_eq, "qst_hunt_down_fugitive", slot_quest_target_center, "$current_town"),
@@ -42009,7 +42079,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
                                       (eq, ":quest_village", 0),
                                       ],
    "I want to buy some cattle.", "village_elder_buy_cattle",[]],
-   
+
   #SB : disguise_farmer
   [anyone|plyr,"village_elder_trade_talk", [
   (this_or_next|party_slot_eq, "$current_town", slot_town_lord, "trp_player"),
@@ -42021,7 +42091,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   (eq, ":has_disguise", 0),
   ],
    "Actually, I need a set of whatever it is your peasants are wearing.", "village_elder_buy_clothing",[]],
-   
+
   [anyone ,"village_elder_buy_clothing", [(party_slot_eq, "$current_town", slot_town_lord, "trp_player"),
     (call_script, "script_dplmc_print_commoner_at_arg1_says_sir_madame_to_s0", "$current_town"),
     (call_script, "script_dplmc_store_troop_is_female_reg", "$g_talk_troop", 4),
@@ -42055,13 +42125,13 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
         (store_sub, reg7, ":attacked_hour", "$g_current_hours"),
         (val_div, reg7, 24), #get days
         (str_store_party_name, s1, ":attacker"),
-        
+
   ], "We were attacked by {s1} {reg7?{reg7} days ago:just recently}...", "village_elder_ask_enemies", []],
-  
+
   [anyone|auto_proceed,"village_elder_ask_enemies_local",
   [], "Hmm. Let me think about it...", "village_elder_ask_enemies", []],
-  
-  
+
+
   [anyone,"village_elder_ask_enemies",
    [
      (assign, ":give_report", 0),
@@ -42543,8 +42613,10 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    [(quest_get_slot, ":quest_target_amount", "qst_deliver_grain", slot_quest_target_amount),
     (troop_remove_items, "trp_player", "itm_grain", ":quest_target_amount"),
     (add_xp_as_reward, 400),
-    (call_script, "script_change_center_prosperity", "$current_town", 4),
-    (call_script, "script_change_player_relation_with_center", "$current_town", 5),
+##++START-VEXED++##
+    (call_script, "script_change_center_prosperity", "$current_town", 6),
+    (call_script, "script_change_player_relation_with_center", "$current_town", 10),
+##++END-VEXED++##
     (call_script, "script_end_quest", "qst_deliver_grain"),
 #Troop commentaries begin
     (call_script, "script_add_log_entry", logent_helped_peasants, "trp_player",  "$current_town", -1, -1),
@@ -42684,7 +42756,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    [
      (assign, "$g_leave_encounter",1),
      #TODO: Change this value
-     (call_script, "script_change_player_relation_with_center", "$current_town", 3),
+##++START-VEXED++##
+     (call_script, "script_change_player_relation_with_center", "$current_town", 6),
+##++END-VEXED++##
      (call_script, "script_start_quest", "$random_quest_no", "$g_talk_troop"),
      ]],
 
@@ -42726,7 +42800,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone,"village_elder_deliver_cattle_mission_accept", [(call_script, "script_dplmc_print_subordinate_says_sir_madame_to_s0"),], "Thank you, {s0}. We'll be praying for you night and day.", "close_window",
   ##diplomacy end+
    [(assign, "$g_leave_encounter",1),
-    (call_script, "script_change_player_relation_with_center", "$current_town", 3),
+##++START-VEXED++##
+    (call_script, "script_change_player_relation_with_center", "$current_town", 6),
+##++END-VEXED++##
     (call_script, "script_start_quest", "$random_quest_no", "$g_talk_troop"),
     ]],
 
@@ -43015,7 +43091,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    "You put up quite a good fight there. Good moves. You definitely show promise.\
  And you earned a prize of {reg10} denars for knocking down {reg8} opponents.", "arena_master_pre_talk",[
      (call_script, "script_troop_add_gold", "trp_player", arena_tier1_prize),
-     (add_xp_to_troop,5,"trp_player"),
+##++START-VEXED++##
+     (add_xp_to_troop,50,"trp_player"),
+##++END-VEXED++##
      (assign, "$last_training_fight_town", -1)]],
 
   [anyone ,"arena_master_fight_result",
@@ -43029,7 +43107,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    "That was a good fight you put up there. You managed to take down no less than {reg8} opponents.\
  And of course, you earned a prize money of {reg10} denars.", "arena_master_pre_talk",[
      (call_script, "script_troop_add_gold", "trp_player", arena_tier2_prize),
-     (add_xp_to_troop,10,"trp_player"),
+##++START-VEXED++##
+     (add_xp_to_troop,100,"trp_player"),
+##++END-VEXED++##
      (assign, "$last_training_fight_town", -1)]],
 
   [anyone ,"arena_master_fight_result",
@@ -43042,7 +43122,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    "Your performance was amazing! You are without doubt a very skilled fighter.\
  Not everyone can knock down {reg8} people in the fights. Of course you deserve a prize with that performance: {reg10} denars. Nice, eh?", "arena_master_pre_talk",[
      (call_script, "script_troop_add_gold", "trp_player", arena_tier3_prize),
-     (add_xp_to_troop,10,"trp_player"),
+##++START-VEXED++##
+     (add_xp_to_troop,150,"trp_player"),
+##++END-VEXED++##
      (assign, "$last_training_fight_town", -1)]],
 
   [anyone ,"arena_master_fight_result",
@@ -43055,14 +43137,18 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
  And you earned a prize of {reg10} denars for knocking down {reg8} opponents.", "arena_master_pre_talk",
    [
      (call_script, "script_troop_add_gold", "trp_player", arena_tier4_prize),
-     (add_xp_to_troop,10,"trp_player"),
+##++START-VEXED++##
+     (add_xp_to_troop,200,"trp_player"),
+##++END-VEXED++##
      (assign, "$last_training_fight_town", -1),
      ]],
 
   [anyone ,"arena_master_fight_result", [(assign, reg10, arena_grand_prize)],
    "Congratulations champion! Your fight there was something to remember! You managed to be the last fighter standing beating down everyone else. And of course you won the grand prize of the fights: {reg10} denars.", "arena_master_pre_talk",[
      (call_script, "script_troop_add_gold", "trp_player", arena_grand_prize),
-     (add_xp_to_troop,200,"trp_player"),
+##++START-VEXED++##
+     (add_xp_to_troop,500,"trp_player"),
+##++END-VEXED++##
      (assign, "$last_training_fight_town", -1)]],
 
 
@@ -43515,7 +43601,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (str_store_troop_name, s3, ":leader"),
       (call_script, "script_change_player_relation_with_troop", ":leader", -1), #unnecessary?
       (call_script, "script_dplmc_store_troop_is_female_reg", ":leader", 3),
-      
+
     ],
     #snd_encounter_vaegirs_neutral is the same as hostile
     "What!? We are under the protection of {s3}! Be certain {reg3?she:he} will take vengeance!", "reinforcements_attack",[
@@ -43566,7 +43652,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    "I will drink from your skull!", "battle_reason_stated",[
    (play_sound, "snd_encounter_sea_raiders"),
    ]],
-    
+
   [anyone,"bandit_introduce", [
       # (store_random_in_range, ":rand", 11, 15),
         # (str_store_string, s11, "@I can smell a fat purse a mile away. Methinks yours could do with some lightening, eh?"),
@@ -43673,7 +43759,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (else_try),
         (play_sound, "snd_encounter_bandits"),
       (try_end),
-      
+
       ]],
 
   [anyone|plyr,"bandit_meet", [], "Never mind, I have no business with you.", "close_window",[(assign, "$g_leave_encounter", 1)]],
@@ -43753,10 +43839,10 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (party_get_num_attached_parties, ":num_attached_parties", "$g_encountered_party"),
     (this_or_next|gt, ":num_attached_parties", 0), #always fight
     (lt, "$g_strength_ratio", 500),
-    
+
     (store_party_size_wo_prisoners, reg20, "$g_encountered_party"),
     (val_sub, reg20, 1), #determines whether it's a lone troop
-    
+
     ],
    "Have you no mercy? {reg20?We will fight you to the last man:I will fight with my last breath}!", "close_window",
    []],
@@ -43843,7 +43929,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
     (quest_get_slot, ":quest_giver_troop", "qst_capture_prisoners", slot_quest_giver_troop),
     (str_store_troop_name, s1, ":quest_giver_troop"),
   ], "{s1} wants you alive and well, so don't be trying something we'll both regret.", "prisoner_chat_2",[]],
-  
+
   [anyone|plyr,"prisoner_chat", [], "Do not try running away or trying something stupid. I will be watching you.", "prisoner_chat_2",[]],
 
   [trp_fugitive,"prisoner_chat_2", [
@@ -43863,7 +43949,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (str_store_troop_name, s5, ":leader"),
     (try_end),
   ], "Though it may seem to you that I have foresworn my service to {s5}, I swear that I was made the scapegoat for the crimes {s4} accused me of.", "fugitive_chat_2",[]],
-  
+
   [anyone|plyr,"fugitive_chat_2", [], "I think not. I'll take the word of {s4} over such a pathetic excuse any day.", "close_window",[]],
   #TODO : assign random motive string instead of binary questioning
   # for example, stolen wealth - offer to share with player
@@ -44297,7 +44383,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   #diplomacy start+ replace {sir/madame} with {my lord/my lady} or {your highness} if appropriate
   [anyone,"hall_guard_duty", [(call_script, "script_dplmc_print_subordinate_says_sir_madame_to_s0"),], "Yes, {s0}. As you wish.", "close_window",[]],
   #SB : allow filtering of larger courts
-  
+
   [anyone|plyr,"hall_guard_talk", [
     (is_between, "$g_player_court", centers_begin, centers_end),
     (eq, "$g_player_court", "$current_town"),
@@ -44346,7 +44432,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    (call_script, "script_enter_court_staff", "$current_town", "p_temp_party_2"),
    (party_set_slot, "$current_town", slot_party_temp_slot_1, "p_temp_party_2"), #2nd mode
    ]],
-   
+
   [anyone,"dplmc_guard_talk_enter_court", [
     (eq, "$temp", 0), #none in stack
     (call_script, "script_dplmc_print_subordinate_says_sir_madame_to_s0"),
@@ -44361,7 +44447,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    [
      (call_script, "script_dplmc_enter_court_aux", "$current_town", "p_temp_party_2"),
    ]],
-   
+
   #normal mode
   [anyone,"dplmc_guard_talk_reenter_court", [],
    "As you wish. The court shall be convened momentarily.", "close_window",
@@ -44369,7 +44455,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
      (party_set_slot, "$current_town", slot_party_temp_slot_1, 0),
      (call_script, "script_enter_court", "$current_town"),
    ]],
-   
+
   #diplomacy end+
   #SB : allow reassignment of guard troops if the player has no culture preference
   [anyone|plyr,"hall_guard_talk", [
@@ -44381,7 +44467,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
      (assign, "$diplomacy_var", slot_faction_guard_troop), #slot to change
      (assign, "$diplomacy_var2", 21), #level requirement, include pre-knight horsemen troops
    ]],
-   
+
   [anyone,"dplmc_guard_talk_replace", [],
    "I see... Who would you replace me with?", "dplmc_guard_plyr_replace",[]],
    #list members in party, in garrison too
@@ -44426,7 +44512,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   (try_end),
   ],
    "{!}{s1} {reg10?({s2}):}", "dplmc_guard_troop_replaced",[
-   
+
    (store_repeat_object, ":stack_no"), #we already validated above
    (party_stack_get_troop_id, ":troop_no", "p_main_party", ":stack_no"),
    (faction_set_slot, "$players_kingdom", slot_faction_temp_slot, ":troop_no"),
@@ -44500,8 +44586,8 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 #using s0 and script_dplmc_print_subordinate_says_sir_madame_to_s0"
   [anyone,"member_chat", [(call_script, "script_dplmc_print_subordinate_says_sir_madame_to_s0"),], "Your orders {s0}?", "regular_member_talk",[]],
   [anyone|plyr,"regular_member_talk", [], "Tell me about yourself", "view_regular_char_requested",[]],
-  #SB : quest convenience 
-  
+  #SB : quest convenience
+
   [anyone,"view_regular_char_requested", [(call_script, "script_dplmc_print_subordinate_says_sir_madame_to_s0"),], "Aye {s0}. Let me tell you all there is to know about me.", "do_regular_member_view_char",[[change_screen_view_character]]],
 ##diplomacy end+
   [anyone,"do_regular_member_view_char", [], "Anything else?", "regular_member_talk",[]],
@@ -44550,7 +44636,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (troop_raise_skill, "trp_temp_array_b", skl_power_throw, 10),
       (troop_raise_skill, "trp_temp_array_b", skl_riding, 10),
       (troop_raise_attribute, "trp_temp_array_b", ca_strength, 30),
-    
+
       #copy max of facekeys, overriding tableau troop doesn't reflect equipment
       (str_store_troop_face_keys, s13, "$g_talk_troop", 1),
       (troop_set_face_keys, "trp_temp_array_b", s13, 0),
@@ -44865,7 +44951,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   "{!}Okay.  I'll just give you the reward, and we can assume that all of this already happened.", "close_window",
   [
 	#Setup quest 1: recruit 5 men
-	(troop_add_gold, "trp_player", 100),
+	(troop_add_gold, "trp_player", 3000),
     (str_store_troop_name, s9, "$g_talk_troop"),
     (str_store_party_name, s1, "$g_starting_town"),
     (str_store_string, s2, "str_start_up_quest_message_1"),
@@ -44889,15 +44975,19 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
 	(assign, "$relative_of_merchant_is_found", 1),
 	(call_script, "script_succeed_quest", "qst_save_relative_of_merchant"),
 	(call_script, "script_finish_quest", "qst_save_relative_of_merchant", 100),
-	(troop_add_gold, "trp_player", 200),
+##++START-VEXED++##
+	(troop_add_gold, "trp_player", 1000),
 	#Setup quest 4: fight bandits
+##++END-VEXED++##
 	(str_store_party_name_link, s9, "$g_starting_town"),
 	(str_store_string, s2, "str_save_town_from_bandits"),
 	(call_script, "script_start_quest", "qst_save_town_from_bandits", "$g_talk_troop"),
 	#Finish quest 4
 	(assign, "$current_startup_quest_phase", 4),
-	(call_script, "script_change_player_relation_with_center", "$g_starting_town", 1),
-	(troop_add_gold, "trp_player", 200),
+##++START-VEXED++##
+	(call_script, "script_change_player_relation_with_center", "$g_starting_town", 5),
+	(troop_add_gold, "trp_player", 1000),
+##++END-VEXED++##
     (call_script, "script_succeed_quest", "qst_save_town_from_bandits"),
     (call_script, "script_end_quest", "qst_save_town_from_bandits"),
 	#So he'll reappear in the tavern (unless you don't immediately speak with him)
@@ -44912,9 +45002,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone,"merchant_quest_1b",
   [
   ],
-  "You won't be able to do this by yourself, though. If you try and take on the whole gang singlehandedly, the hunter will become the hunted, I'll warrant. You'll first want to round up a group of volunteers. There's always a few lads in the villages around here, looking for a bit of work that's more interesting than tilling the soil or hauling water. They'll follow you if you pay. So... Take this purse of 100 denars. Consider it an advance on your reward. Go round to the villages, and use the money to hire some help. I'll reckon that you need at least five men to take on these bandits.", "merchant_quest_1c",
+  "You won't be able to do this by yourself, though. If you try and take on the whole gang singlehandedly, the hunter will become the hunted, I'll warrant. You'll first want to round up a group of volunteers. There's always a few lads in the villages around here, looking for a bit of work that's more interesting than tilling the soil or hauling water. They'll follow you if you pay. So... Take this purse of 1000 denars. Consider it an advance on your reward. Go round to the villages, and use the money to hire some help. I'll reckon that you need at least fifteen men to take on these bandits.", "merchant_quest_1c",
   [
-    (call_script, "script_troop_add_gold", "trp_player", 100),
+    (call_script, "script_troop_add_gold", "trp_player", 1000),
 
     (str_store_troop_name, s9, "$g_talk_troop"),
     (str_store_party_name_link, s1, "$g_starting_town"), #SB : link center
@@ -44944,7 +45034,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
       (assign, ":chance", 100), #salvage chance
       (try_for_range, ":item_slot", ek_item_0, ek_head),
         (troop_get_inventory_slot, ":item_no", "trp_bandit", ":item_slot"),
-        (gt, ":item_no", 0), 
+        (gt, ":item_no", 0),
         (store_random_in_range, ":random_no", 0, 100),
         (lt, ":random_no", ":chance"),
         (troop_add_item, "trp_player", ":item_no", 0),
@@ -44955,7 +45045,7 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   ]],
 
    # Merc Camp Begin
-# Balion	
+# Balion
   [anyone ,"start", [(eq,"$g_talk_troop","trp_konrad"),], "Good day, {sir/madam}. Here to take a look at Balion's finest?", "mercenary_recruit",[]],
 # Geroia
   [anyone ,"start", [(eq,"$g_talk_troop","trp_vernid"),], "Courage and discipline makes Geroia's strenght, perhaps you would like a demonstration?", "mercenary_recruit",[]],
@@ -44963,36 +45053,36 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone ,"start", [(eq,"$g_talk_troop","trp_sverre"),], "Speak Southerner, what brings you to our camp?", "mercenary_recruit",[]],
 # Zendar
   [anyone ,"start", [(eq,"$g_talk_troop","trp_stavros"),], "What brings you to this cold and desolate place?", "mercenary_recruit",[]],
- 
+
 # Generic
   [anyone|plyr,"mercenary_recruit", [], "I wish to recruit some of your men.", "mercenary_buy_troops",[]],
 
   [anyone,"mercenary_buy_troops", [], "I'll gather the men available, they'll do anything you say as long as you pay them for it.", "mercenary_buy_troops_2",
   [
   (set_mercenary_source_party,"$g_talk_troop_party"),
-  (change_screen_buy_mercenaries) 
+  (change_screen_buy_mercenaries)
   ]],
- 
+
   # Backstory
-# Balion 
+# Balion
    [anyone|plyr,"mercenary_recruit", [(eq,"$g_talk_troop","trp_konrad"),], "Tell me about the land of Balion and how you arrived in Calradia.", "balion_backstory",[]],
    [anyone,"balion_backstory", [], "The lands of Balion lay beyond the Calradian sea, a great island with vast grasslands separated by mountain ranges, lush forests pepper the land with fair game for our hunters...", "balion_backstory_2",[]],
    [anyone,"balion_backstory_2", [], "... The Kings of Balion united the tribes under a single banner after fending off several invasions of the Calradian Empire and the Northmen of Jumne. After decades of peace and prosperity they looked for new lands to conquer and Calradia seemed a good place to start.", "balion_backstory_3",[]],
    [anyone,"balion_backstory_3", [], "This castle here was built as a staging area for the main invasion force but soon after it was built, the King received news of rebelling Earls trying to seize power in his absence. Prompting him to return home and fight a civil war that is still unresolved to this day.", "balion_backstory_4",[]],
    [anyone,"balion_backstory_4", [], "Myself? I left Balion with a company of men to serve as a mercenary here in Calradia, I enjoyed my time for the most part but I earned myself some nasty wounds that hampered my ability to fight. I had to look for other ways to make money so I claimed this abandoned fortress and through my contacts in Balion I keep a steady flow of Knights and mercenaries that wish to have no part in the civil war but still wish to earn their fame in battle.", "mercenary_recruit",[]],
-# Geroia 
+# Geroia
    [anyone|plyr,"mercenary_recruit", [(eq,"$g_talk_troop","trp_vernid"),], "What brings you to Calradia?", "geroia_backstory",[]],
    [anyone,"geroia_backstory", [], "Trade. The Counts of Geroia try to maintain trade posts everywhere possible and Calradia is no exception, even though our first expeditions were a disaster.", "geroia_backstory_2",[]],
    [anyone,"geroia_backstory_2", [], "Calradia has a serious banditry problem and even though we always escort our caravans with a handful of guards they still managed to overpower them and seize our trade goods.", "geroia_backstory_3",[]],
    [anyone,"geroia_backstory_3", [], "Our own reputation at stake, the Counts commissioned me to lead a Geroian company to guard our caravans and wage war against bandits. We managed to dissolve the larger groups but many still remain, in the process we managed to earn ourselves a name here in Calradia, Kings seek our services and bandits fear us.", "geroia_backstory_4",[]],
    [anyone,"geroia_backstory_4", [], "Since most bandits now wouldn't dare attacking our caravans, most of our forces are sought after for other purposes. Be it military trainers, advisors or mercenaries.", "mercenary_recruit",[]],
-# Geroia 
+# Geroia
    [anyone|plyr,"mercenary_recruit", [(eq,"$g_talk_troop","trp_sverre"),], "What can you tell me about Jumne and its warriors?", "jumne_backstory",[]],
    [anyone,"jumne_backstory", [], "Hah, here for a tale Southerner? Very well I will oblige. The icy lands of Jumne lay very far to the north-west of Calradia, your Vaegirs complain of their cold winters but theirs is nothing compared to the one in Jumne.", "jumne_backstory_2",[]],
    [anyone,"jumne_backstory_2", [], "There is no place our explorers haven't reached and no place our warriors haven't fought. Calradia, Balion, Geroia and many other lands suffered the wrath of the Northmen and our name brought fear on all of them.", "jumne_backstory_3",[]],
    [anyone,"jumne_backstory_3", [], "The Nords may be our descendants from the times we invaded Calradia but they bear little resemblance to the peoples of Jumne, they have forsaken most of their heritage and gods and adopted many customs of the Calradians. Pathetic.", "jumne_backstory_4",[]],
    [anyone,"jumne_backstory_4", [], "Now the tribes are scattered and there is no great King to unite them towards a common goal so many turn to trading, raiding or mercenary work. I do all three depending on my mood, today you caught me in a good mood so better not waste it.", "mercenary_recruit",[]],
-# Geroia 
+# Geroia
    [anyone|plyr,"mercenary_recruit", [(eq,"$g_talk_troop","trp_stavros"),], "What happened here?", "zendar_backstory",[]],
    [anyone,"zendar_backstory", [], "Are you so young that you have never heard of the fall of Zendar? Well then allow me to tell you the tale, not one with a happy ending as you can see...", "zendar_backstory_2",[]],
    [anyone,"zendar_backstory_2", [], "A few decades ago stood here the city-state of Zendar. A merchant hub where all the peoples of Calradia did trade and it was neutral ground to all, many treaties were signed here and all respected Zendar's neutrality.", "zendar_backstory_3",[]],
@@ -45001,9 +45091,9 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
    [anyone,"zendar_backstory_5", [], "One deception led to another however, somehow the Sea Raiders knew we set a trap to the river pirates and allowed us to proceed with it whilst they attacked a Zendar depleted of its defenders. They killed Hareck, slaughtered the populace and burned everything they couldn't carry. We saw the smoke on the horizon but still arrived too late, Zendar was ablaze and would never recover.", "zendar_backstory_6",[]],
    [anyone,"zendar_backstory_6", [], "The survivors scattered around Calradia and some such as myself vowed that no bandit in Calradia shall know rest whilst the men of Zendar still draw breath. They banded together to form groups of manhunters that would seek to destroy bandits roaming Calradia but what started as a noble goal soon turned into the very thing they sought to destroy, bands of slavers that cared only for gold.", "zendar_backstory_7",[]],
    [anyone,"zendar_backstory_7", [], "I grew old and tired of that life and now I seek to rebuild, I know I won't see Zendar stand again in my lifetime but perhaps through my efforts I will set its reconstruction in motion. I'm gathering here refugees and the old guard of Zendar so they may make use of their services for a nobler goal.", "mercenary_recruit",[]],
-				
+
    [anyone,"mercenary_buy_troops_2", [], "Anything else?", "mercenary_recruit",[]],
-   [anyone|plyr ,"mercenary_recruit", [],  "I'll be on my way.", "close_window", []],		
+   [anyone|plyr ,"mercenary_recruit", [],  "I'll be on my way.", "close_window", []],
   # Merc Camp End
 
   #[anyone, "merchant_all_quest_completed",
@@ -45550,4 +45640,3 @@ I suppose there are plenty of bounty hunters around to get the job done . . .", 
   [anyone|plyr,"free", [[neg|in_meta_mission]], " [Leave]", "close_window",[]],
 #  [anyone,"free", [], "NO MATCHING SENTENCE!", "close_window",[]],
 ]
-
