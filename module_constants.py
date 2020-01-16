@@ -2677,3 +2677,6 @@ slot_last_beers_time   = 521
 #camel fear mod do not remove
 camels_begin = "itm_pack_camel"
 camels_end = "itm_arrows"
+
+slot_troop_kill_count = 163
+slot_troop_wounded_count = 164
