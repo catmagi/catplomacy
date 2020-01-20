@@ -193,3 +193,6 @@ icon_dedal_map_swadia_lord_a = 191
 icon_dedal_map_rhodok_king_a = 192
 icon_dedal_map_vaegir_lord_a = 193
 icon_dedal_map_sarranid_lord_a = 194
+icon_heraldic_banner_01 = 195
+icon_heraldic_banner_02 = 196
+icon_heraldic_banner_03 = 197

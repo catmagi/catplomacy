@@ -2614,7 +2614,7 @@ slot_team_d0_formation_x               = 129 #plus 8 more for the other division
 slot_team_d0_formation_y               = 138 #plus 8 more for the other divisions
 slot_team_d0_formation_zrot            = 147 #plus 8 more for the other divisions
 
-reset_team_stats_begin = slot_team_size  
+reset_team_stats_begin = slot_team_size
 reset_team_stats_end   = slot_team_d0_y + 8 + 1
 
 #Slot Division Type definitions

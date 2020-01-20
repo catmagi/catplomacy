@@ -914,11 +914,11 @@ troops = [
                itm.book_engineering, itm.book_weapon_mastery],def_attrib|level(5),wp(20),knows_common,merchant_face_1, merchant_face_2],
 
 # Tavern minstrel.
-  ["tavern_minstrel_1","Wandering Minstrel","Minstrel",tf_hero|tf_randomize_face|tf_guarantee_shield|tf_guarantee_armor|tf_guarantee_boots, 0, reserved, fac.commoners,[itm.leather_jacket, itm.hide_boots, itm.lute],def_attrib|level(5),wp(20),knows_common,merchant_face_1,merchant_face_2], #lute
-  ["tavern_minstrel_2","Wandering Bard","Minstrel",tf_hero|tf_randomize_face|tf_guarantee_shield|tf_guarantee_armor|tf_guarantee_boots, 0, reserved, fac.commoners,[itm.tunic_with_green_cape, itm.hide_boots, itm.lyre],def_attrib|level(5),wp(20),knows_common,merchant_face_1,merchant_face_2],  #early harp/lyre
-  ["tavern_minstrel_3","Wandering Ashik","Minstrel",tf_hero|tf_randomize_face|tf_guarantee_shield|tf_guarantee_armor|tf_guarantee_boots, 0, reserved, fac.commoners,[itm.nomad_robe, itm.hide_boots, itm.lute],def_attrib|level(5),wp(20),knows_common,merchant_face_1,merchant_face_2], #lute/oud or rebab
-  ["tavern_minstrel_4","Wandering Skald","Minstrel",tf_hero|tf_randomize_face|tf_guarantee_shield|tf_guarantee_armor|tf_guarantee_boots, 0, reserved, fac.commoners,[itm.fur_coat, itm.hide_boots, itm.lyre],def_attrib|level(5),wp(20),knows_common,merchant_face_1,merchant_face_2], #No instrument or lyre
-  ["tavern_minstrel_5","Wandering Troubadour","Minstrel",tf_hero|tf_randomize_face|tf_guarantee_shield|tf_guarantee_armor|tf_guarantee_boots, 0, reserved, fac.commoners,[itm.short_tunic, itm.hide_boots, itm.lute],def_attrib|level(5),wp(20),knows_common,merchant_face_1,merchant_face_2], #Lute or Byzantine/Occitan lyra
+  ["tavern_minstrel_1","Wandering Minstrel","Minstrel",tf_hero|tf_randomize_face|tf_guarantee_shield|tf_guarantee_armor|tf_guarantee_boots, 0, reserved, fac.commoners,[itm.leather_jacket, itm.hide_boots, itm.lute, itm.dedal_lutnia],def_attrib|level(5),wp(20),knows_common,merchant_face_1,merchant_face_2], #lute
+  ["tavern_minstrel_2","Wandering Bard","Minstrel",tf_hero|tf_randomize_face|tf_guarantee_shield|tf_guarantee_armor|tf_guarantee_boots, 0, reserved, fac.commoners,[itm.tunic_with_green_cape, itm.hide_boots, itm.lyre, itm.dedal_lira],def_attrib|level(5),wp(20),knows_common,merchant_face_1,merchant_face_2],  #early harp/lyre
+  ["tavern_minstrel_3","Wandering Ashik","Minstrel",tf_hero|tf_randomize_face|tf_guarantee_shield|tf_guarantee_armor|tf_guarantee_boots, 0, reserved, fac.commoners,[itm.nomad_robe, itm.hide_boots, itm.lute, itm.dedal_lutnia],def_attrib|level(5),wp(20),knows_common,merchant_face_1,merchant_face_2], #lute/oud or rebab
+  ["tavern_minstrel_4","Wandering Skald","Minstrel",tf_hero|tf_randomize_face|tf_guarantee_shield|tf_guarantee_armor|tf_guarantee_boots, 0, reserved, fac.commoners,[itm.fur_coat, itm.hide_boots, itm.lyre, itm.dedal_lira],def_attrib|level(5),wp(20),knows_common,merchant_face_1,merchant_face_2], #No instrument or lyre
+  ["tavern_minstrel_5","Wandering Troubadour","Minstrel",tf_hero|tf_randomize_face|tf_guarantee_shield|tf_guarantee_armor|tf_guarantee_boots, 0, reserved, fac.commoners,[itm.short_tunic, itm.hide_boots, itm.lute, itm.dedal_lutnia],def_attrib|level(5),wp(20),knows_common,merchant_face_1,merchant_face_2], #Lute or Byzantine/Occitan lyra
 
 #NPC system changes begin
 #Companions
@@ -2740,6 +2740,11 @@ troops = [
   ["common_footman","Footman","Footmen",tf_guarantee_boots|tf_guarantee_armor|tf_guarantee_shield,no_scene,reserved,fac.commoners,
    [itm.spiked_club,itm.fighting_pick,itm.sword_medieval_a,itm.boar_spear,itm.tab_shield_round_a,itm.tab_shield_round_b,itm.padded_cloth,itm.leather_jerkin,itm.leather_cap,itm.padded_coif,itm.footman_helmet,itm.nomad_boots,itm.wrapping_boots],
    def_attrib|level(9),wp(75),knows_common|knows_shield_1,mercenary_face_1, mercenary_face_2],
+#dedal
+["musican_male","Musican","Musican",tf_guarantee_boots|tf_guarantee_armor,0,0,fac_commoners,[itm_short_tunic,itm_linen_tunic,itm_tabard,itm_woolen_hose,itm_blue_hose],def_attrib|level(4),wp(60),knows_common,man_face_young_1, man_face_old_2],
+["musican_female","Musican","Musican",tf_female|tf_guarantee_boots|tf_guarantee_armor,0,0,fac_commoners,[itm_blue_dress,itm_dress,itm_woolen_dress,itm_peasant_dress,itm_woolen_hose,itm_blue_hose,itm_wimple_a,itm_wimple_with_veil,itm_female_hood],def_attrib|level(2),wp(40),knows_common,woman_face_1,woman_face_2],
+["musicans_end","_","_",tf_inactive,0,0,0,[],0,0,0,0],
+
 ]
 
 

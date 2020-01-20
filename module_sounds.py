@@ -228,4 +228,7 @@ sounds = [
  ("sounds_end", sf_priority_10|sf_vol_10, ["enemy_scored_a_point.wav"]),
  #INVASION MODE END
  ("horn", sf_priority_1|sf_vol_15, ["horn1.wav", "horn2.wav", "horn3.wav", "horn4.wav", "horn5.wav", "horn6.wav", "horn7.wav"]),
+ ("dedal_tavern_lute",	sf_priority_6|sf_vol_5|sf_looping, ["dedal_tavern_lute_1.ogg","dedal_tavern_lute_2.ogg","dedal_tavern_lute_3.ogg"]),
+ ("dedal_tavern_lyre",	sf_priority_6|sf_vol_6|sf_looping, ["dedal_tavern_lyre_1.ogg","dedal_tavern_lyre_2.ogg","dedal_tavern_lyre_3.ogg"]),
+ 
 ]

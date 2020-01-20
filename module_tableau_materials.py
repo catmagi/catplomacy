@@ -1097,5 +1097,241 @@ tableaus = [
     (cur_tableau_add_tableau_mesh, "tableau_troop_profile_alpha_mask", ":troop_no", pos1, 0, 0),
     ]),
 
-  
+  ###############################################################################
+# FISH&CHIP MODIFICATIONS START
+################################################################################
+
+    # CHIP&FISH BANNERS
+
+    ("heraldic_banner_01", 0, "missiles", 256, 256, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (set_fixed_point_multiplier, 100),
+            (init_position, pos1),(position_set_x, pos1, -19),(position_set_y, pos1, 91),(position_move_z, pos1, -20),
+            (cur_tableau_add_mesh, ":banner_mesh", pos1, 79, 0),
+            (init_position, pos1),(position_set_z, pos1, 10),
+            (cur_tableau_add_mesh, "mesh_tableau_mesh_heraldic_banner_01", pos1, 0, 0),
+            (cur_tableau_set_camera_parameters, 0, 100, 100, 0, 100000),
+        ]
+    ),
+    ("heraldic_banner_02", 0, "missiles", 128, 256, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (set_fixed_point_multiplier, 100),
+            (init_position, pos1),(position_set_x, pos1, -58),(position_set_y, pos1, -1),(position_move_z, pos1, -20),(position_rotate_z, pos1, 90),
+            (cur_tableau_add_mesh, ":banner_mesh", pos1, 45, 0),
+            (init_position, pos1),(position_set_z, pos1, 10),
+            (cur_tableau_add_mesh, "mesh_tableau_mesh_heraldic_banner_02", pos1, 0, 0),
+            (cur_tableau_set_camera_parameters, 0, 100, 50, 0, 100000),
+       ]
+    ),
+    ("heraldic_banner_03", 0, "missiles", 512, 256, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (set_fixed_point_multiplier, 100),
+            (init_position, pos1),(position_set_x, pos1, -16),(position_set_y, pos1, 100),(position_move_z, pos1, -20),
+            (cur_tableau_add_mesh, ":banner_mesh", pos1, 87, 0),
+            (init_position, pos1),(position_set_z, pos1, 10),
+            (cur_tableau_add_mesh, "mesh_tableau_mesh_heraldic_banner_03", pos1, 0, 0),
+            (cur_tableau_set_camera_parameters, 0, 100, 200, 0, 100000),
+        ]
+    ),
+
+    # CHIP&FISH HERALDIC ITEMS
+
+    ("heraldic_shirt_a", 0, "shirt_a", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_shirt_a", ":banner_mesh", 14, 125, 92),
+        ]
+    ),
+    ("heraldic_arena_tunicW", 0, "arena_tunicW", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_arena_tunicW", ":banner_mesh", -3, 133, 85),
+        ]
+    ),
+    ("heraldic_rich_tunic_a", 0, "rich_tunic_a", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_rich_tunic_a", ":banner_mesh", 32, 116, 80),
+        ]
+    ),
+    ("heraldic_tabard_b", 0, "tabard_b", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_tabard_b", ":banner_mesh", 52, 110, 67),
+        ]
+    ),
+    ("heraldic_padded_cloth_a", 0, "padded_cloth_a", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_padded_cloth_a", ":banner_mesh", -61, 141, 87),
+        ]
+    ),
+    ("heraldic_padded_cloth_b", 0, "padded_cloth_b", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_padded_cloth_b", ":banner_mesh", -63, 131, 80),
+        ]
+    ),
+    ("heraldic_archers_vest", 0, "archers_vest", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_archers_vest", ":banner_mesh", -61, 115, 60),
+        ]
+    ),
+    ("heraldic_leather_vest_a", 0, "leather_vest_a", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_leather_vest_a", ":banner_mesh", -61, 122, 80),
+        ]
+    ),
+    ("heraldic_sarranid_leather_armor", 0, "sarranid_leather_armor", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_sarranid_leather_armor", ":banner_mesh", 12, 103, 97),
+        ]
+    ),
+    ("heraldic_tribal_warrior_outfit_a", 0, "tribal_warrior_outfit_a", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_tribal_warrior_outfit_a", ":banner_mesh", 0, 65, 100),
+        ]
+    ),
+    ("heraldic_light_mail_and_plate", 0, "light_mail_and_plate", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_light_mail_and_plate", ":banner_mesh", -59, 135, 87),
+        ]
+    ),
+    ("heraldic_mail_and_plate", 0, "mail_and_plate", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_mail_and_plate", ":banner_mesh", -57, 133, 80),
+        ]
+    ),
+    ("heraldic_cuir_bouilli_a", 0, "cuir_bouilli_a", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_cuir_bouilli_a", ":banner_mesh", -71, 127, 80),
+        ]
+    ),
+    ("heraldic_brigandine_b", 0, "brigandine_b", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_brigandine_b", ":banner_mesh", -59, 135, 87),
+        ]
+    ),
+    ("heraldic_arena_armorW", 0, "arena_armorW", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_arena_armorW", ":banner_mesh", -5, 114, 75),
+        ]
+    ),
+    ("heraldic_mail_long_surcoat", 0, "mail_long_surcoat", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_mail_long_surcoat", ":banner_mesh", 54, 90, 70),
+        ]
+    ),
+    ("heraldic_full_plate", 0, "full_plate", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":banner_mesh", 1),
+            (call_script, "script_setup_heraldry", "mesh_camo_tableau_full_plate", ":banner_mesh", 34, 121, 80),
+        ]
+    ),
+
+    # CHIP&FISH CAMO ITEMS
+
+    ("camo_peasant_dress_b", 0, "peasant_dress_b", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_peasant_dress_b", ":instance_id"),
+        ]
+    ),
+    ("camo_blue_dress", 0, "blue_dress", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_blue_dress", ":instance_id"),
+        ]
+    ),
+
+    ("camo_shirt_a", 0, "shirt_a", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_shirt_a", ":instance_id"),
+        ]
+    ),
+    ("camo_arena_tunicW", 0, "arena_tunicW", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_arena_tunicW", ":instance_id"),
+        ]
+    ),
+    ("camo_rich_tunic_a", 0, "rich_tunic_a", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_rich_tunic_a", ":instance_id"),
+        ]
+    ),
+    ("camo_coarse_tunic_a", 0, "coarse_tunic_a", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_coarse_tunic_a", ":instance_id"),
+        ]
+    ),
+    ("camo_tabard_b", 0, "tabard_b", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_tabard_b", ":instance_id"),
+        ]
+    ),
+    ("camo_sarranid_cloth_robe_b", 0, "sarranid_cloth_robe_b", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_sarranid_cloth_robe_b", ":instance_id"),
+        ]
+    ),
+    ("camo_padded_cloth_a", 0, "padded_cloth_a", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_padded_cloth_a", ":instance_id"),
+        ]
+    ),
+    ("camo_padded_cloth_b", 0, "padded_cloth_b", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_padded_cloth_b", ":instance_id"),
+        ]
+    ),
+    ("camo_red_gambeson_a", 0, "red_gambeson_a", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_red_gambeson_a", ":instance_id"),
+        ]
+    ),
+    ("camo_fur_coat", 0, "fur_coat", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_fur_coat", ":instance_id"),
+        ]
+    ),
+    ("camo_archers_vest", 0, "archers_vest", 1024, 1024, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_archers_vest", ":instance_id"),
+        ]
+    ),
+    ("camo_tribal_warrior_outfit_a", 0, "tribal_warrior_outfit_a", 512, 512, 0, 0, 0, 0,
+        [
+            (store_script_param, ":instance_id", 1),
+            (call_script, "script_setup_camouflage", "mesh_camo_tableau_tribal_warrior_outfit_a", ":instance_id"),
+        ]
+    ),
+
+################################################################################
+# FISH&CHIP MODIFICATIONS END
+################################################################################
+
 ]

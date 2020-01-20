@@ -262,4 +262,50 @@ map_icons = [
   ("dedal_map_rhodok_king_a",0,"dedal_map_rhodok_king_a", avatar_scale,snd_gallop, 0.15, 0.173, 0),
   ("dedal_map_vaegir_lord_a",0,"dedal_map_vaegir_lord_a", avatar_scale,snd_gallop, 0.15, 0.173, 0),
   ("dedal_map_sarranid_lord_a",0,"dedal_map_sarranid_lord_a", avatar_scale,snd_gallop, 0.15, 0.173, 0),
+  
+  ################################################################################
+# FISH&CHIP MODIFICATIONS START
+################################################################################
+
+    # Medium square flag
+    ("heraldic_banner_01",0,"heraldic_map_flag_01", banner_scale, 0,
+        [
+            (ti_on_init_map_icon,
+                [
+                	(store_trigger_param_1, ":party_id"),
+                    (call_script, "script_get_banner_mesh_for_party", ":party_id"),
+                    (cur_map_icon_set_tableau_material, "tableau_heraldic_banner_01", reg0),
+                ]
+            ),
+        ]
+    ),
+    # Small horizontal flag
+    ("heraldic_banner_02",0,"heraldic_map_flag_02", banner_scale, 0,
+        [
+            (ti_on_init_map_icon,
+                [
+                	(store_trigger_param_1, ":party_id"),
+                    (call_script, "script_get_banner_mesh_for_party", ":party_id"),
+                    (cur_map_icon_set_tableau_material, "tableau_heraldic_banner_02", reg0),
+                ]
+            ),
+        ]
+    ),
+    # Large tall flag
+    ("heraldic_banner_03",0,"heraldic_map_flag_03", banner_scale, 0,
+        [
+            (ti_on_init_map_icon,
+                [
+                	(store_trigger_param_1, ":party_id"),
+                    (call_script, "script_get_banner_mesh_for_party", ":party_id"),
+                    (cur_map_icon_set_tableau_material, "tableau_heraldic_banner_03", reg0),
+                ]
+            ),
+        ]
+    ),
+
+################################################################################
+# FISH&CHIP MODIFICATIONS END
+################################################################################
+
 ]

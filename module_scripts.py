@@ -77971,4 +77971,87 @@ Born at {s43}^Contact in {s44} of the {s45}.^\
   ]),
 #######################################################################################
 
+################################################################################
+# FISH&CHIP MODIFICATIONS START
+################################################################################
+
+    # Shared script for all FISH&CHIP heraldic items
+    ("setup_heraldry",
+        [
+            (store_script_param, ":heraldic_mesh", 1),
+            (store_script_param, ":banner_mesh", 2),
+            (store_script_param, ":offset_x", 3),
+            (store_script_param, ":offset_y", 4),
+            (store_script_param, ":scale_factor", 5),
+            (set_fixed_point_multiplier, 100),
+            (store_sub, ":background_slot", ":banner_mesh", arms_meshes_begin),
+            (troop_get_slot, ":background_color", "trp_banner_background_color_array", ":background_slot"),
+            (cur_tableau_set_background_color, ":background_color"),
+            (init_position, pos1),
+            (position_set_x, pos1, ":offset_x"),
+            (position_set_y, pos1, ":offset_y"),
+            (position_set_z, pos1, 30),
+            (cur_tableau_add_mesh, ":banner_mesh", pos1, ":scale_factor", 0),
+            (init_position, pos1),
+            (position_set_z, pos1, 60),
+            (cur_tableau_add_mesh, ":heraldic_mesh", pos1, 0, 0),
+            (cur_tableau_set_camera_parameters, 0, 200, 200, 0, 100000),
+        ]
+    ),
+
+    # Shared script for all FISH&CHIP camo items
+    ("setup_camouflage",
+        [
+            (store_script_param, ":tableau_mesh", 1),
+            (store_script_param, ":instance_id", 2),
+            (set_fixed_point_multiplier, 100),
+            (init_position, pos1),
+            (try_begin),
+                (gt, ":instance_id", 0),
+                (cur_tableau_add_mesh, ":instance_id", pos1, 0, 0),
+            (else_try),
+                (store_sub, ":instance_id", 0, ":instance_id"),
+                (val_or, ":instance_id", 0xFF000000),
+                (cur_tableau_set_background_color, ":instance_id"),
+            (try_end),
+            (position_set_z, pos1, 30),
+            (cur_tableau_add_mesh, ":tableau_mesh", pos1, 0, 0),
+            (cur_tableau_set_camera_parameters, 0, 200, 200, 0, 100000),
+        ]
+    ),
+
+    # Retrieve appropriate banner mesh for the party. Party can be a town, a castle, lord's party or player's party.
+    ("get_banner_mesh_for_party",
+        [
+            (store_script_param_1, ":party_id"),
+            (assign, ":lord_id", -1),
+            (try_begin),
+                (this_or_next|party_slot_eq, ":party_id", slot_party_type, spt_castle),
+                (party_slot_eq, ":party_id", slot_party_type, spt_town),
+                (party_get_slot, ":lord_id", ":party_id", slot_town_lord),
+            (else_try),
+                (eq, ":party_id", "p_main_party"),
+                (assign, ":lord_id", "trp_player"),
+            (else_try),
+                (party_slot_eq, ":party_id", slot_party_type, spt_kingdom_hero_party),
+                (party_get_num_companion_stacks, ":stacks", ":party_id"),
+                (gt, ":stacks", 0),
+                (party_stack_get_troop_id, ":lord_id", ":party_id", 0),
+            (try_end),
+            (try_begin),
+                (this_or_next|eq, ":lord_id", "trp_player"),
+                (is_between, ":lord_id", active_npcs_begin, active_npcs_end),
+                (troop_get_slot, reg0, ":lord_id", slot_troop_banner_scene_prop),
+                (val_sub, reg0, banner_scene_props_begin),
+                (val_add, reg0, banner_meshes_begin),
+            (else_try),
+                (assign, reg0, "mesh_banners_default_a"),
+            (try_end),
+        ]
+    ),
+
+################################################################################
+# FISH&CHIP MODIFICATIONS END
+################################################################################
+
 ]
