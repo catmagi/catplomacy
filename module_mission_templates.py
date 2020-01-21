@@ -3708,13 +3708,7 @@ mission_templates = [
      (40,mtef_visitor_source,af_override_horse,0,1,[]),(41,mtef_visitor_source,af_override_horse,0,1,[]),(42,mtef_visitor_source,af_override_horse,0,1,[]),(43,mtef_visitor_source,af_override_horse,0,1,[]),(44,mtef_visitor_source,af_override_horse,0,1,[]),(45,mtef_visitor_source,af_override_horse,0,1,[]),(46,mtef_visitor_source,af_override_horse,0,1,[]),(47,mtef_visitor_source,af_override_horse,0,1,[]),
      ],
     [
-      (1, 0, ti_once, [], [
-          (store_current_scene, ":cur_scene"),
-          (scene_set_slot, ":cur_scene", slot_scene_visited, 1),
-          (call_script, "script_init_town_walker_agents"),
-          (call_script, "script_music_set_situation_with_culture", mtf_sit_travel),
-        ]),
-       (0, 0, ti_once, [],### replace static horse
+	   (0, 0, ti_once, [],### replace static horse
         [(neg|is_edit_mode_enabled),
 	    (try_for_range, ":horse", all_items_begin, all_items_end),#itp_type_horse
 			(item_get_type, ":type", ":horse"),
@@ -3729,6 +3723,13 @@ mission_templates = [
 			(try_end),
 		(try_end),
       ]),
+      (1, 0, ti_once, [], [
+          (store_current_scene, ":cur_scene"),
+          (scene_set_slot, ":cur_scene", slot_scene_visited, 1),
+          (call_script, "script_init_town_walker_agents"),
+          (call_script, "script_music_set_situation_with_culture", mtf_sit_travel),
+        ]),
+      
       (ti_before_mission_start, 0, 0, [], [(call_script, "script_change_banners_and_chest")]),
       (ti_inventory_key_pressed, 0, 0, [
       #SB : same conditions, no weapon switching mid-fight

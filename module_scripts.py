@@ -4962,7 +4962,7 @@ scripts = [
       (else_try),
         (store_character_level, ":troop_level", ":troop_id"),
         (assign, ":wage", ":troop_level"),
-        (val_add, ":wage", 3),
+        (val_add, ":wage", 5),
         (val_mul, ":wage", ":wage"),
         (val_div, ":wage", 25),
       (try_end),
@@ -4970,14 +4970,14 @@ scripts = [
       (try_begin), #mounted troops cost 65% more than the normal cost
         (neg|is_between, ":troop_id", companions_begin, companions_end),
         (troop_is_mounted, ":troop_id"),
-        (val_mul, ":wage", 5),
+        (val_mul, ":wage", 6),
         (val_div, ":wage", 3),
       (try_end),
 
-      (try_begin), #mercenaries cost %50 more than the normal cost
+      (try_begin), #mercenaries cost %25 more than the normal cost
         (is_between, ":troop_id", mercenary_troops_begin, mercenary_troops_end),
-        (val_mul, ":wage", 3),
-        (val_div, ":wage", 2),
+        (val_mul, ":wage", 5), #math done by my lovely girlfriend
+        (val_div, ":wage", 4),
       (try_end),
 
       (try_begin),
@@ -5084,7 +5084,7 @@ scripts = [
         (store_character_level, ":troop_level", ":troop_id"),
         (store_add, ":join_cost", ":troop_level", 5),
         (val_mul, ":join_cost", ":join_cost"),
-        (val_add, ":join_cost", 40),
+        (val_add, ":join_cost", 35),
         (val_div, ":join_cost", 5),
         (try_begin), #mounted troops cost %100 more than the normal cost
           (troop_is_mounted, ":troop_id"),
@@ -38148,7 +38148,7 @@ scripts = [
     [(try_for_range, ":town_no", towns_begin, towns_end),
       (store_random_in_range, ":troop_no", mercenary_troops_begin, mercenary_troops_end),
       (party_set_slot, ":town_no", slot_center_mercenary_troop_type, ":troop_no"),
-      (store_random_in_range, ":amount", 15, 200),
+      (store_random_in_range, ":amount", 5, 150),
 	  ##diplomacy start+
 	  #OPTIONAL CHANGE: The same way that lord party sizes increase as the player
 	  #progresses, also increase mercenary party sizes to maintain their relevance.
@@ -38205,7 +38205,7 @@ scripts = [
          (ge, ":player_relation", 4),
          (assign, ":upper_limit", ":player_relation"),
          (val_div, ":upper_limit", 2),
-         (val_add, ":upper_limit", 6),
+         (val_add, ":upper_limit", 10),
        (else_try),
          (lt, ":player_relation", 0),
          (assign, ":upper_limit", 0),
