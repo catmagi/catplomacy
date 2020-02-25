@@ -988,6 +988,10 @@ troops = [
    str_7|agi_11|int_8|cha_7|level(2),wp(80),knows_tracker_npc|
    knows_power_throw_3|knows_athletics_2|knows_power_strike_1,
    0x00000000000c100739ce9c805d2f381300000000001cc7ad0000000000000000],
+  ["npc17","Mike Lockwhale","Mike Lockwhale",tf_hero|tf_unmoveable_in_party_window, 0, reserved,  fac_commoners,[itm_rich_outfit,itm_nomad_boots, itm_dagger],
+   str_6|agi_12|int_9|cha_8|level(2),wp(100),knows_merchant_npc|
+   knows_power_throw_3|knows_athletics_5|knows_power_strike_2|knows_riding_2,
+   0x00000000000430c701ea98836781647f],
 #NPC system changes end
 
 

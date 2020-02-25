@@ -32402,7 +32402,7 @@ scripts = [
           (agent_start_running_away, ":cur_agent"),
           (agent_set_slot, ":cur_agent",  slot_agent_is_running_away, 1),
         (else_try),
-          (ge, ":mission_time", 45), #first 45 seconds anyone does not run away whatever happens.
+          (ge, ":mission_time", 35), #first 45 seconds anyone does not run away whatever happens.
           (agent_get_slot, ":agent_courage_score", ":cur_agent",  slot_agent_courage_score),
           (store_agent_hit_points, ":agent_hit_points", ":cur_agent"),
           (val_mul, ":agent_hit_points", 4),
@@ -41062,6 +41062,20 @@ scripts = [
         (troop_set_slot, "trp_npc16", slot_troop_kingsupport_opponent, "trp_npc12"), #nizar
         (troop_set_slot, "trp_npc16", slot_troop_town_with_contacts, "p_town_9"), #khudan
         (troop_set_slot, "trp_npc16", slot_lord_reputation_type, lrep_roguish), #
+        
+        (troop_set_slot, "trp_npc17", slot_troop_morality_type, tmt_humanitarian), #new npc
+        (troop_set_slot, "trp_npc17", slot_troop_morality_value, 4),
+        (troop_set_slot, "trp_npc17", slot_troop_2ary_morality_type, -1),
+        (troop_set_slot, "trp_npc17", slot_troop_2ary_morality_value, 0),
+        (troop_set_slot, "trp_npc17", slot_troop_personalityclash_object, "trp_npc16"), #klethi
+        (troop_set_slot, "trp_npc17", slot_troop_personalityclash2_object, "trp_npc1"), #klethi - borcha
+        (troop_set_slot, "trp_npc17", slot_troop_personalitymatch_object, "trp_npc7"),  #deshavi - klethi
+        (troop_set_slot, "trp_npc17", slot_troop_home, "p_village_20"), #Uslum
+        (troop_set_slot, "trp_npc17", slot_troop_payment_request, 10),
+        (troop_set_slot, "trp_npc17", slot_troop_kingsupport_argument, argument_lords),
+        (troop_set_slot, "trp_npc17", slot_troop_kingsupport_opponent, "trp_npc12"), #nizar
+        (troop_set_slot, "trp_npc17", slot_troop_town_with_contacts, "p_town_9"), #khudan
+        (troop_set_slot, "trp_npc17", slot_lord_reputation_type, lrep_roguish), #
 
 
 
@@ -41073,7 +41087,7 @@ scripts = [
             (try_for_range, ":slot_addition", 0, "$number_of_npc_slots"),
                 (store_add, ":slot", ":slot_addition", slot_troop_intro),
 
-                (store_mul, ":string_addition", ":slot_addition", 16),
+                (store_mul, ":string_addition", ":slot_addition", 17),
                 (store_add, ":string", "str_npc1_intro", ":string_addition"),
                 (val_add, ":string", ":npc"),
                 (val_sub, ":string", companions_begin),
