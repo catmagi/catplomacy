@@ -4,6 +4,8 @@ custom version of diplomacy for mount and blade warband I'm working on when I'm 
 
 this may never get finished
 
+repo doesn't directly have the assets used in the mod, you will need to download the most recent release and use the assets from that if you compile this yourself.
+
 credits:
 Oliver from the TW Forum Modding discord, for his already merged formations + diplomacy mods, saved me a ton of heart ache
 
