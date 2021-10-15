@@ -5,7 +5,7 @@ custom version of diplomacy for mount and blade warband I'm working on when I'm 
 this may never get finished
 
 credits:
-Oliver from the TW Forum Modding discord, for his already merged formations + diplomacy modsy, saved me a ton of heart ache
+Oliver from the TW Forum Modding discord, for his already merged formations + diplomacy mods, saved me a ton of heart ache
 
 Diplomacy - http://forums.taleworlds.com/index.php/topic,116424.0.html
 
